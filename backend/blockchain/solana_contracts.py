@@ -170,63 +170,74 @@ class SolanaContractManager:
         if not recipients:
             return True
 
+        BATCH_SIZE = 10
+        recipient_items = list(recipients.items())
+        success = True
+
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
+                # Process in batches
+                for i in range(0, len(recipient_items), BATCH_SIZE):
+                    batch = recipient_items[i:i + BATCH_SIZE]
 
-                # Add transfer instructions for each recipient
-                for address, amount in recipients.items():
-                    # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                    lamports = int(amount * 1_000_000_000)
+                    # Create transaction for this batch
+                    transaction = Transaction()
+                    instructions_added = False
 
-                    if lamports <= 0:
-                        continue
+                    # Add transfer instructions for each recipient in batch
+                    for address, amount in batch:
+                        # Convert SOL to lamports (1 SOL = 1e9 lamports)
+                        lamports = int(amount * 1_000_000_000)
 
-                    try:
-                        to_pubkey = Pubkey.from_string(address)
-                    except ValueError:
-                        logger.error(f"Invalid recipient address: {address}")
-                        continue
+                        if lamports <= 0:
+                            continue
 
-                    ix = transfer(
-                        TransferParams(
-                            from_pubkey=self._payer.pubkey(),
-                            to_pubkey=to_pubkey,
-                            lamports=lamports
+                        try:
+                            to_pubkey = Pubkey.from_string(address)
+                        except ValueError:
+                            logger.error(f"Invalid recipient address: {address}")
+                            continue
+
+                        ix = transfer(
+                            TransferParams(
+                                from_pubkey=self._payer.pubkey(),
+                                to_pubkey=to_pubkey,
+                                lamports=lamports
+                            )
                         )
-                    )
-                    transaction.add(ix)
+                        transaction.add(ix)
+                        instructions_added = True
 
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
+                    if not instructions_added:
+                        continue
 
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
+                    # Get recent blockhash
+                    try:
+                        latest_blockhash_resp = await client.get_latest_blockhash()
+                        latest_blockhash = latest_blockhash_resp.value.blockhash
+                        transaction.recent_blockhash = latest_blockhash
+                    except Exception as e:
+                        logger.error(f"Failed to get latest blockhash: {e}")
+                        success = False
+                        break
 
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
+                    # Send transaction
+                    try:
+                        resp = await client.send_transaction(
+                            transaction,
+                            self._payer
+                        )
+                        logger.info(f"Rewards batch {i//BATCH_SIZE + 1} distributed successfully. Signature: {resp.value}")
+                    except Exception as e:
+                        logger.error(f"Failed to send transaction for batch {i//BATCH_SIZE + 1}: {e}")
+                        success = False
+                        # We continue to try other batches or should we stop?
+                        # Stopping is safer to avoid partial state if possible, but
+                        # continuing allows partial success. Let's stop on failure for now
+                        # as it's easier to debug.
+                        break
 
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
-                    return True
-
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
+                return success
 
             except Exception as e:
                 logger.error(f"Error distributing rewards: {e}")
