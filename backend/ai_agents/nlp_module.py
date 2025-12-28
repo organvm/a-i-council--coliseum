@@ -7,6 +7,7 @@ Provides natural language processing capabilities for AI agents.
 import os
 import json
 import logging
+import re
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 from openai import AsyncOpenAI
@@ -27,7 +28,7 @@ class NLPProcessor:
             self.client = AsyncOpenAI(api_key=self.api_key)
         else:
             self.client = None
-            logger.warning("OPENAI_API_KEY not found. NLP features will use placeholders.")
+            logger.warning("OPENAI_API_KEY not found. NLP features will use placeholders/heuristics.")
     
     async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
         """
@@ -69,6 +70,72 @@ class NLPProcessor:
             return text
         return text[:max_length] + "..."
     
+    def _classify_topic_fallback(self, text: str) -> Dict[str, float]:
+        """
+        Fallback topic classification using keyword matching when API is unavailable.
+        """
+        text_lower = text.lower()
+
+        # Keyword definitions
+        topic_keywords = {
+            "politics": [
+                "government", "election", "vote", "policy", "president", "minister",
+                "law", "democrat", "republican", "parliament", "congress", "senate",
+                "campaign", "candidate", "diplomacy", "treaty", "political"
+            ],
+            "technology": [
+                "computer", "ai", "artificial intelligence", "software", "hardware",
+                "internet", "digital", "tech", "algorithm", "code", "data", "cyber",
+                "crypto", "blockchain", "app", "mobile", "web", "robot", "network",
+                "machine learning", "cloud", "server", "database"
+            ],
+            "economy": [
+                "money", "market", "stock", "trade", "finance", "bank", "inflation",
+                "tax", "currency", "business", "price", "cost", "investment",
+                "budget", "economic", "revenue", "profit", "wealth"
+            ],
+            "entertainment": [
+                "movie", "music", "film", "star", "celebrity", "game", "show",
+                "art", "culture", "media", "song", "concert", "drama", "theatre",
+                "video", "stream", "entertainment"
+            ],
+            "sports": [
+                "game", "match", "team", "player", "win", "lose", "score", "ball",
+                "league", "tournament", "championship", "sport", "athlete", "medal",
+                "olympic", "cup", "football", "basketball", "soccer"
+            ],
+            "science": [
+                "research", "study", "space", "physics", "biology", "chemistry",
+                "climate", "environment", "energy", "health", "medicine", "nasa",
+                "planet", "universe", "experiment", "lab", "scientific"
+            ]
+        }
+
+        scores = {topic: 0.0 for topic in topic_keywords}
+        total_hits = 0
+
+        for topic, keywords in topic_keywords.items():
+            for keyword in keywords:
+                # Use regex to match whole words/phrases
+                # Escape keyword to handle special chars if any
+                pattern = r'\b' + re.escape(keyword) + r'\b'
+                matches = len(re.findall(pattern, text_lower))
+                if matches > 0:
+                    scores[topic] += matches
+                    total_hits += matches
+
+        if total_hits == 0:
+            return {"general": 1.0}
+
+        # Normalize scores
+        results = {}
+        for topic, score in scores.items():
+            if score > 0:
+                results[topic] = round(score / total_hits, 2)
+
+        # Sort by confidence
+        return dict(sorted(results.items(), key=lambda x: x[1], reverse=True))
+
     async def classify_topic(self, text: str) -> Dict[str, float]:
         """
         Classify text into topic categories
@@ -77,12 +144,7 @@ class NLPProcessor:
             Dict of topics with confidence scores
         """
         if not self.client:
-            # Fallback for when API is not available
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
+            return self._classify_topic_fallback(text)
 
         prompt = f"""
         Classify the following text into relevant topics (e.g., politics, technology, economy, entertainment, sports, science).
@@ -107,11 +169,7 @@ class NLPProcessor:
                 return {"error": 1.0}
         except Exception as e:
             logger.error(f"Error classifying topic: {e}")
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
+            return self._classify_topic_fallback(text)
     
     async def extract_keywords(self, text: str, top_k: int = 5) -> List[str]:
         """
