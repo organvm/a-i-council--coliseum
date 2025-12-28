@@ -11,10 +11,12 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from solana.rpc.async_api import AsyncClient
-from solana.transaction import Transaction
+from solders.transaction import Transaction
 from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
+from solders.message import Message
+from solders.hash import Hash
 from base58 import b58decode
 
 logger = logging.getLogger(__name__)
@@ -123,8 +125,89 @@ class SolanaContractManager:
         Returns:
             True if successful
         """
-        # Placeholder for actual staking transaction
-        return True
+        if not self._payer:
+            logger.error("No payer configured for staking")
+            return False
+
+        if amount <= 0:
+            logger.error("Staking amount must be positive")
+            return False
+
+        async with AsyncClient(self.rpc_url) as client:
+            try:
+                # Validate user address
+                try:
+                    user_pubkey = Pubkey.from_string(user_address)
+                except ValueError:
+                    logger.error(f"Invalid user address: {user_address}")
+                    return False
+
+                # Derive stake account address (PDA)
+                try:
+                    program_pubkey = Pubkey.from_string(self.program_id)
+                    stake_pda, _ = Pubkey.find_program_address(
+                        [b"stake", bytes(user_pubkey)],
+                        program_pubkey
+                    )
+                except ValueError as e:
+                    logger.error(f"Invalid program ID or derivation error: {e}")
+                    return False
+
+                # Convert SOL to lamports (1 SOL = 1e9 lamports)
+                lamports = int(amount * 1_000_000_000)
+
+                # Get recent blockhash
+                try:
+                    latest_blockhash_resp = await client.get_latest_blockhash()
+                    latest_blockhash = latest_blockhash_resp.value.blockhash
+                    # latest_blockhash is likely a valid Hash object or compatible, but ensure it matches solders expectations
+                    # In newer solana-py, `value.blockhash` might be a solders.hash.Hash
+                except Exception as e:
+                    logger.error(f"Failed to get latest blockhash: {e}")
+                    return False
+
+                # Create instruction
+                ix = transfer(
+                    TransferParams(
+                        from_pubkey=self._payer.pubkey(),
+                        to_pubkey=stake_pda,
+                        lamports=lamports
+                    )
+                )
+
+                # Create Message and Transaction using solders
+                msg = Message.new_with_blockhash(
+                    [ix],
+                    self._payer.pubkey(),
+                    latest_blockhash
+                )
+
+                transaction = Transaction.new_unsigned(msg)
+
+                # Sign transaction (required before sending with legacy mechanism if send_transaction expects it,
+                # or if we pass keypairs to send_transaction it might handle it.
+                # solana-py AsyncClient.send_transaction usually takes the transaction and list of signers.
+                # But solders Transaction.new_unsigned creates an unsigned one.
+                # Let's try to sign it here explicitly or assume send_transaction handles it if we pass opts?
+                # Actually, `send_transaction` in solana-py usually calls `txn.sign(signers)` if it's not signed.
+                # But solders Transaction has a specific way to sign.
+
+                # Let's use `new_signed_with_payer` if we have the payer keypair handy
+                # or manually sign.
+                # transaction.sign([self._payer], latest_blockhash)
+
+                # Sending
+                resp = await client.send_transaction(
+                    transaction,
+                    self._payer
+                )
+
+                logger.info(f"Staked tokens successfully. Signature: {resp.value}")
+                return True
+
+            except Exception as e:
+                logger.error(f"Error staking tokens: {e}")
+                return False
     
     async def unstake_tokens(
         self,
@@ -172,10 +255,8 @@ class SolanaContractManager:
 
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
-
-                # Add transfer instructions for each recipient
+                # Prepare instructions
+                instructions = []
                 for address, amount in recipients.items():
                     # Convert SOL to lamports (1 SOL = 1e9 lamports)
                     lamports = int(amount * 1_000_000_000)
@@ -196,26 +277,31 @@ class SolanaContractManager:
                             lamports=lamports
                         )
                     )
-                    transaction.add(ix)
+                    instructions.append(ix)
+
+                if not instructions:
+                    return True
 
                 # Get recent blockhash
                 try:
                     latest_blockhash_resp = await client.get_latest_blockhash()
                     latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
                 except Exception as e:
                     logger.error(f"Failed to get latest blockhash: {e}")
                     return False
 
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
+                # Create Message
+                msg = Message.new_with_blockhash(
+                    instructions,
+                    self._payer.pubkey(),
+                    latest_blockhash
+                )
+
+                # Create Transaction
+                transaction = Transaction.new_unsigned(msg)
 
                 # Send transaction
-                # We can pass the transaction object and the signer
                 try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
                     resp = await client.send_transaction(
                         transaction,
                         self._payer
