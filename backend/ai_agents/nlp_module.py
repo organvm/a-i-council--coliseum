@@ -69,6 +69,81 @@ class NLPProcessor:
             return text
         return text[:max_length] + "..."
     
+    def _classify_topic_heuristic(self, text: str) -> Dict[str, float]:
+        """
+        Heuristic-based topic classification using keywords.
+        Used as a fallback when LLM is unavailable.
+        """
+        text_lower = text.lower()
+
+        # Keyword dictionaries for different topics
+        topics_keywords = {
+            "politics": [
+                "government", "president", "election", "vote", "policy", "congress",
+                "senate", "law", "democrat", "republican", "campaign", "candidate",
+                "minister", "parliament", "diplomacy", "treaty"
+            ],
+            "technology": [
+                "software", "hardware", "computer", "ai", "artificial intelligence",
+                "internet", "cyber", "digital", "app", "code", "programming",
+                "data", "algorithm", "network", "server", "cloud", "blockchain",
+                "crypto", "iphone", "android", "microsoft", "google", "apple",
+                "python", "javascript", "linux", "database"
+            ],
+            "economy": [
+                "market", "stock", "trade", "finance", "bank", "money", "currency",
+                "inflation", "gdp", "recession", "invest", "economy", "fiscal",
+                "tax", "budget", "business", "corporate", "revenue", "profit"
+            ],
+            "science": [
+                "research", "study", "experiment", "discovery", "space", "nasa",
+                "biology", "physics", "chemistry", "medical", "health", "virus",
+                "vaccine", "climate", "environment", "energy", "scientist"
+            ],
+            "sports": [
+                "game", "match", "team", "player", "score", "win", "loss",
+                "championship", "tournament", "league", "football", "basketball",
+                "soccer", "baseball", "tennis", "olympics", "athlete"
+            ],
+            "entertainment": [
+                "movie", "film", "music", "song", "album", "artist", "actor",
+                "actress", "celebrity", "concert", "show", "series", "netflix",
+                "cinema", "hollywood", "award", "star"
+            ]
+        }
+
+        scores = {topic: 0.0 for topic in topics_keywords}
+        total_matches = 0
+
+        # Count keyword matches
+        for topic, keywords in topics_keywords.items():
+            for keyword in keywords:
+                if keyword in text_lower:
+                    # Simple presence check, could be improved with frequency count
+                    # Adding a small weight for each occurrence
+                    count = text_lower.count(keyword)
+                    scores[topic] += count
+                    total_matches += count
+
+        # Normalize scores
+        if total_matches > 0:
+            normalized_scores = {
+                topic: round(score / total_matches, 2)
+                for topic, score in scores.items()
+                if score > 0
+            }
+            # Ensure we have at least "general" if everything is very low confidence
+            # But here we filter out 0 scores.
+
+            # If the top score is very low, add general?
+            # For now, just return what we found.
+            if not normalized_scores:
+                 return {"general": 1.0}
+
+            return normalized_scores
+        else:
+            return {"general": 1.0}
+
     async def classify_topic(self, text: str) -> Dict[str, float]:
         """
         Classify text into topic categories
@@ -77,12 +152,7 @@ class NLPProcessor:
             Dict of topics with confidence scores
         """
         if not self.client:
-            # Fallback for when API is not available
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
+            return self._classify_topic_heuristic(text)
 
         prompt = f"""
         Classify the following text into relevant topics (e.g., politics, technology, economy, entertainment, sports, science).
@@ -107,11 +177,7 @@ class NLPProcessor:
                 return {"error": 1.0}
         except Exception as e:
             logger.error(f"Error classifying topic: {e}")
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
+            return self._classify_topic_heuristic(text)
     
     async def extract_keywords(self, text: str, top_k: int = 5) -> List[str]:
         """
