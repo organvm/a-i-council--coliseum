@@ -7,6 +7,7 @@ Manages agent memory including short-term and long-term storage.
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from collections import deque
+import heapq
 
 
 class MemoryEntry:
@@ -33,6 +34,8 @@ class MemoryManager:
         self.short_term: deque = deque(maxlen=max_short_term)
         self.long_term: Dict[str, MemoryEntry] = {}
         self.max_long_term = max_long_term
+        # Min-heap storing (expires_at, key) tuples for O(1) expiration check
+        self.expiry_heap: List = []
     
     def add_short_term(self, value: Any) -> None:
         """Add to short-term memory (FIFO queue)"""
@@ -57,6 +60,9 @@ class MemoryManager:
         entry = MemoryEntry(key, value, ttl)
         self.long_term[key] = entry
         
+        if entry.expires_at:
+            heapq.heappush(self.expiry_heap, (entry.expires_at, key))
+
         # Enforce size limit
         if len(self.long_term) > self.max_long_term:
             self._evict_lru()
@@ -84,6 +90,7 @@ class MemoryManager:
     def clear_long_term(self) -> None:
         """Clear long-term memory"""
         self.long_term.clear()
+        self.expiry_heap.clear()
     
     def clear_all(self) -> None:
         """Clear all memory"""
@@ -91,14 +98,22 @@ class MemoryManager:
         self.clear_long_term()
     
     def _clean_expired(self) -> None:
-        """Remove expired entries"""
+        """Remove expired entries using min-heap for O(1) check"""
+        if not self.expiry_heap:
+            return
+
         now = datetime.utcnow()
-        expired_keys = [
-            key for key, entry in self.long_term.items()
-            if entry.expires_at and entry.expires_at < now
-        ]
-        for key in expired_keys:
-            del self.long_term[key]
+
+        # Peek at the soonest expiring item
+        while self.expiry_heap and self.expiry_heap[0][0] < now:
+            expires_at, key = heapq.heappop(self.expiry_heap)
+
+            # Lazy deletion check: verify key exists and expiration matches
+            # This handles cases where key was updated/removed or updated with new TTL
+            if key in self.long_term:
+                entry = self.long_term[key]
+                if entry.expires_at == expires_at:
+                    del self.long_term[key]
     
     def _evict_lru(self) -> None:
         """Evict least recently used entry"""
