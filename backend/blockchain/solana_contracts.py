@@ -15,6 +15,7 @@ from solana.transaction import Transaction
 from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
+from solders.hash import Hash
 from base58 import b58decode
 
 logger = logging.getLogger(__name__)
@@ -157,11 +158,10 @@ class SolanaContractManager:
         Distribute rewards to multiple recipients
         
         Args:
-            recipients: Dict of address -> amount (in SOL or Lamports?)
-            Assuming amount is in SOL for now, need to convert to Lamports.
+            recipients: Dict of address -> amount (in SOL)
             
         Returns:
-            True if successful
+            True if successful (all batches processed successfully)
         """
         if not self._payer:
             logger.error("No payer configured for reward distribution")
@@ -170,67 +170,75 @@ class SolanaContractManager:
         if not recipients:
             return True
 
+        # Process in batches to avoid transaction size limits
+        BATCH_SIZE = 20
+        items = list(recipients.items())
+        all_success = True
+
         async with AsyncClient(self.rpc_url) as client:
-            try:
-                # Create transaction
-                transaction = Transaction()
+            for i in range(0, len(items), BATCH_SIZE):
+                batch = items[i:i + BATCH_SIZE]
+                try:
+                    # Create transaction
+                    transaction = Transaction()
+                    instructions_added = False
 
-                # Add transfer instructions for each recipient
-                for address, amount in recipients.items():
-                    # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                    lamports = int(amount * 1_000_000_000)
+                    # Add transfer instructions for each recipient in batch
+                    for address, amount in batch:
+                        # Convert SOL to lamports (1 SOL = 1e9 lamports)
+                        # Use round to avoid floating point precision issues
+                        lamports = int(round(amount * 1_000_000_000))
 
-                    if lamports <= 0:
-                        continue
+                        if lamports <= 0:
+                            continue
 
-                    try:
-                        to_pubkey = Pubkey.from_string(address)
-                    except ValueError:
-                        logger.error(f"Invalid recipient address: {address}")
-                        continue
+                        try:
+                            to_pubkey = Pubkey.from_string(address)
+                        except ValueError:
+                            logger.error(f"Invalid recipient address: {address}")
+                            all_success = False
+                            continue
 
-                    ix = transfer(
-                        TransferParams(
-                            from_pubkey=self._payer.pubkey(),
-                            to_pubkey=to_pubkey,
-                            lamports=lamports
+                        ix = transfer(
+                            TransferParams(
+                                from_pubkey=self._payer.pubkey(),
+                                to_pubkey=to_pubkey,
+                                lamports=lamports
+                            )
                         )
-                    )
-                    transaction.add(ix)
+                        transaction.add(ix)
+                        instructions_added = True
 
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
+                    if not instructions_added:
+                        continue
+
+                    # Get recent blockhash
+                    try:
+                        latest_blockhash_resp = await client.get_latest_blockhash()
+                        latest_blockhash = latest_blockhash_resp.value.blockhash
+                        transaction.recent_blockhash = latest_blockhash
+                    except Exception as e:
+                        logger.error(f"Failed to get latest blockhash: {e}")
+                        all_success = False
+                        continue
+
+                    # Send transaction
+                    try:
+                        resp = await client.send_transaction(
+                            transaction,
+                            self._payer
+                        )
+                        logger.info(f"Rewards batch {i//BATCH_SIZE + 1} distributed successfully. Signature: {resp.value}")
+
+                    except Exception as e:
+                        logger.error(f"Failed to send transaction batch {i//BATCH_SIZE + 1}: {e}")
+                        all_success = False
+
                 except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
+                    logger.error(f"Error processing reward batch {i//BATCH_SIZE + 1}: {e}")
+                    all_success = False
 
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
-
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
-
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
-                    return True
-
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
-
-            except Exception as e:
-                logger.error(f"Error distributing rewards: {e}")
-                return False
+        return all_success
     
     def get_program_accounts(self) -> List[SolanaAccount]:
         """Get all program accounts"""
