@@ -57,8 +57,49 @@ class SolanaContractManager:
     
     async def initialize_council_program(self) -> bool:
         """Initialize the council selection program"""
-        # Placeholder for actual Solana program initialization
-        return True
+        try:
+            # Check if RPC URL is set
+            if not self.rpc_url:
+                logger.error("RPC URL not configured")
+                return False
+
+            async with AsyncClient(self.rpc_url) as client:
+                # 1. Check connection
+                try:
+                    version = await client.get_version()
+                    logger.info(f"Connected to Solana cluster: {version.value}")
+                except Exception as e:
+                    logger.error(f"Failed to connect to Solana cluster: {e}")
+                    return False
+
+                # 2. Verify Program ID
+                try:
+                    program_pubkey = Pubkey.from_string(self.program_id)
+                except ValueError:
+                    logger.error(f"Invalid program ID format: {self.program_id}")
+                    return False
+
+                # 3. Check Program Account
+                try:
+                    account_info = await client.get_account_info(program_pubkey)
+                    if account_info.value is None:
+                        logger.error(f"Program account not found: {self.program_id}")
+                        return False
+
+                    if not account_info.value.executable:
+                        logger.error(f"Account is not executable (not a program): {self.program_id}")
+                        return False
+
+                    logger.info(f"Council program verified: {self.program_id}")
+                    return True
+
+                except Exception as e:
+                    logger.error(f"Failed to verify program account: {e}")
+                    return False
+
+        except Exception as e:
+            logger.error(f"Error initializing council program: {e}")
+            return False
     
     async def create_council_account(
         self,
