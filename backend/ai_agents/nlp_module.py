@@ -64,10 +64,46 @@ class NLPProcessor:
         Returns:
             Summarized text
         """
-        # Placeholder for actual summarization
-        if len(text) <= max_length:
-            return text
-        return text[:max_length] + "..."
+        if not self.client:
+            # Fallback for when API is not available
+            if len(text) <= max_length:
+                return text
+            return text[:max_length] + "..."
+
+        prompt = f"""
+        Summarize the following text efficiently. The summary must be under {max_length} characters.
+
+        Text: {text}
+        """
+
+        try:
+            response = await self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant that summarizes text."},
+                    {"role": "user", "content": prompt}
+                ]
+            )
+            content = response.choices[0].message.content
+            if content:
+                # Ensure the summary respects the max_length constraint as a safety net
+                if len(content) > max_length:
+                    # Handle edge case where max_length is very small
+                    slice_idx = max(0, max_length - 3)
+                    return content[:slice_idx] + "..."
+                return content
+
+            # If content is empty, fall back to slicing
+            if len(text) <= max_length:
+                return text
+            return text[:max_length] + "..."
+
+        except Exception as e:
+            logger.error(f"Error summarizing text: {e}")
+            # Fallback on error
+            if len(text) <= max_length:
+                return text
+            return text[:max_length] + "..."
     
     async def classify_topic(self, text: str) -> Dict[str, float]:
         """
