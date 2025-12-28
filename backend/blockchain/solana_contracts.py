@@ -11,7 +11,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from solana.rpc.async_api import AsyncClient
-from solana.transaction import Transaction
+from solders.transaction import Transaction
+from solders.message import Message
 from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
@@ -157,8 +158,7 @@ class SolanaContractManager:
         Distribute rewards to multiple recipients
         
         Args:
-            recipients: Dict of address -> amount (in SOL or Lamports?)
-            Assuming amount is in SOL for now, need to convert to Lamports.
+            recipients: Dict of address -> amount (in SOL)
             
         Returns:
             True if successful
@@ -172,13 +172,12 @@ class SolanaContractManager:
 
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
+                instructions = []
 
                 # Add transfer instructions for each recipient
                 for address, amount in recipients.items():
                     # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                    lamports = int(amount * 1_000_000_000)
+                    lamports = int(round(amount * 1_000_000_000))
 
                     if lamports <= 0:
                         continue
@@ -196,37 +195,36 @@ class SolanaContractManager:
                             lamports=lamports
                         )
                     )
-                    transaction.add(ix)
+                    instructions.append(ix)
 
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
-
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
-
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
-
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
+                if not instructions:
+                    logger.info("No valid instructions generated for rewards")
                     return True
 
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
+                # Batch instructions to respect transaction size limits
+                # Limit roughly 20 transfers per transaction to be safe
+                BATCH_SIZE = 20
+                success = True
+
+                for i in range(0, len(instructions), BATCH_SIZE):
+                    batch = instructions[i:i + BATCH_SIZE]
+
+                    try:
+                        # Get recent blockhash for each batch
+                        latest_blockhash_resp = await client.get_latest_blockhash()
+                        latest_blockhash = latest_blockhash_resp.value.blockhash
+
+                        msg = Message(batch, self._payer.pubkey())
+                        transaction = Transaction([self._payer], msg, latest_blockhash)
+
+                        resp = await client.send_transaction(transaction)
+                        logger.info(f"Rewards batch {i//BATCH_SIZE + 1} distributed successfully. Signature: {resp.value}")
+
+                    except Exception as e:
+                        logger.error(f"Failed to send reward batch {i//BATCH_SIZE + 1}: {e}")
+                        success = False
+
+                return success
 
             except Exception as e:
                 logger.error(f"Error distributing rewards: {e}")
