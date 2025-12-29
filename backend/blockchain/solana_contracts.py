@@ -11,10 +11,12 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from solana.rpc.async_api import AsyncClient
-from solana.transaction import Transaction
+from solders.transaction import Transaction
+from solders.message import Message
 from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
+from solders.hash import Hash
 from base58 import b58decode
 
 logger = logging.getLogger(__name__)
@@ -157,8 +159,7 @@ class SolanaContractManager:
         Distribute rewards to multiple recipients
         
         Args:
-            recipients: Dict of address -> amount (in SOL or Lamports?)
-            Assuming amount is in SOL for now, need to convert to Lamports.
+            recipients: Dict of address -> amount (in SOL)
             
         Returns:
             True if successful
@@ -170,13 +171,34 @@ class SolanaContractManager:
         if not recipients:
             return True
 
+        # Batch processing constant to avoid transaction size limits
+        BATCH_SIZE = 10
+        recipient_items = list(recipients.items())
+        success = True
+
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
+                latest_blockhash_resp = await client.get_latest_blockhash()
+                # Ensure we have a Hash object
+                # latest_blockhash_resp.value.blockhash is typically a Hash object in newer versions
+                # but if it returns a string, we need to convert it.
+                # In solana-py >= 0.30, `get_latest_blockhash` returns `GetLatestBlockhashResp`
+                # where `.value.blockhash` is a `Hash` object (from solders.hash).
+                latest_blockhash = latest_blockhash_resp.value.blockhash
 
-                # Add transfer instructions for each recipient
-                for address, amount in recipients.items():
+                if isinstance(latest_blockhash, str):
+                     # If for some reason it's a string (e.g. mocked or older version compat), convert it
+                     latest_blockhash = Hash.from_string(latest_blockhash)
+
+            except Exception as e:
+                logger.error(f"Failed to get blockhash: {e}")
+                return False
+
+            for i in range(0, len(recipient_items), BATCH_SIZE):
+                batch = recipient_items[i:i + BATCH_SIZE]
+                instructions = []
+
+                for address, amount in batch:
                     # Convert SOL to lamports (1 SOL = 1e9 lamports)
                     lamports = int(amount * 1_000_000_000)
 
@@ -187,6 +209,7 @@ class SolanaContractManager:
                         to_pubkey = Pubkey.from_string(address)
                     except ValueError:
                         logger.error(f"Invalid recipient address: {address}")
+                        success = False
                         continue
 
                     ix = transfer(
@@ -196,41 +219,24 @@ class SolanaContractManager:
                             lamports=lamports
                         )
                     )
-                    transaction.add(ix)
+                    instructions.append(ix)
 
-                # Get recent blockhash
+                if not instructions:
+                    continue
+
                 try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
+                    msg = Message(instructions, self._payer.pubkey())
+                    tx = Transaction.new_unsigned(msg)
+                    tx.sign([self._payer], latest_blockhash)
 
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
-
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
-
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
-                    return True
+                    resp = await client.send_transaction(tx)
+                    logger.info(f"Rewards batch distributed successfully. Signature: {resp.value}")
 
                 except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
+                    logger.error(f"Failed to send reward batch: {e}")
+                    success = False
 
-            except Exception as e:
-                logger.error(f"Error distributing rewards: {e}")
-                return False
+            return success
     
     def get_program_accounts(self) -> List[SolanaAccount]:
         """Get all program accounts"""
