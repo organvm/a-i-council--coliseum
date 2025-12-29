@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="min-h-screen p-8">
+    <main className="min-h-screen p-8" id="main-content">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
