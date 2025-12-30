@@ -7,6 +7,7 @@ Manages agent memory including short-term and long-term storage.
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from collections import deque
+import heapq
 
 
 class MemoryEntry:
@@ -33,6 +34,7 @@ class MemoryManager:
         self.short_term: deque = deque(maxlen=max_short_term)
         self.long_term: Dict[str, MemoryEntry] = {}
         self.max_long_term = max_long_term
+        self.expiration_heap: List[tuple] = []
     
     def add_short_term(self, value: Any) -> None:
         """Add to short-term memory (FIFO queue)"""
@@ -56,6 +58,8 @@ class MemoryManager:
         # Add new entry
         entry = MemoryEntry(key, value, ttl)
         self.long_term[key] = entry
+        if entry.expires_at:
+            heapq.heappush(self.expiration_heap, (entry.expires_at, key))
         
         # Enforce size limit
         if len(self.long_term) > self.max_long_term:
@@ -93,12 +97,12 @@ class MemoryManager:
     def _clean_expired(self) -> None:
         """Remove expired entries"""
         now = datetime.utcnow()
-        expired_keys = [
-            key for key, entry in self.long_term.items()
-            if entry.expires_at and entry.expires_at < now
-        ]
-        for key in expired_keys:
-            del self.long_term[key]
+        while self.expiration_heap and self.expiration_heap[0][0] < now:
+            _, key = heapq.heappop(self.expiration_heap)
+            if key in self.long_term:
+                entry = self.long_term[key]
+                if entry.expires_at and entry.expires_at < now:
+                    del self.long_term[key]
     
     def _evict_lru(self) -> None:
         """Evict least recently used entry"""
