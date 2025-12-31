@@ -5,11 +5,12 @@ Handles incoming events from various sources and normalizes them.
 """
 
 from typing import Dict, Any, List, Optional, Callable
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
 import uuid
 import asyncio
+import html
 
 
 class EventSource(str, Enum):
@@ -45,6 +46,14 @@ class NormalizedEvent(BaseModel):
     content: Optional[str] = None
     timestamp: datetime
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator('title', 'description', 'content', mode='before')
+    @classmethod
+    def sanitize_html(cls, v: Optional[str]) -> Optional[str]:
+        """Sanitize HTML content to prevent XSS"""
+        if v is None:
+            return v
+        return html.escape(str(v))
 
 
 class EventIngestionSystem:
