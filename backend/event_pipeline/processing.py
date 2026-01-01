@@ -6,6 +6,7 @@ Processes events through various transformations and enrichments.
 
 from typing import Dict, Any, Optional, Callable, List
 from datetime import datetime
+import heapq
 
 from .ingestion import NormalizedEvent
 
@@ -134,6 +135,7 @@ class EventProcessor:
                 word_freq[word] = word_freq.get(word, 0) + 1
         
         # Top 5 keywords
-        sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
-        event.keywords = [word for word, _ in sorted_words[:5]]
+        # Optimization: Use heapq.nlargest instead of full sort (O(N log K) vs O(N log N))
+        top_k = heapq.nlargest(5, word_freq.items(), key=lambda x: x[1])
+        event.keywords = [word for word, _ in top_k]
         return event
