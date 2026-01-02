@@ -11,7 +11,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from solana.rpc.async_api import AsyncClient
-from solana.transaction import Transaction
+from solders.transaction import Transaction
 from solders.pubkey import Pubkey
 from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
@@ -123,8 +123,72 @@ class SolanaContractManager:
         Returns:
             True if successful
         """
-        # Placeholder for actual staking transaction
-        return True
+        if not self._payer:
+            logger.error("No payer configured for staking")
+            return False
+
+        # Verify we can sign for this user (custodial/agent mode)
+        if user_address != str(self._payer.pubkey()):
+            logger.error(f"Cannot stake for address {user_address}. Backend can only sign for {self._payer.pubkey()}")
+            return False
+
+        async with AsyncClient(self.rpc_url) as client:
+            try:
+                # Convert SOL to lamports (1 SOL = 1e9 lamports)
+                lamports = int(amount * 1_000_000_000)
+
+                if lamports <= 0:
+                    logger.error("Invalid stake amount")
+                    return False
+
+                # Destination: Using program_id as the staking vault/contract address
+                try:
+                    staking_vault = Pubkey.from_string(self.program_id)
+                except ValueError:
+                    logger.error(f"Invalid program ID (staking vault): {self.program_id}")
+                    return False
+
+                ix = transfer(
+                    TransferParams(
+                        from_pubkey=self._payer.pubkey(),
+                        to_pubkey=staking_vault,
+                        lamports=lamports
+                    )
+                )
+
+                # Get recent blockhash
+                try:
+                    latest_blockhash_resp = await client.get_latest_blockhash()
+                    latest_blockhash = latest_blockhash_resp.value.blockhash
+                except Exception as e:
+                    logger.error(f"Failed to get latest blockhash: {e}")
+                    return False
+
+                # Create and sign transaction
+                # Transaction.new_signed_with_payer(instructions, payer, signing_keypairs, recent_blockhash)
+                # Note: This uses solders.transaction.Transaction which has new_signed_with_payer
+                transaction = Transaction.new_signed_with_payer(
+                    [ix],
+                    self._payer.pubkey(),
+                    [self._payer],
+                    latest_blockhash
+                )
+
+                # Send transaction
+                try:
+                    resp = await client.send_transaction(
+                        transaction
+                    )
+                    logger.info(f"Staked successfully. Signature: {resp.value}")
+                    return True
+
+                except Exception as e:
+                    logger.error(f"Failed to send transaction: {e}")
+                    return False
+
+            except Exception as e:
+                logger.error(f"Error executing stake: {e}")
+                return False
     
     async def unstake_tokens(
         self,
