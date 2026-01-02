@@ -118,9 +118,7 @@ class EthereumContractManager:
         # Verify from_address matches private key (optional but good safety)
         account = Account.from_key(private_key)
         if account.address.lower() != from_address.lower():
-             # If mismatch, we warn or fail.
-             # Here we might just use the account address derived from key as the real sender
-             pass
+             raise ValueError(f"Private key does not match from_address. Key address: {account.address}, from_address: {from_address}")
 
         to_address = self.w3.to_checksum_address(to_address)
         sender_address = self.w3.to_checksum_address(from_address)
