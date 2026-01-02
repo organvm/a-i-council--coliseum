@@ -1,60 +1,95 @@
 """
 System Orchestrator Module
 
-Manages the lifecycle of AI agents and the main event loop of the council.
+Manages the lifecycle of AI agents and coordinates system-wide activities.
 """
 
-import asyncio
 from typing import Dict, List, Optional
-from datetime import datetime, timedelta
-import logging
-import random
-
-from .agent import Agent, AgentRole, Message
-from .communication import AgentCommunicationProtocol
+import asyncio
+from .base_agent import AgentRole, Message
+from .agent import Agent
+from .memory_manager import MemoryManager
+from .knowledge_base import KnowledgeBase
 from .decision_engine import DecisionEngine
-from ..event_pipeline.ingestion import EventIngestionSystem
-from ..voting.voting_engine import VotingEngine
-
-logger = logging.getLogger(__name__)
 
 class SystemOrchestrator:
     """
-    The central nervous system of the AI Council.
-
-    Responsibilities:
-    - Manage agent lifecycles (spawn, kill, pause)
-    - Run the main "tick" loop for continuous operation
-    - Coordinate between Agents, Event Pipeline, and Voting Engine
+    Orchestrates the AI Council system.
+    Manages agents, distributes messages, and coordinates activities.
     """
 
+    _instance = None
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(SystemOrchestrator, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self):
+        if self._initialized:
+            return
+
         self.agents: Dict[str, Agent] = {}
-        self.is_running = False
-        self.tick_rate = 1.0  # Seconds between ticks
-        self.loop_task: Optional[asyncio.Task] = None
-        self.last_activity_time = datetime.utcnow()
-        self.silence_threshold_seconds = 30  # Trigger conversation after 30s of silence
-
-        # Initialize Subsystems
-        self.communication_protocol = AgentCommunicationProtocol()
-        self.event_system = EventIngestionSystem()
-        self.voting_engine = VotingEngine()
+        self.active = False
+        self.memory_manager = MemoryManager()
+        self.knowledge_base = KnowledgeBase()
         self.decision_engine = DecisionEngine()
+        self._initialized = True
 
-    def add_agent(self, agent: Agent) -> None:
+    def register_agent(self, agent: Agent) -> str:
         """Register a new agent with the system"""
+        # Inject shared components if they are using defaults
+        # Note: In a real system we might force sharing, but here we just register
         self.agents[agent.state.agent_id] = agent
-        self.communication_protocol.register_agent(agent)
-        logger.info(f"Agent {agent.name} ({agent.state.role}) added.")
+        return agent.state.agent_id
 
-    def remove_agent(self, agent_id: str) -> None:
+    def create_agent(self, role: AgentRole, config: Optional[Dict] = None) -> Agent:
+        """Create and register a new agent"""
+        agent = Agent(
+            role=role,
+            config=config,
+            knowledge_base=self.knowledge_base,
+            decision_engine=self.decision_engine
+            # We give them their own memory manager, but share knowledge and decisions
+        )
+        self.register_agent(agent)
+        return agent
+
+    def remove_agent(self, agent_id: str) -> bool:
         """Remove an agent from the system"""
         if agent_id in self.agents:
-            agent = self.agents[agent_id]
-            self.communication_protocol.unregister_agent(agent_id)
             del self.agents[agent_id]
-            logger.info(f"Agent {agent.name} removed.")
+            return True
+        return False
+
+    async def broadcast_message(self, message: Message) -> None:
+        """Broadcast a message to all active agents"""
+        tasks = []
+        for agent in self.agents.values():
+            if agent.state.is_active:
+                tasks.append(agent.process_message(message))
+
+        # Gather responses
+        responses = await asyncio.gather(*tasks, return_exceptions=True)
+
+        # Process responses (if any agents replied)
+        for response in responses:
+            if isinstance(response, Message):
+                # Handle agent response (e.g. log it, or re-broadcast if needed)
+                # For now, we just print it
+                print(f"Agent {response.sender_id} replied: {response.content}")
+
+    async def start(self):
+        """Start the orchestration loop"""
+        self.active = True
+        print("System Orchestrator started.")
+        # In a real app, this might start a background loop
+
+    async def stop(self):
+        """Stop the orchestration loop"""
+        self.active = False
+        print("System Orchestrator stopped.")
 
     def get_agent(self, agent_id: str) -> Optional[Agent]:
         """Get agent by ID"""

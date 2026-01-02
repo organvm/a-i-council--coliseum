@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
 
-from ..voting import VoteType
+from ..voting.voting_engine import VoteType
 
 
 router = APIRouter()

@@ -61,3 +61,8 @@ This file tracks granular tasks for the frontend development.
 - [ ] **Animations**
     - [ ] Add Framer Motion for entering/leaving elements (chat messages).
     - [ ] Add transitions for voting updates.
+# Frontend Tasks
+- [ ] Implement Dashboard
+- [ ] Connect WebSocket
+- [ ] Voting Interface
+- [ ] Achievements UI

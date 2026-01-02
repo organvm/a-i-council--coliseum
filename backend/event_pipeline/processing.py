@@ -83,12 +83,19 @@ class EventProcessor:
         events: List[NormalizedEvent],
         enrichments: Optional[List[str]] = None
     ) -> List[ProcessedEvent]:
-        """Process multiple events"""
-        processed_events = []
-        for event in events:
-            processed = await self.process_event(event, enrichments)
-            processed_events.append(processed)
-        return processed_events
+        """Process multiple events concurrently"""
+        import asyncio
+
+        # Limit concurrency to avoid overwhelming resources.
+        # The number (e.g., 100) can be tuned or made configurable.
+        semaphore = asyncio.Semaphore(100)
+
+        async def _process_with_semaphore(event):
+            async with semaphore:
+                return await self.process_event(event, enrichments)
+
+        tasks = [_process_with_semaphore(event) for event in events]
+        return await asyncio.gather(*tasks)
     
     async def enrich_sentiment(self, event: ProcessedEvent) -> ProcessedEvent:
         """Add sentiment analysis enrichment"""
@@ -127,6 +134,8 @@ class EventProcessor:
                 word_freq[word] = word_freq.get(word, 0) + 1
         
         # Top 5 keywords
-        sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
-        event.keywords = [word for word, _ in sorted_words[:5]]
+        # Optimization: Use heapq.nlargest instead of full sort (O(N log K) vs O(N log N))
+        import heapq
+        top_k = heapq.nlargest(5, word_freq.items(), key=lambda x: x[1])
+        event.keywords = [word for word, _ in top_k]
         return event
