@@ -73,9 +73,9 @@ class KnowledgeBase:
     
     def get_popular_entries(self, limit: int = 10) -> List[KnowledgeEntry]:
         """Get most accessed entries"""
-        import heapq
-        return heapq.nlargest(
-            limit,
+        sorted_entries = sorted(
             self.entries.values(),
-            key=lambda e: e.access_count
+            key=lambda e: e.access_count,
+            reverse=True
         )
+        return sorted_entries[:limit]

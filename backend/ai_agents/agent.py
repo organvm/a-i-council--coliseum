@@ -24,21 +24,6 @@ class Agent(BaseAgent):
     - KnowledgeBase: For accessing static knowledge
     - NLPProcessor: For language understanding and generation
     - DecisionEngine: For making choices and voting
-This module provides the concrete implementation of the AI Agent,
-integrating all core modules (Memory, Knowledge, NLP, Decision Engine).
-"""
-
-from typing import Dict, Any, Optional, List
-from .base_agent import BaseAgent, AgentRole, Message
-from .memory_manager import MemoryManager
-from .knowledge_base import KnowledgeBase
-from .decision_engine import DecisionEngine
-from .nlp_module import NLPProcessor
-
-class Agent(BaseAgent):
-    """
-    Concrete implementation of an AI Agent.
-    Integrates Memory, Knowledge, NLP, and Decision making capabilities.
     """
 
     def __init__(
@@ -120,94 +105,71 @@ class Agent(BaseAgent):
                 metadata={"reply_to": message.message_id}
             )
 
-        decision_engine: Optional[DecisionEngine] = None,
-        nlp_processor: Optional[NLPProcessor] = None
-    ):
-        super().__init__(role, config)
-        self.memory_manager = memory_manager or MemoryManager()
-        self.knowledge_base = knowledge_base or KnowledgeBase()
-        self.decision_engine = decision_engine or DecisionEngine()
-        self.nlp_processor = nlp_processor or NLPProcessor()
-
-    async def process_message(self, message: Message) -> Optional[Message]:
-        """
-        Process incoming message, update memory, and potentially respond.
-        """
-        # Add to short term memory
-        self.memory_manager.add_short_term(message.dict())
-
-        # Analyze content
-        sentiment = await self.nlp_processor.analyze_sentiment(message.content)
-        topics = await self.nlp_processor.classify_topic(message.content)
-
-        # Store analysis in memory
-        self.add_to_memory("last_sentiment", sentiment)
-        self.add_to_memory("last_topics", topics)
-
-        # Decide if response is needed
-        # Respond if addressed directly or if it's a broadcast and we are active
-        should_respond = (
-            message.recipient_id == self.state.agent_id or
-            (message.recipient_id is None and self.state.is_active)
-        )
-
-        if should_respond:
-            response_text = await self.generate_response(message.content)
-            return Message(
-                sender_id=self.state.agent_id,
-                recipient_id=message.sender_id,
-                content=response_text,
-                metadata={
-                    "sentiment_context": sentiment,
-                    "topics": topics,
-                    "responding_to": message.message_id
-                }
-            )
         return None
 
     async def make_decision(self, context: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Make a decision using the DecisionEngine or internal logic.
+        Make a decision based on current context.
+
+        Args:
+            context: Context for decision (e.g., voting options, topic)
+
+        Returns:
+            Decision result
         """
-        decision_type = context.get("type", "internal")
+        self.update_state(last_active=datetime.utcnow())
+
+        decision_type = context.get("type", "generic")
 
         if decision_type == "vote":
-            decision_id = context.get("decision_id")
-            if not decision_id:
-                return {"error": "No decision_id provided for vote"}
+            options = context.get("options", [])
+            topic = context.get("topic", "")
 
-            # Logic to determine vote would go here, possibly using NLP and KnowledgeBase
-            # For now, we simulate a random or default choice
-            choice = context.get("default_choice", "yes")
+            # Consult memory and knowledge base
+            relevant_knowledge = self.knowledge_base.search_by_content(topic)
 
-            try:
-                self.decision_engine.cast_vote(
-                    decision_id=decision_id,
-                    agent_id=self.state.agent_id,
-                    choice=choice,
-                    reasoning="Automated decision based on role configuration"
-                )
-                return {"status": "voted", "choice": choice}
-            except ValueError as e:
-                return {"error": str(e)}
+            # Use NLP to determine best option based on role and knowledge
+            # This is a simplification; in a real system, we'd prompt the LLM
+            # to pick an option based on its persona.
 
-        return {"status": "skipped", "reason": "Unknown decision type"}
+            # For now, pick random or first option as placeholder logic
+            # unless specific logic is implemented
+            import random
+            choice = random.choice(options) if options else None
+
+            reasoning = f"Based on my role as {self.state.role} and analysis of {topic}, I choose {choice}."
+
+            return {
+                "choice": choice,
+                "reasoning": reasoning,
+                "confidence": 0.8
+            }
+
+        return {"error": "Unknown decision type"}
 
     async def generate_response(self, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
         """
-        Generate a response using NLP processor.
+        Generate a response using the NLP module.
         """
-        # Since NLPProcessor currently lacks generation, we use summarization as a proxy
-        # or a simple template. In a real scenario, this would call an LLM.
+        self.update_state(last_active=datetime.utcnow())
 
-        summary = await self.nlp_processor.summarize(prompt, max_length=50)
+        response = await self.nlp_processor.generate(
+           system=self.system_prompt,
+           prompt=prompt,
+           context=context
+        )
 
-        role_prefixes = {
-            AgentRole.MODERATOR: "As a moderator, I note:",
-            AgentRole.DEBATER: "I argue that:",
-            AgentRole.ANALYST: "Analysis shows:",
-            AgentRole.FACT_CHECKER: "Fact check:",
-        }
+        return response
 
-        prefix = role_prefixes.get(self.state.role, "Response:")
-        return f"{prefix} {summary} (processed by {self.state.agent_id})"
+    async def reflect(self) -> None:
+        """
+        Periodically reflect on short-term memory to consolidate into long-term memory.
+        """
+        recent_memories = self.memory_manager.get_short_term(limit=10)
+        if not recent_memories:
+            return
+
+        # Example reflection: summarize recent interactions
+        # summary = await self.nlp_processor.summarize(str(recent_memories))
+        # self.memory_manager.add_long_term("reflection_" + datetime.utcnow().isoformat(), summary)
+        pass

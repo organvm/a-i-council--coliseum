@@ -4,12 +4,8 @@ FastAPI Main Application
 Main entry point for the AI Council Coliseum backend.
 """
 
-import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
 from contextlib import asynccontextmanager
 import uvicorn
 import logging
@@ -23,7 +19,6 @@ from .api import (
     users_router
 )
 from .api.dependencies import initialize_orchestrator, get_orchestrator
-from .api.dependencies import get_orchestrator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -35,18 +30,10 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("🚀 Starting AI Council Coliseum Backend...")
     await initialize_orchestrator()
-    print("🚀 Starting AI Council Coliseum Backend...")
-
-    # Initialize Orchestrator
-    orchestrator = get_orchestrator()
-    await orchestrator.start()
-
     yield
-
     # Shutdown
     logger.info("👋 Shutting down AI Council Coliseum Backend...")
     orchestrator = get_orchestrator()
-    print("👋 Shutting down AI Council Coliseum Backend...")
     await orchestrator.stop()
 
 
@@ -57,35 +44,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware - Security: Load allowed origins from environment variable
-origins = [
-    origin.strip()
-    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-    if origin.strip()
-]
+# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],  # Configure for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Middleware to add security headers to all responses"""
-
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
-        response = await call_next(request)
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        return response
-
-
-app.add_middleware(SecurityHeadersMiddleware)
 
 # Include routers
 app.include_router(agents_router, prefix="/api/agents", tags=["agents"])
