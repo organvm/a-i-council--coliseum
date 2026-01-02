@@ -5,11 +5,12 @@ Handles incoming events from various sources and normalizes them.
 """
 
 from typing import Dict, Any, List, Optional, Callable
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
 import uuid
 import asyncio
+import html
 
 
 class EventSource(str, Enum):
@@ -45,6 +46,14 @@ class NormalizedEvent(BaseModel):
     content: Optional[str] = None
     timestamp: datetime
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator('title', 'description', 'content', mode='before')
+    @classmethod
+    def sanitize_html(cls, v: Optional[str]) -> Optional[str]:
+        """Sanitize HTML content to prevent XSS"""
+        if v is None:
+            return v
+        return html.escape(str(v))
 
 
 class EventIngestionSystem:
@@ -149,16 +158,27 @@ class EventIngestionSystem:
         limit: int = 10,
         source: Optional[EventSource] = None
     ) -> List[NormalizedEvent]:
-        """Get recent normalized events - optimized to avoid full sort"""
-        events = self.normalized_events
+        """Get recent normalized events"""
+        # Bolt Optimization: Avoid full list sort/scan for recent events.
+        # normalized_events is append-only, so it is naturally sorted by time.
+
+        if limit <= 0:
+            return []
         
-        # Apply source filter first, maintaining chronological order
         if source:
-            events = [e for e in events if e.source == source]
-        
-        # Events are appended chronologically, slice the last N and reverse
-        # This ensures we get the most recent N events, even after filtering
-        return list(reversed(events[-limit:]))
+            # Optimized filter: iterate backwards until we find 'limit' items
+            results = []
+            for event in reversed(self.normalized_events):
+                if event.source == source:
+                    results.append(event)
+                    if len(results) >= limit:
+                        break
+            return results
+
+        else:
+            # Optimized no-filter: slice the end and reverse
+            # We want newest first, so we take the last 'limit' and reverse them
+            return list(reversed(self.normalized_events[-limit:]))
     
     def clear_old_events(self, max_age_hours: int = 24) -> int:
         """Clear events older than specified hours"""
