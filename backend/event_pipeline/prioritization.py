@@ -4,9 +4,9 @@ Event Prioritization Module
 Scores events to determine their relevance and importance to the agents.
 """
 
-from typing import List, Dict
-from datetime import datetime, timedelta
-from .ingestion import NormalizedEvent
+from typing import List
+from datetime import datetime
+from .ingestion import NormalizedEvent, EventSource
 
 class EventPrioritizer:
     """
@@ -26,19 +26,24 @@ class EventPrioritizer:
     
     def calculate_score(self, event: NormalizedEvent) -> float:
         """
-        Calculate priority score (0.0 to 1.0+) for an event.
+        Calculate priority score (0.0 to 1.0) for an event.
         """
         score = 0.0
         text = (event.title + " " + event.description).lower()
         
-        # Keyword scoring
+        # Keyword scoring with capping to prevent excessive scores
+        keyword_score = 0.0
         for kw in self.high_priority_keywords:
             if kw in text:
-                score += 0.3
+                keyword_score += 0.3
         
         for kw in self.medium_priority_keywords:
             if kw in text:
-                score += 0.1
+                keyword_score += 0.1
+        
+        # Cap keyword score at 0.6 to ensure total score doesn't exceed 1.0
+        keyword_score = min(keyword_score, 0.6)
+        score += keyword_score
 
         # Recency scoring (decay over time)
         # Assuming event.timestamp is UTC
@@ -52,10 +57,12 @@ class EventPrioritizer:
             score += 0.1
             
         # Source reliability boost (example)
-        if event.source == "internal" or event.source == "user_submission":
+        # Fix: Compare EventSource enum properly
+        if event.source == EventSource.INTERNAL or event.source == EventSource.USER_SUBMISSION:
             score += 0.1
 
-        return score
+        # Cap total score at 1.0
+        return min(score, 1.0)
 
     def prioritize_events(self, events: List[NormalizedEvent]) -> List[NormalizedEvent]:
         """

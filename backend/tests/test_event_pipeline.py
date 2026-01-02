@@ -3,7 +3,6 @@ Tests for Event Pipeline
 """
 
 import pytest
-import asyncio
 from datetime import datetime, timedelta
 from backend.event_pipeline.ingestion import EventIngestionSystem, EventSource, NormalizedEvent
 from backend.event_pipeline.prioritization import EventPrioritizer
@@ -72,7 +71,7 @@ def test_prioritization_scoring(prioritizer):
 
     assert score_high > score_low
     # AI (0.3) + Artificial Intelligence (0.3) + Recent <1h (0.2) = 0.8 approx
-    assert score_high >= 0.5
+    assert score_high == pytest.approx(0.8, rel=1e-3)
 
 def test_prioritization_sorting(prioritizer):
     event1 = NormalizedEvent(

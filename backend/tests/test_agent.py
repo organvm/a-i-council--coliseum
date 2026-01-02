@@ -3,8 +3,6 @@ Tests for Concrete Agent Implementation
 """
 
 import pytest
-import asyncio
-from datetime import datetime
 from backend.ai_agents.agent import Agent, AgentRole, Message
 from backend.ai_agents.memory_manager import MemoryManager
 from backend.ai_agents.knowledge_base import KnowledgeBase

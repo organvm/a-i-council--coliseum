@@ -60,10 +60,27 @@ async def ingest_event(
     orchestrator: SystemOrchestrator = Depends(get_orchestrator)
 ):
     """Ingest a new event manually"""
+    # Validate payload size (limit to 1MB)
+    import sys
+    data_size = sys.getsizeof(str(request.data))
+    if data_size > 1_000_000:  # 1MB limit
+        raise HTTPException(
+            status_code=413,
+            detail="Payload too large. Maximum size is 1MB."
+        )
+    
+    # Validate metadata against source
+    metadata: Dict[str, Any] = request.metadata or {}
+    if "source" in metadata and metadata["source"] != request.source.value:
+        raise HTTPException(
+            status_code=400,
+            detail="Metadata 'source' must match the event source."
+        )
+    
     event = await orchestrator.event_system.ingest_event(
         source=request.source,
         raw_data=request.data,
-        metadata=request.metadata
+        metadata=metadata
     )
 
     if not event:

@@ -45,9 +45,13 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("👋 Shutting down AI Council Coliseum Backend...")
-    orchestrator = get_orchestrator()
     print("👋 Shutting down AI Council Coliseum Backend...")
-    await orchestrator.stop()
+    orchestrator = get_orchestrator()
+    if orchestrator is not None:
+        try:
+            await orchestrator.stop()
+        except Exception:
+            logger.exception("Error while stopping orchestrator during shutdown")
 
 
 app = FastAPI(

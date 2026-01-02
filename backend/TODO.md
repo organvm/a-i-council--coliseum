@@ -63,7 +63,7 @@ This file tracks granular tasks for the backend development.
 ## 💾 Database & Infrastructure
 
 - [ ] **Models**
-    - [ ] Create SQLAlchemy models in `backend/database/models.py`.
+    - [ ] Create SQLAlchemy 2.0-style ORM models in `backend/database/models.py`.
     - [ ] Set up `alembic` for migrations.
 - [ ] **Configuration**
     - [ ] Update `config.py` to read DB credentials from `.env`.

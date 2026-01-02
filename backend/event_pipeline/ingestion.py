@@ -11,7 +11,6 @@ from enum import Enum
 import uuid
 import asyncio
 import logging
-import xml.etree.ElementTree as ET
 import html
 
 logger = logging.getLogger(__name__)
@@ -125,10 +124,7 @@ class EventIngestionSystem:
                 normalized = handler(raw_data)
                 normalized.event_id = raw_event.event_id
                 normalized.source = source
-                # Keep original timestamp if handler didn't set a specific one from data
-                # But usually handler sets it from content. If not, use ingestion time.
-                if not normalized.timestamp:
-                    normalized.timestamp = raw_event.timestamp
+                # Timestamp is set by handler from source data
             else:
                 # Default normalization
                 normalized = self._default_normalize(raw_event)
@@ -159,12 +155,12 @@ class EventIngestionSystem:
         """Handle RSS feed item data"""
         # Expecting data to mimic feedparser entry or similar structure
         return NormalizedEvent(
-            event_id="", # Assigned by caller
+            event_id="",  # Will be assigned by caller after handler returns
             source=EventSource.RSS_FEED,
             title=data.get("title", "No Title"),
             description=data.get("summary") or data.get("description", ""),
             url=data.get("link"),
-            timestamp=datetime.utcnow(), # Parse 'published' if real RSS
+            timestamp=datetime.utcnow(),  # Parse 'published' if real RSS
             tags=data.get("tags", []),
             metadata={"author": data.get("author")}
         )
@@ -172,20 +168,20 @@ class EventIngestionSystem:
     def _handle_news_api(self, data: Dict[str, Any]) -> NormalizedEvent:
         """Handle NewsAPI article data"""
         return NormalizedEvent(
-            event_id="",
+            event_id="",  # Will be assigned by caller after handler returns
             source=EventSource.NEWS_API,
             title=data.get("title", ""),
             description=data.get("description", ""),
             url=data.get("url"),
             content=data.get("content"),
-            timestamp=datetime.utcnow(), # Parse 'publishedAt' if real
+            timestamp=datetime.utcnow(),  # Parse 'publishedAt' if real
             metadata={"source_name": data.get("source", {}).get("name")}
         )
 
     def _handle_user_submission(self, data: Dict[str, Any]) -> NormalizedEvent:
         """Handle manual user submission"""
         return NormalizedEvent(
-            event_id="",
+            event_id="",  # Will be assigned by caller after handler returns
             source=EventSource.USER_SUBMISSION,
             title=data.get("title", ""),
             description=data.get("description", ""),

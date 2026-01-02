@@ -50,19 +50,27 @@ async def test_orchestrator_broadcast(orchestrator):
     # Broadcast message
     await orchestrator.broadcast_event("New topic: AI Safety")
 
-    # Give some time for message processing
-    await asyncio.sleep(0.1)
+    # Wait for message processing using polling with a timeout
+    timeout = 2.0
+    interval = 0.05
+    loop = asyncio.get_event_loop()
+    end_time = loop.time() + timeout
+
+    found = False
+    while not found and loop.time() < end_time:
+        memories1 = agent1.memory_manager.get_short_term(limit=5)
+        for m in memories1:
+            content = m.get("content", {})
+            if isinstance(content, dict):
+                msg_content = content.get("content", "")
+                sender = content.get("sender_id", "")
+                if "new topic: ai safety" in msg_content.lower() and sender == "SYSTEM":
+                    found = True
+                    break
+        if not found:
+            await asyncio.sleep(interval)
 
     # Agents should have received the message (stored in short term memory)
-    # We check agent1's history or memory
-    # Note: process_message adds to memory_manager
-
-    memories1 = agent1.memory_manager.get_short_term(limit=5)
-    found = False
-    for m in memories1:
-        if m["content"]["content"] == "New topic: AI Safety" and m["content"]["sender_id"] == "SYSTEM":
-            found = True
-            break
-    assert found
+    assert found, "Agent did not receive the broadcast message"
 
     await orchestrator.stop()
