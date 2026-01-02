@@ -16,7 +16,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <a
+          href="#main-content"
+          className="fixed top-4 left-4 z-50 -translate-y-[200%] transition-transform focus:translate-y-0 bg-primary-600 text-white px-4 py-2 rounded shadow-lg font-medium"
+        >
+          Skip to content
+        </a>
+        {children}
+      </body>
     </html>
   )
 }
