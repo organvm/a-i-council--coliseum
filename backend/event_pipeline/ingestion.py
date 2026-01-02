@@ -6,10 +6,11 @@ Handles incoming events from various sources and normalizes them.
 
 from typing import Dict, Any, List, Optional, Callable
 from pydantic import BaseModel, Field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 import asyncio
+import html
 
 
 class EventSource(str, Enum):
@@ -29,7 +30,7 @@ class RawEvent(BaseModel):
     event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     source: EventSource
     raw_data: Dict[str, Any]
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
@@ -118,15 +119,21 @@ class EventIngestionSystem:
     def _default_normalize(self, raw_event: RawEvent) -> NormalizedEvent:
         """Default normalization for events without specific handler"""
         data = raw_event.raw_data
+
+        # Sanitize inputs to prevent XSS
+        title = str(data.get("title", "Untitled Event"))
+        description = str(data.get("description", ""))
+        content = data.get("content")
+
         return NormalizedEvent(
             event_id=raw_event.event_id,
             source=raw_event.source,
-            title=data.get("title", "Untitled Event"),
-            description=data.get("description", ""),
+            title=html.escape(title),
+            description=html.escape(description),
             category=data.get("category"),
             tags=data.get("tags", []),
             url=data.get("url"),
-            content=data.get("content"),
+            content=html.escape(str(content)) if content is not None else None,
             timestamp=raw_event.timestamp,
             metadata=raw_event.metadata
         )
@@ -162,7 +169,7 @@ class EventIngestionSystem:
     
     def clear_old_events(self, max_age_hours: int = 24) -> int:
         """Clear events older than specified hours"""
-        cutoff = datetime.utcnow()
+        cutoff = datetime.now(timezone.utc)
         cutoff = cutoff.replace(hour=cutoff.hour - max_age_hours)
         
         old_count = len(self.normalized_events)
