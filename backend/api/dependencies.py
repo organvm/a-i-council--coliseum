@@ -1,20 +1,38 @@
 """
 API Dependencies
 
-Provides dependency injection for API endpoints.
+Provides dependency injection for API routes.
 """
 
 from typing import Optional
-from backend.ai_agents.orchestrator import SystemOrchestrator
+from functools import lru_cache
+from ..ai_agents.orchestrator import SystemOrchestrator
+from ..ai_agents.agent import Agent, AgentRole
 
-_orchestrator: Optional[SystemOrchestrator] = None
+# Global singleton instance
+_orchestrator_instance: Optional[SystemOrchestrator] = None
 
 def get_orchestrator() -> SystemOrchestrator:
-    """
-    Get the global SystemOrchestrator instance.
-    Initializes it if not already initialized.
-    """
-    global _orchestrator
-    if _orchestrator is None:
-        _orchestrator = SystemOrchestrator()
-    return _orchestrator
+    """Dependency to get the global system orchestrator instance"""
+    global _orchestrator_instance
+    if _orchestrator_instance is None:
+        _orchestrator_instance = SystemOrchestrator()
+    return _orchestrator_instance
+
+async def initialize_orchestrator():
+    """Initialize the orchestrator with default agents on startup"""
+    orchestrator = get_orchestrator()
+    if not orchestrator.agents:
+        # Spawn initial council members
+        roles = [
+            (AgentRole.MODERATOR, "Atlas"),
+            (AgentRole.DEBATER, "Socrates"),
+            (AgentRole.DEBATER, "Machiavelli"),
+            (AgentRole.ANALYST, "Athena"),
+        ]
+
+        for role, name in roles:
+            agent = Agent(role=role, config={"name": name})
+            orchestrator.add_agent(agent)
+
+        await orchestrator.start()

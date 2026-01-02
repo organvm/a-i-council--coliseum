@@ -1,97 +1,70 @@
 """
 Event Prioritization Module
 
-Prioritizes events based on various factors.
+Scores events to determine their relevance and importance to the agents.
 """
 
-from typing import Dict, Any
+from typing import List, Dict
 from datetime import datetime, timedelta
-
 from .ingestion import NormalizedEvent
-from .classification import EventClassifier
-
 
 class EventPrioritizer:
     """
-    System for prioritizing events
+    Prioritizes events based on keywords, recency, and potential impact.
     """
     
-    def __init__(self, classifier: EventClassifier):
-        self.classifier = classifier
-        self.category_weights: Dict[str, float] = {
-            "breaking_news": 2.0,
-            "politics": 1.5,
-            "international": 1.4,
-            "economics": 1.3,
-            "technology": 1.2,
-            "science": 1.1,
-            "health": 1.1,
-            "environment": 1.0,
-            "sports": 0.8,
-            "entertainment": 0.7,
-            "other": 0.5,
+    def __init__(self):
+        # Keywords that boost score
+        self.high_priority_keywords = {
+            "ai", "artificial intelligence", "crypto", "blockchain", "bitcoin",
+            "ethereum", "solana", "regulation", "breakthrough", "emergency",
+            "market crash", "bull run"
+        }
+        self.medium_priority_keywords = {
+            "tech", "update", "release", "investment", "startup", "policy"
         }
     
-    async def calculate_priority(self, event: NormalizedEvent) -> float:
+    def calculate_score(self, event: NormalizedEvent) -> float:
         """
-        Calculate priority score for an event
+        Calculate priority score (0.0 to 1.0+) for an event.
+        """
+        score = 0.0
+        text = (event.title + " " + event.description).lower()
         
-        Args:
-            event: Event to prioritize
+        # Keyword scoring
+        for kw in self.high_priority_keywords:
+            if kw in text:
+                score += 0.3
+        
+        for kw in self.medium_priority_keywords:
+            if kw in text:
+                score += 0.1
+
+        # Recency scoring (decay over time)
+        # Assuming event.timestamp is UTC
+        now = datetime.utcnow()
+        age_hours = (now - event.timestamp).total_seconds() / 3600.0
+        
+        # Boost for very fresh events (< 1 hour)
+        if age_hours < 1:
+            score += 0.2
+        elif age_hours < 6:
+            score += 0.1
             
-        Returns:
-            Priority score (higher is more important)
-        """
-        score = 1.0
-        
-        # Category weight
-        category = await self.classifier.get_primary_category(event)
-        score *= self.category_weights.get(category.value, 1.0)
-        
-        # Breaking news boost
-        if self.classifier.is_breaking_news(event):
-            score *= 2.0
-        
-        # Recency boost (events in last hour get boost)
-        age = datetime.utcnow() - event.timestamp
-        if age < timedelta(hours=1):
-            score *= 1.5
-        elif age < timedelta(hours=6):
-            score *= 1.2
-        
-        # Content quality (longer descriptions = higher quality)
-        if event.description and len(event.description) > 200:
-            score *= 1.1
-        
+        # Source reliability boost (example)
+        if event.source == "internal" or event.source == "user_submission":
+            score += 0.1
+
         return score
-    
-    async def rank_events(
-        self,
-        events: list[NormalizedEvent]
-    ) -> list[tuple[NormalizedEvent, float]]:
+
+    def prioritize_events(self, events: List[NormalizedEvent]) -> List[NormalizedEvent]:
         """
-        Rank a list of events by priority
+        Sort events by calculated priority score descending.
+        """
+        # We can attach the score to metadata or just return sorted list
+        # For now, let's just sort them.
+        # Ideally, NormalizedEvent would have a 'priority_score' field,
+        # but it's not in the model currently.
+        # We can calculate on the fly for sorting.
         
-        Args:
-            events: Events to rank
-            
-        Returns:
-            List of (event, priority_score) tuples sorted by priority
-        """
-        scored_events = []
-        for event in events:
-            score = await self.calculate_priority(event)
-            scored_events.append((event, score))
-        
-        scored_events.sort(key=lambda x: x[1], reverse=True)
-        return scored_events
-    
-    def set_category_weight(self, category: str, weight: float) -> None:
-        """
-        Set priority weight for a category
-        
-        Args:
-            category: Category name
-            weight: Weight multiplier
-        """
-        self.category_weights[category] = weight
+        return sorted(events, key=self.calculate_score, reverse=True)

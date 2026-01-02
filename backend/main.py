@@ -12,6 +12,7 @@ from starlette.requests import Request
 from starlette.responses import Response
 from contextlib import asynccontextmanager
 import uvicorn
+import logging
 
 from .api import (
     agents_router,
@@ -21,13 +22,19 @@ from .api import (
     achievements_router,
     users_router
 )
+from .api.dependencies import initialize_orchestrator, get_orchestrator
 from .api.dependencies import get_orchestrator
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for the application"""
     # Startup
+    logger.info("🚀 Starting AI Council Coliseum Backend...")
+    await initialize_orchestrator()
     print("🚀 Starting AI Council Coliseum Backend...")
 
     # Initialize Orchestrator
@@ -37,6 +44,8 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
+    logger.info("👋 Shutting down AI Council Coliseum Backend...")
+    orchestrator = get_orchestrator()
     print("👋 Shutting down AI Council Coliseum Backend...")
     await orchestrator.stop()
 

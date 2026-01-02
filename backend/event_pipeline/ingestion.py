@@ -10,8 +10,11 @@ from datetime import datetime
 from enum import Enum
 import uuid
 import asyncio
+import logging
+import xml.etree.ElementTree as ET
 import html
 
+logger = logging.getLogger(__name__)
 
 class EventSource(str, Enum):
     """Sources of events"""
@@ -66,6 +69,11 @@ class EventIngestionSystem:
         self.normalized_events: List[NormalizedEvent] = []
         self.source_handlers: Dict[EventSource, Callable] = {}
         self.filters: List[Callable] = []
+
+        # Register default handlers
+        self.register_source_handler(EventSource.RSS_FEED, self._handle_rss_feed)
+        self.register_source_handler(EventSource.NEWS_API, self._handle_news_api)
+        self.register_source_handler(EventSource.USER_SUBMISSION, self._handle_user_submission)
     
     def register_source_handler(
         self,
@@ -112,17 +120,24 @@ class EventIngestionSystem:
         
         # Normalize event
         handler = self.source_handlers.get(source)
-        if handler:
-            normalized = handler(raw_data)
-            normalized.event_id = raw_event.event_id
-            normalized.source = source
-            normalized.timestamp = raw_event.timestamp
-        else:
-            # Default normalization
-            normalized = self._default_normalize(raw_event)
-        
-        self.normalized_events.append(normalized)
-        return normalized
+        try:
+            if handler:
+                normalized = handler(raw_data)
+                normalized.event_id = raw_event.event_id
+                normalized.source = source
+                # Keep original timestamp if handler didn't set a specific one from data
+                # But usually handler sets it from content. If not, use ingestion time.
+                if not normalized.timestamp:
+                    normalized.timestamp = raw_event.timestamp
+            else:
+                # Default normalization
+                normalized = self._default_normalize(raw_event)
+
+            self.normalized_events.append(normalized)
+            return normalized
+        except Exception as e:
+            logger.error(f"Error normalizing event from {source}: {e}")
+            return None
     
     def _default_normalize(self, raw_event: RawEvent) -> NormalizedEvent:
         """Default normalization for events without specific handler"""
@@ -138,6 +153,45 @@ class EventIngestionSystem:
             content=data.get("content"),
             timestamp=raw_event.timestamp,
             metadata=raw_event.metadata
+        )
+
+    def _handle_rss_feed(self, data: Dict[str, Any]) -> NormalizedEvent:
+        """Handle RSS feed item data"""
+        # Expecting data to mimic feedparser entry or similar structure
+        return NormalizedEvent(
+            event_id="", # Assigned by caller
+            source=EventSource.RSS_FEED,
+            title=data.get("title", "No Title"),
+            description=data.get("summary") or data.get("description", ""),
+            url=data.get("link"),
+            timestamp=datetime.utcnow(), # Parse 'published' if real RSS
+            tags=data.get("tags", []),
+            metadata={"author": data.get("author")}
+        )
+
+    def _handle_news_api(self, data: Dict[str, Any]) -> NormalizedEvent:
+        """Handle NewsAPI article data"""
+        return NormalizedEvent(
+            event_id="",
+            source=EventSource.NEWS_API,
+            title=data.get("title", ""),
+            description=data.get("description", ""),
+            url=data.get("url"),
+            content=data.get("content"),
+            timestamp=datetime.utcnow(), # Parse 'publishedAt' if real
+            metadata={"source_name": data.get("source", {}).get("name")}
+        )
+
+    def _handle_user_submission(self, data: Dict[str, Any]) -> NormalizedEvent:
+        """Handle manual user submission"""
+        return NormalizedEvent(
+            event_id="",
+            source=EventSource.USER_SUBMISSION,
+            title=data.get("title", ""),
+            description=data.get("description", ""),
+            category=data.get("category"),
+            timestamp=datetime.utcnow(),
+            metadata={"user_id": data.get("user_id")}
         )
     
     async def batch_ingest(
