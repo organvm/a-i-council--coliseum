@@ -6,7 +6,7 @@ Manages agent memory including short-term and long-term storage.
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-from collections import deque
+from collections import deque, OrderedDict
 import heapq
 
 
@@ -32,7 +32,8 @@ class MemoryManager:
     
     def __init__(self, max_short_term: int = 100, max_long_term: int = 1000):
         self.short_term: deque = deque(maxlen=max_short_term)
-        self.long_term: Dict[str, MemoryEntry] = {}
+        # Bolt Optimization: Use OrderedDict for O(1) LRU management
+        self.long_term: OrderedDict[str, MemoryEntry] = OrderedDict()
         self.max_long_term = max_long_term
         # Min-heap storing (expires_at, key) tuples for O(1) expiration check
         self.expiry_heap: List = []
@@ -60,6 +61,9 @@ class MemoryManager:
         entry = MemoryEntry(key, value, ttl)
         self.long_term[key] = entry
         
+        # Mark as most recently used (move to end)
+        self.long_term.move_to_end(key)
+
         if entry.expires_at:
             heapq.heappush(self.expiry_heap, (entry.expires_at, key))
 
@@ -75,6 +79,8 @@ class MemoryManager:
         if entry:
             entry.access_count += 1
             entry.last_accessed = datetime.utcnow()
+            # Mark as most recently used
+            self.long_term.move_to_end(key)
             return entry.value
         return None
     
@@ -116,15 +122,12 @@ class MemoryManager:
                     del self.long_term[key]
     
     def _evict_lru(self) -> None:
-        """Evict least recently used entry"""
+        """Evict least recently used entry (O(1) with OrderedDict)"""
         if not self.long_term:
             return
         
-        lru_key = min(
-            self.long_term.items(),
-            key=lambda item: item[1].last_accessed
-        )[0]
-        del self.long_term[lru_key]
+        # Pop from start (least recently used)
+        self.long_term.popitem(last=False)
     
     def get_stats(self) -> Dict[str, Any]:
         """Get memory statistics"""
