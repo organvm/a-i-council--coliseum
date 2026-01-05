@@ -11,16 +11,19 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
+from pydantic import BaseModel, Field
+
+
 class StakeRequest(BaseModel):
     """Request to stake tokens"""
-    amount: float
-    lock_period_days: int = 0
+    amount: float = Field(..., gt=0, description="Amount to stake must be positive")
+    lock_period_days: int = Field(0, ge=0, description="Lock period in days must be non-negative")
 
 
 class TransferRequest(BaseModel):
     """Request to transfer tokens"""
     to_address: str
-    amount: float
+    amount: float = Field(..., gt=0, description="Amount to transfer must be positive")
 
 
 @router.get("/balance/{address}")
