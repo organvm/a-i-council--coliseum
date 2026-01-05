@@ -1,6 +1,10 @@
 export default function Home() {
   return (
-    <main className="min-h-screen p-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen p-8 outline-none"
+    >
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
@@ -63,7 +67,7 @@ export default function Home() {
 
         <div className="card">
           <h2 className="text-3xl font-bold mb-4"><span aria-hidden="true">🎥</span> Live Stream</h2>
-          <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
+          <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center animate-pulse">
             <p className="text-white text-xl">Stream will appear here</p>
           </div>
           <div className="mt-4 flex gap-4">
