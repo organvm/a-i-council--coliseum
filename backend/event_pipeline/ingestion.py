@@ -50,13 +50,23 @@ class NormalizedEvent(BaseModel):
     timestamp: datetime
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
-    @field_validator('title', 'description', 'content', mode='before')
+    @field_validator('title', 'description', 'content', 'category', mode='before')
     @classmethod
     def sanitize_html(cls, v: Optional[str]) -> Optional[str]:
         """Sanitize HTML content to prevent XSS"""
         if v is None:
             return v
         return html.escape(str(v))
+
+    @field_validator('tags', mode='before')
+    @classmethod
+    def sanitize_tags(cls, v: Any) -> Any:
+        """Sanitize tags to prevent XSS"""
+        if v is None:
+            return []
+        if isinstance(v, list):
+            return [html.escape(str(tag)) for tag in v]
+        return v
 
 
 class EventIngestionSystem:
