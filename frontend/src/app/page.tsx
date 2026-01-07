@@ -1,6 +1,12 @@
+import { VideoCameraSlashIcon } from '@heroicons/react/24/outline'
+
 export default function Home() {
   return (
-    <main className="min-h-screen p-8">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="min-h-screen p-8 focus:outline-none"
+    >
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
@@ -63,8 +69,9 @@ export default function Home() {
 
         <div className="card">
           <h2 className="text-3xl font-bold mb-4"><span aria-hidden="true">🎥</span> Live Stream</h2>
-          <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-            <p className="text-white text-xl">Stream will appear here</p>
+          <div className="aspect-video bg-gray-900 rounded-lg flex flex-col items-center justify-center gap-4">
+            <VideoCameraSlashIcon className="w-16 h-16 text-gray-600" aria-hidden="true" />
+            <p className="text-gray-400 text-xl font-medium">Stream will appear here</p>
           </div>
           <div className="mt-4 flex gap-4">
             <button className="btn-primary">Watch Live</button>
