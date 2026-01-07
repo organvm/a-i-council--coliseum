@@ -5,13 +5,14 @@ Handles incoming events from various sources and normalizes them.
 """
 
 from typing import Dict, Any, List, Optional, Callable
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from datetime import datetime
 from enum import Enum
 import uuid
 import asyncio
 import logging
 import html
+import xml.etree.ElementTree as ET
 
 logger = logging.getLogger(__name__)
 
@@ -48,14 +49,6 @@ class NormalizedEvent(BaseModel):
     content: Optional[str] = None
     timestamp: datetime
     metadata: Dict[str, Any] = Field(default_factory=dict)
-
-    @field_validator('title', 'description', 'content', mode='before')
-    @classmethod
-    def sanitize_html(cls, v: Optional[str]) -> Optional[str]:
-        """Sanitize HTML content to prevent XSS"""
-        if v is None:
-            return v
-        return html.escape(str(v))
 
 
 class EventIngestionSystem:
@@ -209,26 +202,12 @@ class EventIngestionSystem:
         source: Optional[EventSource] = None
     ) -> List[NormalizedEvent]:
         """Get recent normalized events"""
-        # Bolt Optimization: Avoid full list sort/scan for recent events.
-        # normalized_events is append-only, so it is naturally sorted by time.
-
-        if limit <= 0:
-            return []
+        events = self.normalized_events
         
         if source:
-            # Optimized filter: iterate backwards until we find 'limit' items
-            results = []
-            for event in reversed(self.normalized_events):
-                if event.source == source:
-                    results.append(event)
-                    if len(results) >= limit:
-                        break
-            return results
+            events = [e for e in events if e.source == source]
 
-        else:
-            # Optimized no-filter: slice the end and reverse
-            # We want newest first, so we take the last 'limit' and reverse them
-            return list(reversed(self.normalized_events[-limit:]))
+        return sorted(events, key=lambda e: e.timestamp, reverse=True)[:limit]
     
     def clear_old_events(self, max_age_hours: int = 24) -> int:
         """Clear events older than specified hours"""

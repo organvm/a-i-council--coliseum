@@ -30,6 +30,7 @@ class EventResponse(BaseModel):
     description: str
     category: Optional[str] = None
     timestamp: str
+    priority_score: Optional[float] = None
 
 
 @router.get("/", response_model=List[EventResponse])
@@ -48,7 +49,8 @@ async def list_events(
             title=e.title,
             description=e.description,
             category=e.category,
-            timestamp=e.timestamp.isoformat()
+            timestamp=e.timestamp.isoformat(),
+            priority_score=getattr(e, "priority_score", None)
         )
         for e in events
     ]
@@ -92,5 +94,6 @@ async def ingest_event(
         title=event.title,
         description=event.description,
         category=event.category,
-        timestamp=event.timestamp.isoformat()
+        timestamp=event.timestamp.isoformat(),
+        priority_score=event.priority_score
     )

@@ -5,15 +5,17 @@ Manages the lifecycle of AI agents and the main event loop of the council.
 """
 
 import asyncio
-from typing import Dict, Optional
-from datetime import datetime
+from typing import Dict, List, Optional
+from datetime import datetime, timedelta
 import logging
 import random
 
-from .agent import Agent
+from .agent import Agent, AgentRole, Message
 from .communication import AgentCommunicationProtocol
 from .decision_engine import DecisionEngine
-from ..event_pipeline.ingestion import EventIngestionSystem
+from ..event_pipeline.ingestion import EventIngestionSystem, NormalizedEvent
+from ..event_pipeline.processing import EventProcessor
+from ..event_pipeline.prioritization import EventPrioritizer
 from ..voting.voting_engine import VotingEngine
 
 logger = logging.getLogger(__name__)
@@ -39,6 +41,8 @@ class SystemOrchestrator:
         # Initialize Subsystems
         self.communication_protocol = AgentCommunicationProtocol()
         self.event_system = EventIngestionSystem()
+        self.event_processor = EventProcessor()
+        self.event_prioritizer = EventPrioritizer()
         self.voting_engine = VotingEngine()
         self.decision_engine = DecisionEngine()
 
@@ -140,3 +144,28 @@ class SystemOrchestrator:
             content=event_content
         )
         self.last_activity_time = datetime.utcnow()
+
+    async def handle_ingestion(self, source: str, data: Dict, metadata: Optional[Dict] = None) -> Optional[NormalizedEvent]:
+        """
+        Full pipeline: Ingest -> Process -> Prioritize -> Store/Notify
+        """
+        # 1. Ingest
+        event = await self.event_system.ingest_event(source, data, metadata)
+        if not event:
+            return None
+
+        # 2. Process (Enrichment)
+        processed_event = await self.event_processor.process_event(event)
+
+        # 3. Prioritize
+        # Ideally prioritize needs a list to sort, but we can just calculate score
+        score = self.event_prioritizer.calculate_score(processed_event)
+        processed_event.priority_score = score
+
+        # 4. Notify Agents (if high priority)
+        if score > 0.5:
+            await self.broadcast_event(
+                f"New High Priority Event ({score:.1f}): {processed_event.title}\n{processed_event.description}"
+            )
+
+        return processed_event

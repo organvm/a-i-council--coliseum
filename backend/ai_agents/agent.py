@@ -127,14 +127,16 @@ class Agent(BaseAgent):
             options = context.get("options", [])
             topic = context.get("topic", "")
 
-            # Consult knowledge base
-            # Note: relevant_knowledge is not used in current placeholder implementation
-            # but will be needed when LLM-based reasoning is implemented
-            relevant_knowledge = self.knowledge_base.search_by_content(topic)  # noqa: F841
+            # Consult memory and knowledge base
+            relevant_knowledge = self.knowledge_base.search_by_content(topic)
 
-            # TODO: Replace placeholder logic with actual LLM-based reasoning
-            # that leverages the agent's NLP processor, knowledge base, and role-specific reasoning
-            # Currently uses random choice as a placeholder
+            # Use NLP to determine best option based on role and knowledge
+            # This is a simplification; in a real system, we'd prompt the LLM
+            # to pick an option based on its persona.
+
+            # For now, pick random or first option as placeholder logic
+            # unless specific logic is implemented
+            import random
             choice = random.choice(options) if options else None
 
             reasoning = f"Based on my role as {self.state.role} and analysis of {topic}, I choose {choice}."
@@ -172,3 +174,24 @@ class Agent(BaseAgent):
         # Example reflection: summarize recent interactions
         # summary = await self.nlp_processor.summarize(str(recent_memories))
         # self.memory_manager.add_long_term("reflection_" + datetime.utcnow().isoformat(), summary)
+
+        response = await self.nlp_processor.generate(
+           system=self.system_prompt,
+           prompt=prompt,
+           context=context
+        )
+
+        return response
+
+    async def reflect(self) -> None:
+        """
+        Periodically reflect on short-term memory to consolidate into long-term memory.
+        """
+        recent_memories = self.memory_manager.get_short_term(limit=10)
+        if not recent_memories:
+            return
+
+        # Example reflection: summarize recent interactions
+        # summary = await self.nlp_processor.summarize(str(recent_memories))
+        # self.memory_manager.add_long_term("reflection_" + datetime.utcnow().isoformat(), summary)
+        pass

@@ -45,6 +45,9 @@ class NLPProcessor:
                 logger.warning("OpenAI library not available. Using fallback NLP methods.")
             elif not self.api_key:
                 logger.warning("OPENAI_API_KEY not found. Using fallback NLP methods.")
+            self.client = AsyncOpenAI(api_key=self.api_key)
+        else:
+            logger.warning("OpenAI API key not found or library missing. Using fallback NLP methods.")
     
     async def generate(self, system: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
         """
