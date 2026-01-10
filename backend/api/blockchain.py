@@ -5,7 +5,7 @@ API endpoints for blockchain integration.
 """
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 router = APIRouter()
@@ -13,14 +13,14 @@ router = APIRouter()
 
 class StakeRequest(BaseModel):
     """Request to stake tokens"""
-    amount: float
-    lock_period_days: int = 0
+    amount: float = Field(..., ge=0.0)
+    lock_period_days: int = Field(0, ge=0)
 
 
 class TransferRequest(BaseModel):
     """Request to transfer tokens"""
-    to_address: str
-    amount: float
+    to_address: str = Field(..., min_length=1)
+    amount: float = Field(..., ge=0.0)
 
 
 @router.get("/balance/{address}")
