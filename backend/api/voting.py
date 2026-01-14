@@ -6,7 +6,7 @@ API endpoints for voting system.
 
 from fastapi import APIRouter, HTTPException
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..voting.voting_engine import VoteType
 
@@ -16,17 +16,17 @@ router = APIRouter()
 
 class CreateVotingSessionRequest(BaseModel):
     """Request to create voting session"""
-    title: str
-    description: str
+    title: str = Field(..., min_length=1, max_length=100)
+    description: str = Field(..., max_length=500)
     vote_type: VoteType
-    options: List[str]
-    duration_minutes: int = 60
+    options: List[str] = Field(..., min_length=2, max_length=20)
+    duration_minutes: int = Field(60, gt=0)
 
 
 class CastVoteRequest(BaseModel):
     """Request to cast a vote"""
     choice: str
-    tokens_staked: float = 0.0
+    tokens_staked: float = Field(0.0, ge=0.0)
 
 
 class VotingSessionResponse(BaseModel):
