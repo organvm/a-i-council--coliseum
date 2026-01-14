@@ -221,12 +221,13 @@ class SolanaContractManager:
         Distribute rewards to multiple recipients
         
         Args:
-            recipients: Dict of address -> amount (in SOL or Lamports?)
-            Assuming amount is in SOL for now, need to convert to Lamports.
+            recipients: Dict of address -> amount in SOL
             
         Returns:
-            True if successful
+            True if successful (all batches sent)
         """
+        import asyncio
+
         if not self._payer:
             logger.error("No payer configured for reward distribution")
             return False
@@ -234,63 +235,75 @@ class SolanaContractManager:
         if not recipients:
             return True
 
+        # Bolt Optimization: Batch transfers to fit within Solana transaction size limits
+        # A transaction is limited to 1232 bytes.
+        # ~15 transfers is a safe limit.
+        BATCH_SIZE = 15
+
+        recipient_items = list(recipients.items())
+        batches = [recipient_items[i:i + BATCH_SIZE] for i in range(0, len(recipient_items), BATCH_SIZE)]
+
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
+                # Get recent blockhash once for all batches (if possible, but better fresh for each if takes time)
+                # However, for speed, we can fetch it once if batches are small enough to process quickly.
+                # Or fetch inside the loop/task.
 
-                # Add transfer instructions for each recipient
-                for address, amount in recipients.items():
-                    # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                    lamports = int(amount * 1_000_000_000)
-
-                    if lamports <= 0:
-                        continue
-
+                async def process_batch(batch_items):
                     try:
-                        to_pubkey = Pubkey.from_string(address)
-                    except ValueError:
-                        logger.error(f"Invalid recipient address: {address}")
-                        continue
+                        instructions = []
+                        for address, amount in batch_items:
+                            # Convert SOL to lamports (1 SOL = 1e9 lamports)
+                            lamports = int(amount * 1_000_000_000)
 
-                    ix = transfer(
-                        TransferParams(
-                            from_pubkey=self._payer.pubkey(),
-                            to_pubkey=to_pubkey,
-                            lamports=lamports
+                            if lamports <= 0:
+                                continue
+
+                            try:
+                                to_pubkey = Pubkey.from_string(address)
+                            except ValueError:
+                                logger.error(f"Invalid recipient address: {address}")
+                                continue
+
+                            ix = transfer(
+                                TransferParams(
+                                    from_pubkey=self._payer.pubkey(),
+                                    to_pubkey=to_pubkey,
+                                    lamports=lamports
+                                )
+                            )
+                            instructions.append(ix)
+
+                        if not instructions:
+                            return True
+
+                        # Get fresh blockhash for this transaction
+                        latest_blockhash_resp = await client.get_latest_blockhash()
+                        latest_blockhash = latest_blockhash_resp.value.blockhash
+
+                        # Create and sign transaction using new_signed_with_payer
+                        transaction = Transaction.new_signed_with_payer(
+                            instructions,
+                            self._payer.pubkey(),
+                            [self._payer],
+                            latest_blockhash
                         )
-                    )
-                    transaction.add(ix)
 
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
+                        # Send transaction
+                        resp = await client.send_transaction(transaction)
+                        logger.info(f"Rewards batch distributed. Signature: {resp.value}")
+                        return True
 
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
+                    except Exception as e:
+                        logger.error(f"Failed to process reward batch: {e}")
+                        return False
 
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
+                # Process all batches concurrently
+                tasks = [process_batch(batch) for batch in batches]
+                results = await asyncio.gather(*tasks)
 
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
-                    return True
-
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
+                # Return True only if ALL batches succeeded
+                return all(results)
 
             except Exception as e:
                 logger.error(f"Error distributing rewards: {e}")
