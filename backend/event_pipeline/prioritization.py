@@ -4,7 +4,7 @@ Event Prioritization Module
 Scores events to determine their relevance and importance to the agents.
 """
 
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from .ingestion import NormalizedEvent
 
@@ -24,7 +24,7 @@ class EventPrioritizer:
             "tech", "update", "release", "investment", "startup", "policy"
         }
     
-    def calculate_score(self, event: NormalizedEvent) -> float:
+    def calculate_score(self, event: NormalizedEvent, now: Optional[datetime] = None) -> float:
         """
         Calculate priority score (0.0 to 1.0+) for an event.
         """
@@ -42,7 +42,8 @@ class EventPrioritizer:
 
         # Recency scoring (decay over time)
         # Assuming event.timestamp is UTC
-        now = datetime.utcnow()
+        if now is None:
+            now = datetime.utcnow()
         age_hours = (now - event.timestamp).total_seconds() / 3600.0
         
         # Boost for very fresh events (< 1 hour)
@@ -67,4 +68,6 @@ class EventPrioritizer:
         # but it's not in the model currently.
         # We can calculate on the fly for sorting.
         
-        return sorted(events, key=self.calculate_score, reverse=True)
+        # Optimization: Calculate 'now' once to avoid N system calls
+        now = datetime.utcnow()
+        return sorted(events, key=lambda e: self.calculate_score(e, now), reverse=True)
