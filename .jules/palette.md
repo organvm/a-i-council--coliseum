@@ -1,0 +1,3 @@
+## 2024-05-23 - Skip Links Must Have Targets
+**Learning:** A "Skip to content" link is useless if the `href` target (e.g., `#main-content`) doesn't exist on the page. Furthermore, the target container must have `tabIndex={-1}` to ensure focus is programmatically shifted to it, allowing the next tab press to navigate *inside* the main content rather than resetting to the top of the body. Adding `outline-none` is also necessary to prevent a focus ring on the container itself when the skip link is used.
+**Action:** Always verify that `layout.tsx` skip links have a corresponding `id` on the `<main>` tag in `page.tsx`, along with `tabIndex={-1}` and `outline-none`.
