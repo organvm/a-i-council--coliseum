@@ -24,6 +24,7 @@ from .api import (
 )
 from .api.dependencies import initialize_orchestrator, get_orchestrator
 from .api.dependencies import get_orchestrator
+from .middleware.rate_limit import RateLimitMiddleware
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -56,6 +57,9 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan
 )
+
+# Rate limiting middleware - Security: Limit requests to prevent abuse
+app.add_middleware(RateLimitMiddleware)
 
 # CORS middleware - Security: Load allowed origins from environment variable
 origins = [
