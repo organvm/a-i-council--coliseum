@@ -6,7 +6,7 @@ Manages agent memory including short-term and long-term storage.
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-from collections import deque
+from collections import deque, OrderedDict
 import heapq
 
 
@@ -32,7 +32,7 @@ class MemoryManager:
     
     def __init__(self, max_short_term: int = 100, max_long_term: int = 1000):
         self.short_term: deque = deque(maxlen=max_short_term)
-        self.long_term: Dict[str, MemoryEntry] = {}
+        self.long_term: OrderedDict[str, MemoryEntry] = OrderedDict()
         self.max_long_term = max_long_term
         # Min-heap storing (expires_at, key) tuples for O(1) expiration check
         self.expiry_heap: List = []
@@ -56,6 +56,10 @@ class MemoryManager:
         # Clean expired entries
         self._clean_expired()
         
+        # If updating existing, move to end (mark recent)
+        if key in self.long_term:
+            self.long_term.move_to_end(key)
+
         # Add new entry
         entry = MemoryEntry(key, value, ttl)
         self.long_term[key] = entry
@@ -75,6 +79,8 @@ class MemoryManager:
         if entry:
             entry.access_count += 1
             entry.last_accessed = datetime.utcnow()
+            # Optimization: Move to end to mark as recently used (O(1))
+            self.long_term.move_to_end(key)
             return entry.value
         return None
     
@@ -120,11 +126,8 @@ class MemoryManager:
         if not self.long_term:
             return
         
-        lru_key = min(
-            self.long_term.items(),
-            key=lambda item: item[1].last_accessed
-        )[0]
-        del self.long_term[lru_key]
+        # Optimization: Pop the first item (least recently used) - O(1)
+        self.long_term.popitem(last=False)
     
     def get_stats(self) -> Dict[str, Any]:
         """Get memory statistics"""

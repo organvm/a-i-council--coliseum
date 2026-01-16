@@ -5,30 +5,9 @@ This module provides the concrete implementation of the AI agent,
 integrating memory, knowledge, NLP, and decision-making capabilities.
 """
 
-from typing import Optional, Dict, Any, List
+from typing import Dict, Any, Optional, List
 from datetime import datetime
 
-from .base_agent import BaseAgent, AgentRole, Message
-from .memory_manager import MemoryManager
-from .knowledge_base import KnowledgeBase
-from .nlp_module import NLPProcessor
-from .decision_engine import DecisionEngine
-
-
-class Agent(BaseAgent):
-    """
-    Concrete implementation of an AI agent.
-
-    Integrates:
-    - MemoryManager: For short-term and long-term memory
-    - KnowledgeBase: For accessing static knowledge
-    - NLPProcessor: For language understanding and generation
-    - DecisionEngine: For making choices and voting
-This module provides the concrete implementation of the AI Agent,
-integrating all core modules (Memory, Knowledge, NLP, Decision Engine).
-"""
-
-from typing import Dict, Any, Optional, List
 from .base_agent import BaseAgent, AgentRole, Message
 from .memory_manager import MemoryManager
 from .knowledge_base import KnowledgeBase
@@ -118,50 +97,6 @@ class Agent(BaseAgent):
                 recipient_id=message.sender_id if is_direct else None,
                 content=response_text,
                 metadata={"reply_to": message.message_id}
-            )
-
-        decision_engine: Optional[DecisionEngine] = None,
-        nlp_processor: Optional[NLPProcessor] = None
-    ):
-        super().__init__(role, config)
-        self.memory_manager = memory_manager or MemoryManager()
-        self.knowledge_base = knowledge_base or KnowledgeBase()
-        self.decision_engine = decision_engine or DecisionEngine()
-        self.nlp_processor = nlp_processor or NLPProcessor()
-
-    async def process_message(self, message: Message) -> Optional[Message]:
-        """
-        Process incoming message, update memory, and potentially respond.
-        """
-        # Add to short term memory
-        self.memory_manager.add_short_term(message.dict())
-
-        # Analyze content
-        sentiment = await self.nlp_processor.analyze_sentiment(message.content)
-        topics = await self.nlp_processor.classify_topic(message.content)
-
-        # Store analysis in memory
-        self.add_to_memory("last_sentiment", sentiment)
-        self.add_to_memory("last_topics", topics)
-
-        # Decide if response is needed
-        # Respond if addressed directly or if it's a broadcast and we are active
-        should_respond = (
-            message.recipient_id == self.state.agent_id or
-            (message.recipient_id is None and self.state.is_active)
-        )
-
-        if should_respond:
-            response_text = await self.generate_response(message.content)
-            return Message(
-                sender_id=self.state.agent_id,
-                recipient_id=message.sender_id,
-                content=response_text,
-                metadata={
-                    "sentiment_context": sentiment,
-                    "topics": topics,
-                    "responding_to": message.message_id
-                }
             )
         return None
 
