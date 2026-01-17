@@ -6,7 +6,7 @@ Manages agent memory including short-term and long-term storage.
 
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-from collections import deque
+from collections import deque, OrderedDict
 import heapq
 
 
@@ -32,7 +32,7 @@ class MemoryManager:
     
     def __init__(self, max_short_term: int = 100, max_long_term: int = 1000):
         self.short_term: deque = deque(maxlen=max_short_term)
-        self.long_term: Dict[str, MemoryEntry] = {}
+        self.long_term: OrderedDict[str, MemoryEntry] = OrderedDict()
         self.max_long_term = max_long_term
         # Min-heap storing (expires_at, key) tuples for O(1) expiration check
         self.expiry_heap: List = []
@@ -59,6 +59,7 @@ class MemoryManager:
         # Add new entry
         entry = MemoryEntry(key, value, ttl)
         self.long_term[key] = entry
+        self.long_term.move_to_end(key)  # Ensure it is at the MRU end
         
         if entry.expires_at:
             heapq.heappush(self.expiry_heap, (entry.expires_at, key))
@@ -73,6 +74,7 @@ class MemoryManager:
         
         entry = self.long_term.get(key)
         if entry:
+            self.long_term.move_to_end(key)  # Mark as recently used
             entry.access_count += 1
             entry.last_accessed = datetime.utcnow()
             return entry.value
@@ -120,11 +122,8 @@ class MemoryManager:
         if not self.long_term:
             return
         
-        lru_key = min(
-            self.long_term.items(),
-            key=lambda item: item[1].last_accessed
-        )[0]
-        del self.long_term[lru_key]
+        # Pop the first item (LRU) - O(1)
+        self.long_term.popitem(last=False)
     
     def get_stats(self) -> Dict[str, Any]:
         """Get memory statistics"""
