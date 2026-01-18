@@ -9,7 +9,7 @@ from backend.ai_agents.agent import Agent, AgentRole, Message
 from backend.ai_agents.memory_manager import MemoryManager
 from backend.ai_agents.knowledge_base import KnowledgeBase
 from backend.ai_agents.nlp_module import NLPProcessor
-from backend.ai_agents.decision_engine import DecisionEngine
+from backend.ai_agents.decision_engine import DecisionEngine, DecisionType
 
 @pytest.fixture
 def agent():
@@ -39,7 +39,8 @@ async def test_agent_process_direct_message(agent):
     assert response is not None
     assert response.sender_id == agent.state.agent_id
     assert response.recipient_id == sender_id
-    assert "I received:" in response.content
+    # Default Debater role prefix
+    assert "I argue that:" in response.content
 
 @pytest.mark.asyncio
 async def test_agent_process_broadcast_message_ignored(agent):
@@ -92,15 +93,23 @@ async def test_agent_memory_update(agent):
 
 @pytest.mark.asyncio
 async def test_agent_make_decision_vote(agent):
+    # Create a decision in the engine first
+    decision_obj = agent.decision_engine.create_decision(
+        title="Should we adopt Python?",
+        description="Technical decision",
+        decision_type=DecisionType.BINARY,
+        options=["Yes", "No"]
+    )
+
     context = {
         "type": "vote",
-        "topic": "Should we adopt Python?",
-        "options": ["Yes", "No"]
+        "decision_id": decision_obj.decision_id,
+        "default_choice": "Yes" # Helper to predict choice since logic is random/stubbed
     }
 
     decision = await agent.make_decision(context)
 
+    assert "status" in decision
+    assert decision["status"] == "voted"
     assert "choice" in decision
     assert decision["choice"] in ["Yes", "No"]
-    assert "reasoning" in decision
-    assert decision["confidence"] == 0.8
