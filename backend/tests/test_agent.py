@@ -39,7 +39,7 @@ async def test_agent_process_direct_message(agent):
     assert response is not None
     assert response.sender_id == agent.state.agent_id
     assert response.recipient_id == sender_id
-    assert "I received:" in response.content
+    assert "I argue that:" in response.content
 
 @pytest.mark.asyncio
 async def test_agent_process_broadcast_message_ignored(agent):
@@ -92,10 +92,19 @@ async def test_agent_memory_update(agent):
 
 @pytest.mark.asyncio
 async def test_agent_make_decision_vote(agent):
+    # Create a decision first so the engine knows about it
+    from backend.ai_agents.decision_engine import DecisionType
+    decision_obj = agent.decision_engine.create_decision(
+        title="Should we adopt Python?",
+        description="Debate",
+        decision_type=DecisionType.BINARY,
+        options=["Yes", "No"]
+    )
+
     context = {
         "type": "vote",
-        "topic": "Should we adopt Python?",
-        "options": ["Yes", "No"]
+        "decision_id": decision_obj.decision_id,
+        "default_choice": "Yes"
     }
 
     decision = await agent.make_decision(context)
@@ -103,4 +112,4 @@ async def test_agent_make_decision_vote(agent):
     assert "choice" in decision
     assert decision["choice"] in ["Yes", "No"]
     assert "reasoning" in decision
-    assert decision["confidence"] == 0.8
+    assert decision["confidence"] == 1.0
