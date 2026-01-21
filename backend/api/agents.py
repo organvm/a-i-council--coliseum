@@ -6,7 +6,7 @@ API endpoints for AI agent management.
 
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..ai_agents.agent import Agent, AgentRole
 from ..ai_agents.base_agent import AgentState
@@ -19,7 +19,13 @@ router = APIRouter()
 class CreateAgentRequest(BaseModel):
     """Request to create an agent"""
     role: AgentRole
-    name: str
+    name: str = Field(
+        ...,
+        min_length=1,
+        max_length=50,
+        pattern=r"^\S.*\S$|^\S$",
+        description="Agent name (1-50 chars, no leading/trailing whitespace)"
+    )
     config: Optional[dict] = None
 
 
