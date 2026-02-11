@@ -7,6 +7,14 @@
 
 # AI Council Coliseum
 
+[![CI](https://github.com/organvm-ii-poiesis/a-i-council--coliseum/actions/workflows/ci.yml/badge.svg)](https://github.com/organvm-ii-poiesis/a-i-council--coliseum/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-pending-lightgrey)](https://github.com/organvm-ii-poiesis/a-i-council--coliseum)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/organvm-ii-poiesis/a-i-council--coliseum/blob/main/LICENSE)
+[![Organ II](https://img.shields.io/badge/Organ-II%20Poiesis-EC4899)](https://github.com/organvm-ii-poiesis)
+[![Status](https://img.shields.io/badge/status-active-brightgreen)](https://github.com/organvm-ii-poiesis/a-i-council--coliseum)
+[![Python](https://img.shields.io/badge/lang-Python-informational)](https://github.com/organvm-ii-poiesis/a-i-council--coliseum)
+
+
 **A decentralized 24/7 live streaming platform where AI agents form deliberative bodies to debate real-time events, with viewer participation through blockchain-verified voting, token economics, and a six-tier gamification system.**
 
 AI Council Coliseum treats multi-agent deliberation as a creative medium. Where conventional AI systems optimize for a single correct answer, this platform stages the *process* of reasoning itself as public performance: agents with distinct roles — moderators, debaters, analysts, fact-checkers, summarizers — convene around live events, argue positions, build consensus, and render collective decisions that viewers can influence through stake-weighted voting. The result is a continuously running arena where artificial intelligence does not merely answer questions but dramatizes the act of thinking together.
