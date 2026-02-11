@@ -1,30 +1,35 @@
 """
-Agents API Router
+Agents API Router.
 
 API endpoints for AI agent management.
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from typing import List, Optional, Dict, Any
+from __future__ import annotations
+
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from ..ai_agents.agent import Agent, AgentRole
-from ..ai_agents.base_agent import AgentState
 from ..ai_agents.orchestrator import SystemOrchestrator
 from .dependencies import get_orchestrator
 
 router = APIRouter()
+AGENT_NOT_FOUND_RESPONSE = {404: {"description": "Agent not found"}}
 
 
 class CreateAgentRequest(BaseModel):
-    """Request to create an agent"""
+    """Request to create an agent."""
+
     role: AgentRole
     name: str
-    config: Optional[dict] = None
+    config: Optional[Dict[str, Any]] = None
 
 
 class AgentResponse(BaseModel):
-    """Agent response model"""
+    """Agent response model."""
+
     agent_id: str
     name: str
     role: str
@@ -34,25 +39,25 @@ class AgentResponse(BaseModel):
 
 @router.get("/", response_model=List[AgentResponse])
 async def list_agents(orchestrator: SystemOrchestrator = Depends(get_orchestrator)):
-    """List all agents"""
+    """List all agents."""
     return [
         AgentResponse(
             agent_id=agent.state.agent_id,
             name=agent.name,
-            role=agent.state.role,
+            role=agent.state.role.value,
             is_active=agent.state.is_active,
-            state=agent.state.model_dump()
+            state=agent.state.model_dump(),
         )
-        for agent in orchestrator.agents.values()
+        for agent in orchestrator.list_agents()
     ]
 
 
 @router.post("/", response_model=AgentResponse)
 async def create_agent(
     request: CreateAgentRequest,
-    orchestrator: SystemOrchestrator = Depends(get_orchestrator)
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """Create a new agent"""
+    """Create a new agent."""
     config = request.config or {}
     config["name"] = request.name
 
@@ -62,18 +67,18 @@ async def create_agent(
     return AgentResponse(
         agent_id=agent.state.agent_id,
         name=agent.name,
-        role=agent.state.role,
+        role=agent.state.role.value,
         is_active=agent.state.is_active,
-        state=agent.state.model_dump()
+        state=agent.state.model_dump(),
     )
 
 
-@router.get("/{agent_id}", response_model=AgentResponse)
+@router.get("/{agent_id}", response_model=AgentResponse, responses=AGENT_NOT_FOUND_RESPONSE)
 async def get_agent(
     agent_id: str,
-    orchestrator: SystemOrchestrator = Depends(get_orchestrator)
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """Get agent by ID"""
+    """Get agent by ID."""
     agent = orchestrator.get_agent(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
@@ -81,32 +86,47 @@ async def get_agent(
     return AgentResponse(
         agent_id=agent.state.agent_id,
         name=agent.name,
-        role=agent.state.role,
+        role=agent.state.role.value,
         is_active=agent.state.is_active,
-        state=agent.state.model_dump()
+        state=agent.state.model_dump(),
     )
 
 
-@router.delete("/{agent_id}")
-async def delete_agent(
+@router.get("/{agent_id}/memory", responses=AGENT_NOT_FOUND_RESPONSE)
+async def get_agent_memory(
     agent_id: str,
-    orchestrator: SystemOrchestrator = Depends(get_orchestrator)
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """Delete an agent"""
+    """Get memory snapshots for a specific agent."""
     agent = orchestrator.get_agent(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
 
-    orchestrator.remove_agent(agent_id)
+    return {
+        "agent_id": agent_id,
+        "short_term": agent.memory_manager.get_short_term(limit=25),
+        "long_term_stats": agent.memory_manager.get_stats(),
+        "state_memory": agent.state.memory,
+    }
+
+
+@router.delete("/{agent_id}", responses=AGENT_NOT_FOUND_RESPONSE)
+async def delete_agent(
+    agent_id: str,
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
+):
+    """Delete an agent."""
+    if not orchestrator.remove_agent(agent_id):
+        raise HTTPException(status_code=404, detail="Agent not found")
     return {"status": "deleted", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/activate")
+@router.post("/{agent_id}/activate", responses=AGENT_NOT_FOUND_RESPONSE)
 async def activate_agent(
     agent_id: str,
-    orchestrator: SystemOrchestrator = Depends(get_orchestrator)
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """Activate an agent"""
+    """Activate an agent."""
     agent = orchestrator.get_agent(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")
@@ -115,12 +135,12 @@ async def activate_agent(
     return {"status": "activated", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/deactivate")
+@router.post("/{agent_id}/deactivate", responses=AGENT_NOT_FOUND_RESPONSE)
 async def deactivate_agent(
     agent_id: str,
-    orchestrator: SystemOrchestrator = Depends(get_orchestrator)
+    orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """Deactivate an agent"""
+    """Deactivate an agent."""
     agent = orchestrator.get_agent(agent_id)
     if not agent:
         raise HTTPException(status_code=404, detail="Agent not found")

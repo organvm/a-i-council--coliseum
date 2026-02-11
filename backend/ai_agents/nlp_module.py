@@ -1,105 +1,101 @@
 """
-NLP Processing Module
+NLP Processing Module.
 
-Provides natural language processing capabilities for AI agents.
+Provides natural language processing capabilities for AI agents with
+an optional OpenAI-backed implementation and deterministic fallbacks.
 """
 
-import os
-from typing import Dict, Any, List, Optional
-import re
-from collections import Counter
-import logging
-
-# Check for OpenAI availability
-try:
-    from openai import AsyncOpenAI
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
+from __future__ import annotations
 
 import json
 import logging
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel
-from openai import AsyncOpenAI
+import os
+import re
+from collections import Counter
+from typing import Any, Dict, List, Optional
 
-# Configure logging
+try:
+    from openai import AsyncOpenAI
+except Exception:  # pragma: no cover - optional dependency
+    AsyncOpenAI = None
+
 logger = logging.getLogger(__name__)
 
+
 class NLPProcessor:
-    """
-    Natural Language Processing module for agent text understanding
-    and generation.
-    """
-    
+    """NLP module for text understanding and lightweight generation."""
+
     def __init__(self, model_name: str = "gpt-4-turbo-preview"):
         self.model_name = model_name
         self.api_key = os.getenv("OPENAI_API_KEY")
-        if self.api_key:
+        self.client = None
+
+        if self.api_key and AsyncOpenAI is not None:
             self.client = AsyncOpenAI(api_key=self.api_key)
+        elif self.api_key and AsyncOpenAI is None:
+            logger.warning("OPENAI_API_KEY is set but openai package is unavailable")
         else:
-            self.client = None
-            logger.warning("OPENAI_API_KEY not found. NLP features will use placeholders.")
-    
-    async def generate(self, system: str, prompt: str, context: Optional[Dict[str, Any]] = None) -> str:
-        """
-        Generate text response using LLM
-        """
+            logger.warning("OPENAI_API_KEY not found. NLP features will use fallbacks")
+
+    async def generate(
+        self,
+        system: str,
+        prompt: str,
+        context: Optional[Dict[str, Any]] = None,
+    ) -> str:
+        """Generate text response using LLM when available, otherwise fallback."""
         if self.client:
             try:
                 messages = [{"role": "system", "content": system}]
 
-                # Add context if available
                 if context and "previous_messages" in context:
                     for msg in context["previous_messages"]:
-                         # Simplified context mapping
-                        content = msg.get("content", {})
+                        content = msg.get("content", {}) if isinstance(msg, dict) else {}
                         if isinstance(content, dict):
                             text = content.get("content", "")
                             sender = content.get("sender_id", "User")
                             messages.append({"role": "user", "content": f"{sender}: {text}"})
 
                 messages.append({"role": "user", "content": prompt})
-
                 response = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=messages,
-                    temperature=0.7
+                    temperature=0.7,
                 )
-                return response.choices[0].message.content
-            except Exception as e:
-                logger.error(f"OpenAI API error: {e}")
+                content = response.choices[0].message.content
+                if content:
+                    return content
+            except Exception as exc:
+                logger.error("OpenAI generation error: %s", exc)
 
-        # Fallback response
         return f"I received: {prompt}"
 
     async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
-        """
-        Analyze sentiment of text.
-        
-        Returns:
-            Dict with sentiment label (positive, negative, neutral) and score (-1.0 to 1.0)
-        """
+        """Analyze sentiment using OpenAI when available, otherwise heuristics."""
         if self.client:
             try:
                 response = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=[
-                        {"role": "system", "content": "Analyze the sentiment of the following text. Return a JSON object with 'sentiment' (positive, negative, neutral) and 'score' (float -1.0 to 1.0)."},
-                        {"role": "user", "content": text}
+                        {
+                            "role": "system",
+                            "content": (
+                                "Analyze sentiment. Return JSON with 'sentiment' "
+                                "(positive|negative|neutral) and 'score' (-1.0..1.0)."
+                            ),
+                        },
+                        {"role": "user", "content": text},
                     ],
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
-                import json
                 return json.loads(response.choices[0].message.content)
-            except Exception as e:
-                logger.error(f"Sentiment analysis error: {e}")
+            except Exception as exc:
+                logger.error("Sentiment analysis error: %s", exc)
 
-        # Fallback: Simple keyword based sentiment
         positive_words = {"good", "great", "excellent", "amazing", "love", "like", "agree", "yes"}
         negative_words = {"bad", "terrible", "awful", "hate", "dislike", "disagree", "no"}
 
-        words = set(re.findall(r'\w+', text.lower()))
+        words = set(re.findall(r"\w+", text.lower()))
         pos_count = len(words.intersection(positive_words))
         neg_count = len(words.intersection(negative_words))
 
@@ -112,115 +108,117 @@ class NLPProcessor:
             score = -0.5 - (0.1 * min(neg_count, 5))
         else:
             sentiment = "neutral"
-            score = 0.0
 
-        return {
-            "sentiment": sentiment,
-            "score": score,
-            "confidence": 0.5  # Low confidence for heuristic
-        }
-    
+        return {"sentiment": sentiment, "score": score, "confidence": 0.5}
+
     async def extract_entities(self, text: str) -> List[Dict[str, Any]]:
-        """
-        Extract named entities from text.
-        """
+        """Extract named entities using OpenAI when available, otherwise heuristics."""
         if self.client:
             try:
                 response = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=[
-                        {"role": "system", "content": "Extract named entities (Person, Org, Location, etc) from the text. Return a JSON object with a key 'entities' containing a list of objects with 'text' and 'type'."},
-                        {"role": "user", "content": text}
+                        {
+                            "role": "system",
+                            "content": (
+                                "Extract named entities. Return JSON with key 'entities': "
+                                "[{text, type}]"
+                            ),
+                        },
+                        {"role": "user", "content": text},
                     ],
-                    response_format={"type": "json_object"}
+                    response_format={"type": "json_object"},
                 )
-                import json
                 return json.loads(response.choices[0].message.content).get("entities", [])
-            except Exception as e:
-                logger.error(f"Entity extraction error: {e}")
+            except Exception as exc:
+                logger.error("Entity extraction error: %s", exc)
 
-        # Fallback: Simple capitalization heuristic
-        # Matches capitalized words that are not at the start of a sentence (simplified)
-        entities = []
+        entities: List[Dict[str, Any]] = []
         words = text.split()
         for i, word in enumerate(words):
-            clean_word = re.sub(r'[^\w]', '', word)
+            clean_word = re.sub(r"[^\w]", "", word)
             if i > 0 and clean_word and clean_word[0].isupper():
                 entities.append({"text": clean_word, "type": "UNKNOWN"})
 
         return entities
-    
+
     async def summarize(self, text: str, max_length: int = 100) -> str:
-        """
-        Summarize text to specified length.
-        """
+        """Summarize text to a maximum length."""
         if self.client:
             try:
                 response = await self.client.chat.completions.create(
                     model=self.model_name,
                     messages=[
-                        {"role": "system", "content": f"Summarize the following text in under {max_length} characters."},
-                        {"role": "user", "content": text}
-                    ]
+                        {
+                            "role": "system",
+                            "content": f"Summarize the following text in under {max_length} characters.",
+                        },
+                        {"role": "user", "content": text},
+                    ],
                 )
-                return response.choices[0].message.content
-            except Exception as e:
-                logger.error(f"Summarization error: {e}")
+                content = response.choices[0].message.content
+                if content:
+                    return content
+            except Exception as exc:
+                logger.error("Summarization error: %s", exc)
 
-        # Fallback: Truncate
         if len(text) <= max_length:
             return text
-        return text[:max_length-3] + "..."
-    
+        return text[: max_length - 3] + "..."
+
     async def classify_topic(self, text: str) -> Dict[str, float]:
-        """
-        Classify text into topic categories.
-        """
+        """Classify topic with OpenAI or a deterministic fallback."""
         if not self.client:
-            # Fallback for when API is not available
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
+            return {"general": 0.7, "politics": 0.2, "technology": 0.1}
 
-        prompt = f"""
-        Classify the following text into relevant topics (e.g., politics, technology, economy, entertainment, sports, science).
-        Return a JSON object where keys are topics and values are confidence scores between 0 and 1.
-
-        Text: {text}
-        """
+        prompt = (
+            "Classify the following text into topics "
+            "(politics, technology, economy, entertainment, sports, science). "
+            "Return JSON where keys are topics and values are confidence scores.\n\n"
+            f"Text: {text}"
+        )
 
         try:
             response = await self.client.chat.completions.create(
                 model=self.model_name,
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that classifies text into topics. Output valid JSON."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You classify text into topics. Output valid JSON.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
-                response_format={ "type": "json_object" }
+                response_format={"type": "json_object"},
             )
             content = response.choices[0].message.content
             if content:
                 return json.loads(content)
-            else:
-                return {"error": 1.0}
-        except Exception as e:
-            logger.error(f"Error classifying topic: {e}")
-            return {
-                "general": 0.7,
-                "politics": 0.2,
-                "technology": 0.1
-            }
-    
-    async def extract_keywords(self, text: str, top_k: int = 5) -> List[str]:
-        """
-        Extract key terms from text using frequency.
-        """
-        words = re.findall(r'\w+', text.lower())
-        # Filter common stopwords (very basic list)
-        stopwords = {"the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "is", "of", "it", "that", "with"}
-        filtered_words = [w for w in words if w not in stopwords and len(w) > 3]
+        except Exception as exc:
+            logger.error("Topic classification error: %s", exc)
 
+        return {"general": 0.7, "politics": 0.2, "technology": 0.1}
+
+    async def extract_keywords(self, text: str, top_k: int = 5) -> List[str]:
+        """Extract top-k keywords by simple frequency analysis."""
+        words = re.findall(r"\w+", text.lower())
+        stopwords = {
+            "the",
+            "a",
+            "an",
+            "and",
+            "or",
+            "but",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "is",
+            "of",
+            "it",
+            "that",
+            "with",
+        }
+        filtered_words = [w for w in words if w not in stopwords and len(w) > 3]
         counts = Counter(filtered_words)
-        return [word for word, count in counts.most_common(top_k)]
+        return [word for word, _ in counts.most_common(top_k)]

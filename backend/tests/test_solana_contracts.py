@@ -1,9 +1,11 @@
 import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
-from backend.blockchain.solana_contracts import SolanaContractManager
-from solders.transaction import Transaction
-from solders.keypair import Keypair
-from solders.pubkey import Pubkey
+
+try:
+    from backend.blockchain.solana_contracts import SolanaContractManager
+    from solders.keypair import Keypair
+except Exception as exc:  # pragma: no cover - optional dependency path
+    pytest.skip(f"Solana optional dependencies unavailable: {exc}", allow_module_level=True)
 
 @pytest.mark.asyncio
 async def test_distribute_rewards_no_payer():

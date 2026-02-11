@@ -1,176 +1,343 @@
 """
-System Orchestrator Module
+System Orchestrator Module.
 
-Manages the lifecycle of AI agents and coordinates system-wide activities.
+Manages AI agents and core in-memory subsystems for MVP operation.
 """
 
-from typing import Dict, List, Optional
+from __future__ import annotations
+
 import asyncio
-from .base_agent import AgentRole, Message
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from ..event_pipeline.classification import EventClassifier
+from ..event_pipeline.ingestion import EventIngestionSystem, EventSource, NormalizedEvent
+from ..event_pipeline.notification import NotificationPriority, NotificationSystem
+from ..event_pipeline.prioritization import EventPrioritizer
+from ..event_pipeline.processing import EventProcessor, ProcessedEvent
+from ..event_pipeline.routing import EventRouter
+from ..event_pipeline.storage import EventStorage
+from ..voting.achievements import AchievementSystem
+from ..voting.gamification import GamificationSystem
+from ..voting.leaderboard import LeaderboardSystem
+from ..voting.voting_engine import Vote, VoteStatus, VoteType, VotingEngine, VotingSession
 from .agent import Agent
-from .memory_manager import MemoryManager
-from .knowledge_base import KnowledgeBase
+from .base_agent import AgentRole, Message
+from .communication import AgentCommunicationProtocol
 from .decision_engine import DecisionEngine
+from .knowledge_base import KnowledgeBase
+from .memory_manager import MemoryManager
+
+logger = logging.getLogger(__name__)
+
 
 class SystemOrchestrator:
-    """
-    Orchestrates the AI Council system.
-    Manages agents, distributes messages, and coordinates activities.
-    """
+    """Coordinates agents, event pipeline, voting, and user progression subsystems."""
 
-    _instance = None
-
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(SystemOrchestrator, cls).__new__(cls)
-            cls._instance._initialized = False
-        return cls._instance
-
-    def __init__(self):
-        if self._initialized:
-            return
-
+    def __init__(self, tick_rate: float = 1.0, silence_threshold_seconds: float = 30.0):
         self.agents: Dict[str, Agent] = {}
-        self.active = False
+
+        self.tick_rate = tick_rate
+        self.silence_threshold_seconds = silence_threshold_seconds
+        self.last_activity_time = datetime.utcnow()
+
+        self.is_running = False
+        self.loop_task: Optional[asyncio.Task] = None
+        self.communication_task: Optional[asyncio.Task] = None
+
+        self.communication_protocol = AgentCommunicationProtocol()
+
         self.memory_manager = MemoryManager()
         self.knowledge_base = KnowledgeBase()
         self.decision_engine = DecisionEngine()
-        self._initialized = True
 
-    def register_agent(self, agent: Agent) -> str:
-        """Register a new agent with the system"""
-        # Inject shared components if they are using defaults
-        # Note: In a real system we might force sharing, but here we just register
+        self.ingestion_system = EventIngestionSystem()
+        self.classifier = EventClassifier()
+        self.prioritizer = EventPrioritizer()
+        self.router = EventRouter()
+        self.processor = EventProcessor()
+        self.storage = EventStorage()
+        self.notifications = NotificationSystem()
+
+        self.processor.add_enricher("sentiment", self.processor.enrich_sentiment)
+        self.processor.add_enricher("entities", self.processor.enrich_entities)
+        self.processor.add_enricher("summary", self.processor.enrich_summary)
+        self.processor.add_enricher("keywords", self.processor.enrich_keywords)
+
+        self.voting_engine = VotingEngine()
+        self.gamification_system = GamificationSystem()
+        self.achievement_system = AchievementSystem()
+        self.leaderboard_system = LeaderboardSystem(self.gamification_system)
+
+    def add_agent(self, agent: Agent) -> str:
+        """Add/register an agent to orchestration and communication."""
         self.agents[agent.state.agent_id] = agent
+        self.communication_protocol.register_agent(agent)
         return agent.state.agent_id
 
-    def create_agent(self, role: AgentRole, config: Optional[Dict] = None) -> Agent:
-        """Create and register a new agent"""
+    def register_agent(self, agent: Agent) -> str:
+        """Backward-compatible alias for add_agent."""
+        return self.add_agent(agent)
+
+    def create_agent(self, role: AgentRole, config: Optional[Dict[str, Any]] = None) -> Agent:
+        """Create and register a new agent with shared knowledge and decision engines."""
         agent = Agent(
             role=role,
             config=config,
             knowledge_base=self.knowledge_base,
-            decision_engine=self.decision_engine
-            # We give them their own memory manager, but share knowledge and decisions
+            decision_engine=self.decision_engine,
         )
-        self.register_agent(agent)
+        self.add_agent(agent)
         return agent
 
     def remove_agent(self, agent_id: str) -> bool:
-        """Remove an agent from the system"""
-        if agent_id in self.agents:
-            del self.agents[agent_id]
-            return True
-        return False
+        """Remove an agent from orchestration and communication."""
+        if agent_id not in self.agents:
+            return False
 
-    async def broadcast_message(self, message: Message) -> None:
-        """Broadcast a message to all active agents"""
-        tasks = []
-        for agent in self.agents.values():
-            if agent.state.is_active:
-                tasks.append(agent.process_message(message))
-
-        # Gather responses
-        responses = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Process responses (if any agents replied)
-        for response in responses:
-            if isinstance(response, Message):
-                # Handle agent response (e.g. log it, or re-broadcast if needed)
-                # For now, we just print it
-                print(f"Agent {response.sender_id} replied: {response.content}")
-
-    async def start(self):
-        """Start the orchestration loop"""
-        self.active = True
-        print("System Orchestrator started.")
-        # In a real app, this might start a background loop
-
-    async def stop(self):
-        """Stop the orchestration loop"""
-        self.active = False
-        print("System Orchestrator stopped.")
+        self.communication_protocol.unregister_agent(agent_id)
+        del self.agents[agent_id]
+        return True
 
     def get_agent(self, agent_id: str) -> Optional[Agent]:
-        """Get agent by ID"""
+        """Get one agent by ID."""
         return self.agents.get(agent_id)
 
+    def list_agents(self) -> List[Agent]:
+        """List all registered agents."""
+        return list(self.agents.values())
+
     async def start(self) -> None:
-        """Start the orchestrator and main loop"""
+        """Start orchestrator background loops."""
         if self.is_running:
             return
 
         self.is_running = True
-
-        # Start communication protocol
-        asyncio.create_task(self.communication_protocol.start())
-
-        # Start main loop
+        self.communication_task = asyncio.create_task(self.communication_protocol.start())
         self.loop_task = asyncio.create_task(self._main_loop())
-        logger.info("System Orchestrator started.")
+        logger.info("System Orchestrator started")
 
     async def stop(self) -> None:
-        """Stop the orchestrator"""
+        """Stop orchestrator background loops."""
         self.is_running = False
-        if self.loop_task:
-            self.loop_task.cancel()
-            try:
-                await self.loop_task
-            except asyncio.CancelledError:
-                pass
-
         await self.communication_protocol.stop()
-        logger.info("System Orchestrator stopped.")
+
+        for task in (self.loop_task, self.communication_task):
+            if task and not task.done():
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+
+        logger.info("System Orchestrator stopped")
 
     async def _main_loop(self) -> None:
-        """Main system loop"""
+        """Main periodic loop used for housekeeping and system-level tasks."""
         while self.is_running:
             try:
                 await self._tick()
                 await asyncio.sleep(self.tick_rate)
-            except Exception as e:
-                logger.error(f"Error in main loop: {e}")
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:
+                logger.exception("Error in orchestrator main loop: %s", exc)
 
     async def _tick(self) -> None:
-        """
-        Single system tick.
-
-        1. Process pending messages (handled by comms protocol)
-        2. Allow agents to reflect/act based on new events
-        3. Check for silence and trigger conversation
-        """
-        # Update last activity based on message queue?
-        # Ideally communication protocol would track last message time.
-        # For now, let's assume if there are agents, we check for silence.
-
+        """Single orchestrator tick."""
         if not self.agents:
             return
 
+        # Keep the MVP loop deterministic and quiet by default.
         now = datetime.utcnow()
-        time_since_activity = (now - self.last_activity_time).total_seconds()
+        idle_seconds = (now - self.last_activity_time).total_seconds()
+        if idle_seconds > self.silence_threshold_seconds:
+            self.last_activity_time = now
 
-        if time_since_activity > self.silence_threshold_seconds:
-            # Pick a random agent to say something
-            active_agents = [a for a in self.agents.values() if a.state.is_active]
-            if active_agents:
-                speaker = random.choice(active_agents)
-                # Trigger a thought/message
-                # In a real system, we'd prompt "It's quiet, start a topic"
-                # For now, just a placeholder log or message
-                logger.info(f"Silence detected. Triggering {speaker.name}...")
-
-                # We could inject a "thought" into the agent to prompt them to speak
-                # await speaker.process_message(Message(..., content="SYSTEM: It's quiet..."))
-
-                self.last_activity_time = now # Reset timer
+    async def broadcast_message(self, message: Message) -> None:
+        """Broadcast a Message object through the communication protocol."""
+        await self.communication_protocol.send_message(message)
+        self.last_activity_time = datetime.utcnow()
 
     async def broadcast_event(self, event_content: str) -> None:
-        """
-        Manually inject an event/message to all agents
-        """
-        # Create a system message
+        """Broadcast a plain text system event to all agents."""
         await self.communication_protocol.broadcast_message(
             sender_id="SYSTEM",
-            content=event_content
+            content=event_content,
         )
         self.last_activity_time = datetime.utcnow()
+
+    async def ingest_event(
+        self,
+        source: EventSource,
+        raw_data: Dict[str, Any],
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Optional[ProcessedEvent]:
+        """Ingest, enrich, and store an event in memory."""
+        event = await self.ingestion_system.ingest_event(source, raw_data, metadata)
+        if not event:
+            return None
+
+        category = await self.classifier.get_primary_category(event)
+        event.category = category.value
+
+        topics = await self.classifier.extract_topics(event)
+        event.tags = sorted(set(event.tags + topics))
+
+        priority_score = self.prioritizer.calculate_score(event)
+
+        processed = await self.processor.process_event(
+            event,
+            enrichments=["summary", "keywords", "sentiment", "entities"],
+        )
+        processed.priority_score = priority_score
+
+        await self.storage.store_event(processed)
+        await self.router.route_event(event, priority_score=priority_score)
+
+        notification_priority = self._notification_priority_from_score(priority_score)
+        await self.notifications.notify_event(processed, priority=notification_priority)
+
+        return processed
+
+    async def list_events(
+        self,
+        limit: int = 10,
+        source: Optional[EventSource] = None,
+    ) -> List[NormalizedEvent]:
+        """List recent normalized events from ingestion history."""
+        return self.ingestion_system.get_recent_events(limit=limit, source=source)
+
+    def create_voting_session(
+        self,
+        title: str,
+        description: str,
+        vote_type: VoteType,
+        options: List[Any],
+        duration_minutes: int = 60,
+        min_stake: float = 0.0,
+    ) -> VotingSession:
+        """Create and activate a voting session."""
+        session = self.voting_engine.create_session(
+            title=title,
+            description=description,
+            vote_type=vote_type,
+            options=options,
+            duration_minutes=duration_minutes,
+            min_stake=min_stake,
+        )
+        self.voting_engine.start_session(session.session_id)
+        return session
+
+    def cast_vote(
+        self,
+        session_id: str,
+        user_id: str,
+        choice: Any,
+        tokens_staked: float = 0.0,
+    ) -> Vote:
+        """Cast a weighted vote and update user progression."""
+        session = self.voting_engine.sessions.get(session_id)
+        if not session:
+            raise ValueError("Voting session not found")
+        if session.status != VoteStatus.ACTIVE:
+            raise ValueError("Voting session is not active")
+        if tokens_staked < session.min_stake:
+            raise ValueError("Insufficient stake for this session")
+        if any(v.user_id == user_id for v in session.votes):
+            raise ValueError("User has already voted in this session")
+        if not self._is_valid_vote_choice(session, choice):
+            raise ValueError("Invalid vote choice")
+
+        user_progress = self.gamification_system.get_or_create_user_progress(user_id)
+        vote_weight = self.gamification_system.get_tier_benefits(user_progress.tier)["vote_weight"]
+
+        vote = self.voting_engine.cast_vote(
+            session_id=session_id,
+            user_id=user_id,
+            choice=choice,
+            weight=vote_weight,
+            tokens_staked=tokens_staked,
+        )
+        if vote is None:
+            raise ValueError("Vote rejected")
+
+        updated_progress = self.gamification_system.record_vote(user_id)
+        votes_cast = updated_progress.votes_cast
+        self.achievement_system.track_progress(user_id, "first_vote", votes_cast)
+        self.achievement_system.track_progress(user_id, "voting_veteran", votes_cast)
+        self.achievement_system.track_progress(user_id, "democratic_champion", votes_cast)
+
+        return vote
+
+    def finalize_voting_session(self, session_id: str) -> Dict[str, Any]:
+        """Finalize a voting session and return final results."""
+        results = self.voting_engine.finalize_session(session_id)
+        if results is None:
+            raise ValueError("Voting session not found")
+        return results
+
+    def get_voting_session(self, session_id: str) -> Optional[VotingSession]:
+        """Get voting session by ID."""
+        return self.voting_engine.sessions.get(session_id)
+
+    def get_voting_results(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get finalized results for a session."""
+        session = self.voting_engine.sessions.get(session_id)
+        if not session:
+            return None
+        return session.results
+
+    @staticmethod
+    def _is_valid_vote_choice(session: VotingSession, choice: Any) -> bool:
+        """Validate vote choice against session vote type/options."""
+        if session.vote_type == VoteType.BINARY:
+            allowed = {True, False, 1, 0, "yes", "no", "agree", "disagree", "Yes", "No"}
+            return choice in allowed
+        if session.vote_type == VoteType.MULTIPLE_CHOICE:
+            return choice in session.options
+        if session.vote_type == VoteType.RANKED:
+            if not isinstance(choice, list) or not choice:
+                return False
+            return set(choice).issubset(set(session.options))
+        if session.vote_type == VoteType.RATING:
+            if not isinstance(choice, (int, float)):
+                return False
+            return 1 <= float(choice) <= 5
+        return True
+
+    def get_user_profile(self, user_id: str) -> Dict[str, Any]:
+        """Get user profile and progression stats."""
+        return self.gamification_system.get_user_stats(user_id)
+
+    def get_user_achievements(self, user_id: str) -> List[Dict[str, Any]]:
+        """Get expanded achievement objects for a user."""
+        user_achievements = self.achievement_system.get_user_achievements(user_id)
+        expanded: List[Dict[str, Any]] = []
+        for ua in user_achievements:
+            definition = self.achievement_system.get_achievement(ua.achievement_id)
+            if not definition:
+                continue
+            expanded.append(
+                {
+                    "achievement_id": definition.achievement_id,
+                    "name": definition.name,
+                    "description": definition.description,
+                    "tier": definition.tier.value,
+                    "points": definition.points,
+                    "completed": ua.completed,
+                    "progress": ua.progress,
+                }
+            )
+        return expanded
+
+    @staticmethod
+    def _notification_priority_from_score(score: float) -> NotificationPriority:
+        if score >= 2.0:
+            return NotificationPriority.URGENT
+        if score >= 1.0:
+            return NotificationPriority.HIGH
+        if score >= 0.5:
+            return NotificationPriority.MEDIUM
+        return NotificationPriority.LOW

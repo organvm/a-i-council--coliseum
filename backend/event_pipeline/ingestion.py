@@ -6,7 +6,7 @@ Handles incoming events from various sources and normalizes them.
 
 from typing import Dict, Any, List, Optional, Callable
 from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 import uuid
 import asyncio
@@ -236,8 +236,7 @@ class EventIngestionSystem:
     
     def clear_old_events(self, max_age_hours: int = 24) -> int:
         """Clear events older than specified hours"""
-        cutoff = datetime.utcnow()
-        cutoff = cutoff.replace(hour=cutoff.hour - max_age_hours)
+        cutoff = datetime.utcnow() - timedelta(hours=max_age_hours)
         
         old_count = len(self.normalized_events)
         self.normalized_events = [

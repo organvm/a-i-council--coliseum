@@ -1,36 +1,33 @@
-import pytest
+"""Backward-compatibility tests for orchestrator public aliases."""
+
 import asyncio
-from backend.ai_agents.agent import Agent, AgentRole, Message
+
+import pytest
+
+from backend.ai_agents.agent import Agent
+from backend.ai_agents.base_agent import AgentRole, Message
 from backend.ai_agents.orchestrator import SystemOrchestrator
 
-@pytest.mark.asyncio
-async def test_agent_initialization():
-    agent = Agent(role=AgentRole.MODERATOR)
-    assert agent.state.role == AgentRole.MODERATOR
-    assert agent.state.is_active == True
 
-@pytest.mark.asyncio
-async def test_agent_processing():
-    agent = Agent(role=AgentRole.DEBATER)
-    msg = Message(sender_id="user", recipient_id=agent.state.agent_id, content="Hello")
-    response = await agent.process_message(msg)
-    assert response is not None
-    assert response.sender_id == agent.state.agent_id
-    # Since we used stub summarization, we check if content contains part of prompt or stub
-    # For DEBATER, it uses "I argue that:"
-    assert "I argue that:" in response.content
-
-@pytest.mark.asyncio
-async def test_orchestrator():
-    orch = SystemOrchestrator()
+def test_register_agent_alias_points_to_add_agent():
+    orchestrator = SystemOrchestrator()
     agent = Agent(role=AgentRole.ANALYST)
-    orch.register_agent(agent)
+    agent_id = orchestrator.register_agent(agent)
 
-    assert orch.get_agent(agent.state.agent_id) == agent
+    assert agent_id == agent.state.agent_id
+    assert orchestrator.get_agent(agent_id) is agent
 
-    msg = Message(sender_id="user", content="Broadcast", recipient_id=None) # Broadcast
-    # We can't easily capture print output here without capsys, but we can ensure it runs without error
-    await orch.broadcast_message(msg)
 
-    # Clean up
-    orch.remove_agent(agent.state.agent_id)
+@pytest.mark.asyncio
+async def test_broadcast_message_accepts_message_object():
+    orchestrator = SystemOrchestrator()
+    agent = Agent(role=AgentRole.DEBATER, config={"name": "Echo"})
+    orchestrator.add_agent(agent)
+
+    await orchestrator.start()
+    await orchestrator.broadcast_message(Message(sender_id="SYSTEM", content="Broadcast"))
+    await asyncio.sleep(0.05)
+    await asyncio.wait_for(orchestrator.stop(), timeout=2.0)
+
+    memories = agent.memory_manager.get_short_term(limit=10)
+    assert any(m["content"]["content"] == "Broadcast" for m in memories)

@@ -1,63 +1,71 @@
 """
-FastAPI Main Application
+FastAPI Main Application.
 
 Main entry point for the AI Council Coliseum backend.
 """
 
+from __future__ import annotations
+
+import logging
 import os
+from contextlib import asynccontextmanager
+
+import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
 from starlette.responses import Response
-from contextlib import asynccontextmanager
-import uvicorn
-import logging
 
-from .api import (
-    agents_router,
-    events_router,
-    voting_router,
-    blockchain_router,
-    achievements_router,
-    users_router
-)
-from .api.dependencies import initialize_orchestrator, get_orchestrator
-from .api.dependencies import get_orchestrator
+try:
+    from backend.api import (
+        achievements_router,
+        agents_router,
+        blockchain_router,
+        events_router,
+        users_router,
+        voting_router,
+    )
+    from backend.api.dependencies import get_orchestrator, initialize_orchestrator
+except ImportError:
+    # Supports running from backend/ as module path main:app
+    from api import (
+        achievements_router,
+        agents_router,
+        blockchain_router,
+        events_router,
+        users_router,
+        voting_router,
+    )
+    from api.dependencies import get_orchestrator, initialize_orchestrator
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifecycle manager for the application"""
-    # Startup
-    logger.info("🚀 Starting AI Council Coliseum Backend...")
+    """Lifecycle manager for the application."""
+    logger.info("Starting AI Council Coliseum Backend")
     await initialize_orchestrator()
-    print("🚀 Starting AI Council Coliseum Backend...")
-
-    # Initialize Orchestrator
     orchestrator = get_orchestrator()
     await orchestrator.start()
 
     yield
 
-    # Shutdown
-    logger.info("👋 Shutting down AI Council Coliseum Backend...")
-    orchestrator = get_orchestrator()
-    print("👋 Shutting down AI Council Coliseum Backend...")
+    logger.info("Shutting down AI Council Coliseum Backend")
     await orchestrator.stop()
 
 
 app = FastAPI(
     title="AI Council Coliseum",
-    description="A decentralized 24/7 live streaming platform where AI agents debate real-time events",
+    description=(
+        "A decentralized 24/7 live streaming platform where AI agents debate real-time events"
+    ),
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
-# CORS middleware - Security: Load allowed origins from environment variable
 origins = [
     origin.strip()
     for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
@@ -73,7 +81,7 @@ app.add_middleware(
 
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Middleware to add security headers to all responses"""
+    """Middleware to add security headers to all responses."""
 
     async def dispatch(
         self, request: Request, call_next: RequestResponseEndpoint
@@ -87,7 +95,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
-# Include routers
 app.include_router(agents_router, prefix="/api/agents", tags=["agents"])
 app.include_router(events_router, prefix="/api/events", tags=["events"])
 app.include_router(voting_router, prefix="/api/voting", tags=["voting"])
@@ -98,33 +105,30 @@ app.include_router(users_router, prefix="/api/users", tags=["users"])
 
 @app.get("/")
 async def root():
-    """Root endpoint"""
+    """Root endpoint."""
     return {
         "message": "Welcome to AI Council Coliseum API",
         "version": "1.0.0",
-        "status": "operational"
+        "status": "operational",
     }
 
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "ai-council-coliseum"
-    }
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "ai-council-coliseum"}
 
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    """WebSocket endpoint for real-time updates"""
+    """WebSocket endpoint for real-time updates."""
     await websocket.accept()
     try:
         while True:
             data = await websocket.receive_text()
             await websocket.send_text(f"Message received: {data}")
     except WebSocketDisconnect:
-        print("WebSocket disconnected")
+        logger.info("WebSocket disconnected")
 
 
 if __name__ == "__main__":
@@ -132,5 +136,5 @@ if __name__ == "__main__":
         "backend.main:app",
         host="0.0.0.0",
         port=8000,
-        reload=True
+        reload=True,
     )

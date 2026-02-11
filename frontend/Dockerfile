@@ -1,21 +1,22 @@
 FROM node:20-alpine
 
 WORKDIR /app
+RUN corepack enable
 
 # Copy package files
-COPY package*.json ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install dependencies
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Copy application code
 COPY . .
 
 # Build application
-RUN npm run build
+RUN pnpm run build
 
 # Expose port
 EXPOSE 3000
 
 # Run application
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

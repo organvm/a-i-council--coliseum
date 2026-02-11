@@ -1,68 +1,57 @@
-"""
-Tests for System Orchestrator
-"""
+"""Contract tests for SystemOrchestrator."""
 
 import pytest
 import asyncio
+
+from backend.ai_agents.agent import Agent
+from backend.ai_agents.base_agent import AgentRole
 from backend.ai_agents.orchestrator import SystemOrchestrator
-from backend.ai_agents.agent import Agent, AgentRole
 
-@pytest.fixture
-def orchestrator():
-    return SystemOrchestrator()
 
-@pytest.mark.asyncio
-async def test_orchestrator_add_remove_agent(orchestrator):
+def test_add_get_list_remove_agent():
+    orchestrator = SystemOrchestrator()
     agent = Agent(role=AgentRole.MODERATOR, config={"name": "ModBot"})
 
-    orchestrator.add_agent(agent)
-    assert agent.state.agent_id in orchestrator.agents
-    assert agent.state.agent_id in orchestrator.communication_protocol.agents
+    agent_id = orchestrator.add_agent(agent)
+    assert agent_id == agent.state.agent_id
+    assert orchestrator.get_agent(agent_id) is agent
+    assert any(a.state.agent_id == agent_id for a in orchestrator.list_agents())
 
-    orchestrator.remove_agent(agent.state.agent_id)
-    assert agent.state.agent_id not in orchestrator.agents
-    assert agent.state.agent_id not in orchestrator.communication_protocol.agents
+    removed = orchestrator.remove_agent(agent_id)
+    assert removed is True
+    assert orchestrator.get_agent(agent_id) is None
+
 
 @pytest.mark.asyncio
-async def test_orchestrator_lifecycle(orchestrator):
-    assert not orchestrator.is_running
+async def test_orchestrator_lifecycle_start_stop():
+    orchestrator = SystemOrchestrator()
 
+    assert orchestrator.is_running is False
     await orchestrator.start()
-    assert orchestrator.is_running
+    assert orchestrator.is_running is True
     assert orchestrator.loop_task is not None
-    assert not orchestrator.loop_task.done()
+    assert orchestrator.communication_task is not None
 
-    await orchestrator.stop()
-    assert not orchestrator.is_running
-    assert orchestrator.loop_task.cancelled() or orchestrator.loop_task.done()
+    await asyncio.wait_for(orchestrator.stop(), timeout=2.0)
+    assert orchestrator.is_running is False
+    assert orchestrator.loop_task is None or orchestrator.loop_task.done()
+    assert orchestrator.communication_task is None or orchestrator.communication_task.done()
+
 
 @pytest.mark.asyncio
-async def test_orchestrator_broadcast(orchestrator):
+async def test_broadcast_event_reaches_agent_memory():
+    orchestrator = SystemOrchestrator()
+    agent = Agent(role=AgentRole.DEBATER, config={"name": "Alice"})
+    orchestrator.add_agent(agent)
+
     await orchestrator.start()
-
-    # Create two agents
-    agent1 = Agent(role=AgentRole.DEBATER, config={"name": "Alice"})
-    agent2 = Agent(role=AgentRole.DEBATER, config={"name": "Bob"})
-
-    orchestrator.add_agent(agent1)
-    orchestrator.add_agent(agent2)
-
-    # Broadcast message
     await orchestrator.broadcast_event("New topic: AI Safety")
-
-    # Give some time for message processing
     await asyncio.sleep(0.1)
+    await asyncio.wait_for(orchestrator.stop(), timeout=2.0)
 
-    # Agents should have received the message (stored in short term memory)
-    # We check agent1's history or memory
-    # Note: process_message adds to memory_manager
-
-    memories1 = agent1.memory_manager.get_short_term(limit=5)
-    found = False
-    for m in memories1:
-        if m["content"]["content"] == "New topic: AI Safety" and m["content"]["sender_id"] == "SYSTEM":
-            found = True
-            break
-    assert found
-
-    await orchestrator.stop()
+    memories = agent.memory_manager.get_short_term(limit=10)
+    assert any(
+        m["content"]["content"] == "New topic: AI Safety"
+        and m["content"]["sender_id"] == "SYSTEM"
+        for m in memories
+    )

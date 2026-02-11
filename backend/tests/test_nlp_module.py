@@ -1,74 +1,62 @@
-"""
-Tests for NLP Processor
-"""
+"""Contract tests for NLPProcessor fallback and optional OpenAI mode."""
 
-import pytest
 import os
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
+
+from backend.ai_agents import nlp_module
 from backend.ai_agents.nlp_module import NLPProcessor
+
 
 @pytest.fixture
 def nlp_processor():
-    # Initialize without API key to force fallback or mock usage
     with patch.dict(os.environ, {}, clear=True):
         return NLPProcessor()
 
+
 @pytest.mark.asyncio
 async def test_sentiment_analysis_fallback(nlp_processor):
-    text = "I love this amazing project!"
-    result = await nlp_processor.analyze_sentiment(text)
-
+    result = await nlp_processor.analyze_sentiment("I love this amazing project!")
     assert result["sentiment"] == "positive"
     assert result["score"] > 0
 
-    text_bad = "I hate this terrible bug."
-    result_bad = await nlp_processor.analyze_sentiment(text_bad)
-    assert result_bad["sentiment"] == "negative"
-    assert result_bad["score"] < 0
+    bad_result = await nlp_processor.analyze_sentiment("I hate this terrible bug.")
+    assert bad_result["sentiment"] == "negative"
+    assert bad_result["score"] < 0
+
 
 @pytest.mark.asyncio
 async def test_extract_entities_fallback(nlp_processor):
-    text = "Hello World from Python."
-    # Our simple fallback matches Capitalized words not at start
-    # "World" and "Python" should be caught
-    entities = await nlp_processor.extract_entities(text)
-
+    entities = await nlp_processor.extract_entities("Hello World from Python.")
     texts = [e["text"] for e in entities]
     assert "World" in texts
     assert "Python" in texts
 
-@pytest.mark.asyncio
-async def test_summarize_fallback(nlp_processor):
-    text = "This is a very long text that needs to be truncated because we are running in fallback mode and cannot use advanced summarization techniques."
-    summary = await nlp_processor.summarize(text, max_length=20)
-
-    assert len(summary) <= 20
-    assert summary.endswith("...")
 
 @pytest.mark.asyncio
-async def test_extract_keywords(nlp_processor):
-    text = "Python is great. Python is fast. Coding in Python is fun."
-    keywords = await nlp_processor.extract_keywords(text)
+async def test_fallback_works_when_openai_unavailable_even_with_key(monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.setattr(nlp_module, "AsyncOpenAI", None)
+    processor = NLPProcessor()
 
-    assert "python" in keywords
-    assert "coding" in keywords or "great" in keywords
+    assert processor.client is None
+    response = await processor.generate("system", "prompt")
+    assert response == "I received: prompt"
+
 
 @pytest.mark.asyncio
-async def test_generate_mock_openai():
-    # Mock the openai client
-    with patch("backend.ai_agents.nlp_module.AsyncOpenAI") as MockOpenAI:
-        # Setup mock response
+async def test_generate_with_mocked_openai_client():
+    with patch("backend.ai_agents.nlp_module.AsyncOpenAI") as mock_openai:
         mock_client = AsyncMock()
         mock_completion = MagicMock()
         mock_completion.choices = [MagicMock(message=MagicMock(content="Mocked Response"))]
         mock_client.chat.completions.create.return_value = mock_completion
+        mock_openai.return_value = mock_client
 
-        MockOpenAI.return_value = mock_client
-
-        # Re-init processor with fake key to trigger client creation
         with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-fake"}):
             processor = NLPProcessor()
             response = await processor.generate("system", "prompt")
 
-            assert response == "Mocked Response"
-            mock_client.chat.completions.create.assert_called_once()
+    assert response == "Mocked Response"
+

@@ -1,78 +1,47 @@
-# AI Council Coliseum - Project Roadmap
+# Roadmap
 
-This document outlines the development roadmap for moving the project from its current skeletal state to a fully functional platform.
+## Current Baseline (MVP Stabilization Complete)
 
-## 📋 Phase 1: Foundation & Core Logic (The "Brain")
-**Goal:** Establish the core AI agent logic and internal systems.
+- Backend runtime compiles and starts cleanly.
+- Core APIs operate with in-memory state.
+- CI gates compile + backend tests + frontend lint/build.
+- Docker compose backend entrypoint aligned to `backend.main:app`.
 
-- [ ] **AI Agent Implementation**
-    - [ ] Create concrete `Agent` class inheriting from `BaseAgent`.
-    - [ ] Integrate `MemoryManager` (Short/Long term) into `Agent`.
-    - [ ] Integrate `KnowledgeBase` into `Agent`.
-    - [ ] Implement `AgentCommunicationProtocol` for inter-agent messaging.
-- [ ] **NLP & Intelligence**
-    - [ ] Replace `NLPProcessor` mocks with real LLM integration (OpenAI/Anthropic).
-    - [ ] Implement prompt templates for different `AgentRole` personas.
-- [ ] **Orchestration**
-    - [ ] Implement the "Main Loop" to continuously cycle agents through `Observe -> Think -> Act`.
-    - [ ] Create a background scheduler for system tasks.
+## Next Milestones
 
-## 🔌 Phase 2: API & Data Layer (The "Nervous System")
-**Goal:** Expose core logic via API and ensure data persistence.
+## Phase A: Persistence and Data Contracts
 
-- [ ] **API Implementation**
-    - [ ] Connect `backend/api/agents.py` to `AgentCommunicationProtocol` and `Agent` instances.
-    - [ ] Connect `backend/api/events.py` to `EventIngestionSystem`.
-    - [ ] Connect `backend/api/voting.py` to `VotingEngine`.
-- [ ] **Persistence**
-    - [ ] Configure database connection (PostgreSQL/SQLAlchemy).
-    - [ ] Create database models (Tables for Agents, Events, Votes, Users).
-    - [ ] Replace in-memory storage in Managers/Engines with database repositories.
+- Add DB-backed repositories for:
+  - events
+  - voting sessions and votes
+  - user progression and achievements
+- Keep API contracts stable while replacing in-memory internals.
+- Add migration tooling and seed strategy.
 
-## 📡 Phase 3: Event Pipeline (The "Senses")
-**Goal:** Ingest and process real-world data for agents to discuss.
+## Phase B: Security and Access Control
 
-- [ ] **Ingestion**
-    - [ ] Implement real `RSS_FEED` handler in `EventIngestionSystem`.
-    - [ ] Implement `NEWS_API` handler.
-- [ ] **Processing**
-    - [ ] Implement real Sentiment Analysis in `EventProcessor`.
-    - [ ] Implement Entity Extraction (People, Places, Orgs).
-    - [ ] Implement automatic tagging/categorization using LLM.
+- Add request authentication for mutating endpoints.
+- Add authorization checks for privileged operations.
+- Add vote-rate limiting and duplicate-abuse protections.
+- Define and implement secure blockchain signing/custody model.
 
-## 🔗 Phase 4: Blockchain & Economy (The "Incentives")
-**Goal:** Implement the economic layer and gamification.
+## Phase C: Realtime Product Flows
 
-- [ ] **Blockchain Integration**
-    - [ ] Implement `SolanaContractManager` with `solana-py` or `solders`.
-    - [ ] Create wallet connection logic (verify signatures).
-    - [ ] Implement Token Staking logic (simulated or devnet).
-- [ ] **Gamification**
-    - [ ] Implement `AchievementSystem` triggers based on user actions (Votes, Chat).
-    - [ ] Implement `Leaderboard` calculation logic.
+- Add websocket updates for:
+  - event ingestion stream
+  - voting session updates
+  - leaderboard updates
+- Integrate frontend pages to live backend contracts.
 
-## 🖥️ Phase 5: Frontend Development (The "Face")
-**Goal:** Create the user interface for interaction.
+## Phase D: Blockchain Execution
 
-- [ ] **Core Components**
-    - [ ] `AgentCard`: Display agent status and current thought.
-    - [ ] `ChatInterface`: Display debate stream.
-    - [ ] `EventFeed`: List incoming events.
-    - [ ] `VotingPanel`: Real-time voting interface.
-- [ ] **Pages**
-    - [ ] **Dashboard**: Main view with stream and agents.
-    - [ ] **Leaderboard**: Rankings display.
-    - [ ] **Profile**: User stats and achievements.
-- [ ] **Integration**
-    - [ ] Implement WebSocket client for real-time updates.
-    - [ ] Integrate Wallet Adapter (Solana).
+- Keep read endpoints stable.
+- Move write endpoints (`stake`, `unstake`, `transfer`, `claim`) from `501` to secure execution only after signing model approval.
+- Add deterministic integration tests for blockchain adapters.
 
-## 🚀 Phase 6: Launch & Polish
-**Goal:** System integration and final testing.
+## Phase E: Production Hardening
 
-- [ ] **Testing**
-    - [ ] End-to-end flow: Ingest -> Debate -> Vote -> Result.
-    - [ ] Load testing for WebSocket connections.
-- [ ] **Deployment**
-    - [ ] Docker Compose production setup.
-    - [ ] CI/CD pipeline configuration.
+- Add observability stack (structured logs, metrics, traces).
+- Add load/stress tests for agent orchestration and voting traffic.
+- Add deployment playbooks and rollback strategy.
+

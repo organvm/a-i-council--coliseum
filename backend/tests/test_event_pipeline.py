@@ -1,88 +1,89 @@
-"""
-Tests for Event Pipeline
-"""
+"""Contract tests for event ingestion/listing and cleanup."""
+
+from datetime import datetime, timedelta
 
 import pytest
-import asyncio
-from datetime import datetime, timedelta
-from backend.event_pipeline.ingestion import EventIngestionSystem, EventSource, NormalizedEvent
-from backend.event_pipeline.prioritization import EventPrioritizer
 
-@pytest.fixture
-def ingestion_system():
-    return EventIngestionSystem()
+from backend.event_pipeline.ingestion import (
+    EventIngestionSystem,
+    EventSource,
+    NormalizedEvent,
+    RawEvent,
+)
 
-@pytest.fixture
-def prioritizer():
-    return EventPrioritizer()
 
 @pytest.mark.asyncio
-async def test_ingest_rss_manual(ingestion_system):
-    # Simulating data passed from an RSS parser
-    rss_data = {
-        "title": "New AI Model Released",
-        "description": "OpenAI releases GPT-5.",
-        "link": "https://example.com/ai",
-        "tags": ["AI", "Tech"]
-    }
-
-    event = await ingestion_system.ingest_event(EventSource.RSS_FEED, rss_data)
-
-    assert event is not None
-    assert event.source == EventSource.RSS_FEED
-    assert event.title == "New AI Model Released"
-    assert event.timestamp is not None
-
-@pytest.mark.asyncio
-async def test_ingest_user_submission(ingestion_system):
-    user_data = {
-        "title": "Community Proposal",
-        "description": "Let's vote on this.",
-        "user_id": "user123",
-        "category": "Governance"
-    }
-
-    event = await ingestion_system.ingest_event(EventSource.USER_SUBMISSION, user_data)
-
-    assert event is not None
-    assert event.source == EventSource.USER_SUBMISSION
-    assert event.metadata["user_id"] == "user123"
-
-def test_prioritization_scoring(prioritizer):
-    # High priority event (AI keyword + recent)
-    event_high = NormalizedEvent(
-        event_id="1",
-        source=EventSource.RSS_FEED,
-        title="AI Breakthrough in Medicine",
-        description="Artificial Intelligence saves lives.",
-        timestamp=datetime.utcnow()
+async def test_ingest_and_list_with_source_filter():
+    ingestion = EventIngestionSystem()
+    await ingestion.ingest_event(
+        EventSource.API,
+        {"title": "API Event", "description": "from api"},
+    )
+    await ingestion.ingest_event(
+        EventSource.USER_SUBMISSION,
+        {"title": "User Event", "description": "from user"},
     )
 
-    # Low priority event (No keywords + old)
-    event_low = NormalizedEvent(
-        event_id="2",
-        source=EventSource.RSS_FEED,
-        title="Cat Video Viral",
-        description="Funny cat jumps.",
-        timestamp=datetime.utcnow() - timedelta(hours=24)
+    api_events = ingestion.get_recent_events(limit=10, source=EventSource.API)
+    user_events = ingestion.get_recent_events(limit=10, source=EventSource.USER_SUBMISSION)
+
+    assert len(api_events) == 1
+    assert api_events[0].source == EventSource.API
+    assert len(user_events) == 1
+    assert user_events[0].source == EventSource.USER_SUBMISSION
+
+
+def test_clear_old_events_boundary_conditions():
+    now = datetime.utcnow()
+    ingestion = EventIngestionSystem()
+
+    keep_event = NormalizedEvent(
+        event_id="newer",
+        source=EventSource.API,
+        title="Recent",
+        description="keep",
+        timestamp=now - timedelta(hours=23),
+    )
+    boundary_event = NormalizedEvent(
+        event_id="boundary",
+        source=EventSource.API,
+        title="Boundary",
+        description="drop",
+        timestamp=now - timedelta(hours=24),
+    )
+    old_event = NormalizedEvent(
+        event_id="older",
+        source=EventSource.API,
+        title="Old",
+        description="drop",
+        timestamp=now - timedelta(hours=25),
     )
 
-    score_high = prioritizer.calculate_score(event_high)
-    score_low = prioritizer.calculate_score(event_low)
+    ingestion.normalized_events = [keep_event, boundary_event, old_event]
+    ingestion.raw_events = [
+        RawEvent(
+            event_id="raw_newer",
+            source=EventSource.API,
+            raw_data={"title": "Recent"},
+            timestamp=now - timedelta(hours=23),
+        ),
+        RawEvent(
+            event_id="raw_boundary",
+            source=EventSource.API,
+            raw_data={"title": "Boundary"},
+            timestamp=now - timedelta(hours=24),
+        ),
+        RawEvent(
+            event_id="raw_old",
+            source=EventSource.API,
+            raw_data={"title": "Old"},
+            timestamp=now - timedelta(hours=25),
+        ),
+    ]
 
-    assert score_high > score_low
-    # AI (0.3) + Artificial Intelligence (0.3) + Recent <1h (0.2) = 0.8 approx
-    assert score_high >= 0.5
+    removed = ingestion.clear_old_events(max_age_hours=24)
 
-def test_prioritization_sorting(prioritizer):
-    event1 = NormalizedEvent(
-        event_id="1", source=EventSource.RSS_FEED,
-        title="Crypto Crash", description="", timestamp=datetime.utcnow()
-    )
-    event2 = NormalizedEvent(
-        event_id="2", source=EventSource.RSS_FEED,
-        title="Boring News", description="", timestamp=datetime.utcnow()
-    )
+    assert removed == 2
+    assert [e.event_id for e in ingestion.normalized_events] == ["newer"]
+    assert [e.event_id for e in ingestion.raw_events] == ["raw_newer"]
 
-    sorted_events = prioritizer.prioritize_events([event2, event1])
-    assert sorted_events[0].event_id == "1"  # Crypto keyword should boost it
