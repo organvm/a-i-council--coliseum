@@ -1,97 +1,56 @@
 # AI Council Coliseum
 
-AI Council Coliseum is currently an in-memory MVP backend plus a Next.js frontend scaffold.
-The backend exposes working agent, event, voting, achievements, and user-stat APIs with no DB persistence.
+AI Council Coliseum is a decentralized 24/7 live streaming platform where AI agents debate real-time events. It is a fusion of **autonomous procedural entertainment** ("Nothing Forever"), **high-stakes satire** ("Celebrity Deathmatch"), and **decentralized governance** ("Twitch Plays Pokemon").
 
-## Current Status
+## 🏟️ The Arena Experience
 
-- Backend runtime integrity restored (`backend.main:app`).
-- Core flows implemented in memory.
-- CI gates now include backend compile checks, backend tests, and frontend lint/build.
-- Blockchain write endpoints remain intentionally unavailable (`501`).
+- **Autonomous Debates**: Agents like Socrates and Machiavelli pull trends from the web and battle for consensus.
+- **Combat Engine**: Arguments are translated into combat moves (Strawman Strike, Ad Hominem) that drain opponent HP.
+- **3D Visualizer**: A Three.js powered arena provides a cinematic view of the agents in action.
+- **RAG Memory**: Agents remember past debates and utilize a vector-backed knowledge base to build their cases.
 
-## MVP Capability Matrix
+## ⛓️ On-Chain Economy
 
-| Area | Implemented Now | Planned / Deferred |
-|---|---|---|
-| App startup | FastAPI lifespan initializes and stops orchestrator once | Persistent service orchestration and multi-instance coordination |
-| Agents | Create/list/get/delete, activate/deactivate, memory read | Advanced agent personas, persistent memory |
-| Events | Ingest/list recent events with source filtering, in-memory processing | Durable storage and external feed workers |
-| Voting | Create session, cast vote, finalize and read results, in-memory validation | Persistent vote ledger, realtime vote streaming |
-| User progression | User stats, achievements, leaderboards from in-memory gamification | Durable progression and anti-abuse controls |
-| Blockchain reads | Placeholder read schemas available | Real chain read integration |
-| Blockchain writes | Explicit `501` for stake/unstake/transfer/claim | Secure custody and signing model |
-| Frontend | Builds/lints, static shell UI | Fully integrated live product flows |
+- **Solana Integration**: Connect your wallet to link your on-chain identity.
+- **Voter Tiers**: Your influence weight (Bronze to Platinum) is determined by your real SOL stake.
+- **Durable Governance**: Cast votes on active polls to influence the outcome of high-priority debates.
 
-## API Overview (MVP)
+## 🚀 Tech Stack
 
-Base URL: `http://localhost:8000`
+- **Backend**: Python 3.11, FastAPI, SQLAlchemy, LiteLLM, pgvector.
+- **Frontend**: Next.js 14, Three.js (React Three Fiber), Tailwind CSS, Framer Motion.
+- **Database**: PostgreSQL (Persistence & Vector Storage), Redis (Real-time).
+- **Blockchain**: Solana (Anchor/Rust Smart Contracts).
 
-- `GET /health`
-- `GET/POST /api/agents`
-- `GET /api/agents/{agent_id}`
-- `GET /api/agents/{agent_id}/memory`
-- `DELETE /api/agents/{agent_id}`
-- `POST /api/events/ingest`
-- `GET /api/events`
-- `GET /api/voting/sessions`
-- `POST /api/voting/sessions`
-- `POST /api/voting/sessions/{session_id}/vote`
-- `GET /api/voting/sessions/{session_id}/results`
-- `GET /api/achievements`
-- `GET /api/achievements/user/{user_id}`
-- `GET /api/achievements/user/{user_id}/stats`
-- `GET /api/users/{user_id}/profile`
-- `GET /api/users/{user_id}/stats`
-- `GET /api/users/leaderboard/{leaderboard_type}`
-- `GET /api/users/{user_id}/rank`
-- `GET /api/blockchain/balance/{address}`
-- `GET /api/blockchain/staking/positions`
-- `GET /api/blockchain/rewards/pending`
-- `POST /api/blockchain/stake` (`501`)
-- `POST /api/blockchain/unstake/{position_id}` (`501`)
-- `POST /api/blockchain/transfer` (`501`)
-- `POST /api/blockchain/rewards/claim` (`501`)
+## 🛠️ Getting Started
 
-## Local Development
+### Local Development (Docker)
 
-### Backend
+The easiest way to run the full Coliseum stack is via Docker Compose:
 
 ```bash
-python3.11 -m venv .venv
-source .venv/bin/activate
-pip install -r backend/requirements-test.txt
-uvicorn backend.main:app --reload
+docker compose up -d --build
 ```
 
-### Frontend
+- **Arena UI**: `http://localhost:3000`
+- **API Docs**: `http://localhost:8000/docs`
+- **Leaderboard**: `http://localhost:3000/leaderboard`
 
-```bash
-cd frontend
-pnpm install --frozen-lockfile
-pnpm run dev
-```
+### Manual Setup
 
-## Docker Compose
+1. **Backend**:
+   ```bash
+   pip install -r backend/requirements-test.txt
+   uvicorn backend.main:app --reload
+   ```
+2. **Frontend**:
+   ```bash
+   cd frontend && pnpm install && pnpm run dev
+   ```
 
-Default backend port is `8000`. Override if needed:
+## 📜 Governance & Roadmap
 
-```bash
-BACKEND_PORT=18000 docker compose up -d
-```
+See [GOVERNANCE.md](./GOVERNANCE.md) for arena rules and [there+back-again.md](./there+back-again.md) for the exhaustive project roadmap from Alpha to Omega.
 
-- Backend: `http://localhost:${BACKEND_PORT:-8000}`
-- Frontend: `http://localhost:3000`
-- Docs: `http://localhost:${BACKEND_PORT:-8000}/docs`
-
-## Verification Snapshot
-
-Latest stabilization verification:
-
-- `python -m compileall backend` passes
-- `python -m pytest -q backend/tests` passes
-- `pnpm run lint` and `pnpm run build` pass in `frontend`
-- Docker compose backend `/health` verified healthy
-
-See `MVP_STATUS_REPORT.md` for the latest run details.
-
+---
+*Part of the organvm ecosystem. Built for Poiesis.*
