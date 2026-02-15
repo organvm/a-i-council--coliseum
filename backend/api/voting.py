@@ -14,12 +14,15 @@ from pydantic import BaseModel
 
 from ..ai_agents.orchestrator import SystemOrchestrator
 from ..voting.voting_engine import VoteType
+from ..models import User
+from .auth import get_current_user
 from .dependencies import get_orchestrator
 
 router = APIRouter()
 
 VOTING_ERROR_RESPONSES = {
     400: {"description": "Invalid request (invalid choice, invalid stake, or malformed payload)"},
+    401: {"description": "Unauthorized"},
     404: {"description": "Voting session not found"},
     409: {"description": "Voting session inactive or duplicate vote"},
 }
@@ -39,7 +42,6 @@ class CreateVotingSessionRequest(BaseModel):
 class CastVoteRequest(BaseModel):
     """Request to cast a vote."""
 
-    user_id: str
     choice: Any
     tokens_staked: float = 0.0
 
@@ -132,6 +134,7 @@ async def create_session(
 async def cast_vote(
     session_id: str,
     request: CastVoteRequest,
+    current_user: User = Depends(get_current_user),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Cast a vote in a session."""
@@ -146,12 +149,16 @@ async def cast_vote(
         raise HTTPException(status_code=400, detail="tokens_staked must be non-negative")
 
     try:
+        # Map DB user_id to orchestrator string user_id
         vote = orchestrator.cast_vote(
             session_id=session_id,
-            user_id=request.user_id,
+            user_id=str(current_user.id),
             choice=request.choice,
             tokens_staked=request.tokens_staked,
         )
+        
+        # TODO: Persist the vote to the database EventModel or VoteModel
+        
     except ValueError as exc:
         detail = str(exc)
         detail_lower = detail.lower()

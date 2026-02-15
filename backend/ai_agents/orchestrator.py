@@ -22,6 +22,7 @@ from ..voting.achievements import AchievementSystem
 from ..voting.gamification import GamificationSystem
 from ..voting.leaderboard import LeaderboardSystem
 from ..voting.voting_engine import Vote, VoteStatus, VoteType, VotingEngine, VotingSession
+from ..combat.engine import CombatEngine
 from .agent import Agent
 from .base_agent import AgentRole, Message
 from .communication import AgentCommunicationProtocol
@@ -29,14 +30,19 @@ from .decision_engine import DecisionEngine
 from .knowledge_base import KnowledgeBase
 from .memory_manager import MemoryManager
 
+from ..models import AgentModel, EventModel, Vote as VoteModel, VotingSessionModel
+from ..database import AsyncSessionLocal
+from sqlalchemy import select, update
+
 logger = logging.getLogger(__name__)
 
 
 class SystemOrchestrator:
-    """Coordinates agents, event pipeline, voting, and user progression subsystems."""
+    """Coordinates agents, event pipeline, voting, and user progression subsystems with DB persistence."""
 
     def __init__(self, tick_rate: float = 1.0, silence_threshold_seconds: float = 30.0):
         self.agents: Dict[str, Agent] = {}
+        # ... (rest of init)
 
         self.tick_rate = tick_rate
         self.silence_threshold_seconds = silence_threshold_seconds
@@ -66,9 +72,63 @@ class SystemOrchestrator:
         self.processor.add_enricher("keywords", self.processor.enrich_keywords)
 
         self.voting_engine = VotingEngine()
+        self.combat_engine = CombatEngine()
         self.gamification_system = GamificationSystem()
         self.achievement_system = AchievementSystem()
         self.leaderboard_system = LeaderboardSystem(self.gamification_system)
+
+    async def start_battle(self, topic: str) -> str:
+        """Start a combat session between two random agents."""
+        if len(self.agents) < 2:
+            return ""
+        
+        fighters = list(self.agents.keys())[:2]
+        battle_id = f"battle_{int(datetime.utcnow().timestamp())}"
+        
+        self.combat_engine.create_battle(battle_id, topic, fighters)
+        
+        # Broadcast the fight start
+        await self.broadcast_event(f"COMBAT STARTED: {fighters[0]} vs {fighters[1]} on '{topic}'")
+        
+        return battle_id
+
+    async def load_state(self) -> None:
+        """Load agents and active sessions from the database."""
+        async with AsyncSessionLocal() as db:
+            # Load Agents
+            result = await db.execute(select(AgentModel))
+            agent_models = result.scalars().all()
+            for model in agent_models:
+                if model.id not in self.agents:
+                    agent = Agent(
+                        role=AgentRole(model.role),
+                        config={**model.config, "name": model.name, "agent_id": model.id},
+                        knowledge_base=self.knowledge_base,
+                        decision_engine=self.decision_engine,
+                    )
+                    agent.state.is_active = model.is_active
+                    self.agents[model.id] = agent
+                    self.communication_protocol.register_agent(agent)
+            
+            logger.info(f"Loaded {len(agent_models)} agents from database")
+
+            # Load Voting Sessions
+            await self.voting_engine.load_active_sessions()
+
+    async def persist_agent(self, agent: Agent) -> None:
+        """Save or update an agent in the database."""
+        async with AsyncSessionLocal() as db:
+            model = AgentModel(
+                id=agent.state.agent_id,
+                name=agent.name,
+                role=agent.state.role.value,
+                is_active=agent.state.is_active,
+                system_prompt=agent.system_prompt,
+                last_active=agent.state.last_active,
+                config=agent.state.memory
+            )
+            await db.merge(model)
+            await db.commit()
 
     def add_agent(self, agent: Agent) -> str:
         """Add/register an agent to orchestration and communication."""
@@ -113,6 +173,7 @@ class SystemOrchestrator:
         if self.is_running:
             return
 
+        await self.load_state()
         self.is_running = True
         self.communication_task = asyncio.create_task(self.communication_protocol.start())
         self.loop_task = asyncio.create_task(self._main_loop())
@@ -193,6 +254,24 @@ class SystemOrchestrator:
         )
         processed.priority_score = priority_score
 
+        # Persist to DB
+        async with AsyncSessionLocal() as db:
+            event_model = EventModel(
+                id=processed.event_id,
+                title=processed.title,
+                description=processed.description,
+                source=processed.source.value,
+                category=processed.category,
+                priority_score=processed.priority_score,
+                timestamp=processed.timestamp,
+                metadata_json=processed.metadata,
+                sentiment=processed.sentiment,
+                keywords=processed.keywords,
+                summary=processed.summary
+            )
+            db.add(event_model)
+            await db.commit()
+
         await self.storage.store_event(processed)
         await self.router.route_event(event, priority_score=priority_score)
 
@@ -209,7 +288,7 @@ class SystemOrchestrator:
         """List recent normalized events from ingestion history."""
         return self.ingestion_system.get_recent_events(limit=limit, source=source)
 
-    def create_voting_session(
+    async def create_voting_session(
         self,
         title: str,
         description: str,
@@ -219,7 +298,7 @@ class SystemOrchestrator:
         min_stake: float = 0.0,
     ) -> VotingSession:
         """Create and activate a voting session."""
-        session = self.voting_engine.create_session(
+        session = await self.voting_engine.create_session(
             title=title,
             description=description,
             vote_type=vote_type,
@@ -227,10 +306,10 @@ class SystemOrchestrator:
             duration_minutes=duration_minutes,
             min_stake=min_stake,
         )
-        self.voting_engine.start_session(session.session_id)
+        await self.voting_engine.start_session(session.session_id)
         return session
 
-    def cast_vote(
+    async def cast_vote(
         self,
         session_id: str,
         user_id: str,
@@ -269,7 +348,25 @@ class SystemOrchestrator:
         self.achievement_system.track_progress(user_id, "voting_veteran", votes_cast)
         self.achievement_system.track_progress(user_id, "democratic_champion", votes_cast)
 
+        # Persist to DB
+        asyncio.create_task(self._persist_vote_to_db(vote))
+
         return vote
+
+    async def _persist_vote_to_db(self, vote: Vote) -> None:
+        """Helper to persist vote object to database."""
+        async with AsyncSessionLocal() as db:
+            vote_model = VoteModel(
+                id=vote.vote_id,
+                session_id=vote.session_id,
+                user_id=int(vote.user_id),
+                choice=vote.choice,
+                weight=vote.weight,
+                tokens_staked=vote.tokens_staked,
+                timestamp=vote.timestamp
+            )
+            db.add(vote_model)
+            await db.commit()
 
     def finalize_voting_session(self, session_id: str) -> Dict[str, Any]:
         """Finalize a voting session and return final results."""

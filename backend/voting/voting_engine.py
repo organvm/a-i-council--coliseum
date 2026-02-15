@@ -57,16 +57,65 @@ class VotingSession(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
 
+from ..database import AsyncSessionLocal
+from ..models import VotingSessionModel, Vote as VoteModel
+from sqlalchemy import select, update
+import asyncio
+
 class VotingEngine:
     """
-    Engine for managing viewer voting sessions
+    Engine for managing viewer voting sessions with DB persistence
     """
     
     def __init__(self):
+        # We still keep a small cache for speed, but primary source is DB
         self.sessions: Dict[str, VotingSession] = {}
-        self.user_votes: Dict[str, List[str]] = {}  # user_id -> vote_ids
+        self.user_votes: Dict[str, List[str]] = {}
+
+    async def load_active_sessions(self) -> None:
+        """Hydrate the in-memory engine from the database."""
+        async with AsyncSessionLocal() as db:
+            result = await db.execute(
+                select(VotingSessionModel).where(VotingSessionModel.status == "active")
+            )
+            models = result.scalars().all()
+            for m in models:
+                session = VotingSession(
+                    session_id=m.id,
+                    title=m.title,
+                    description=m.description,
+                    vote_type=VoteType(m.vote_type),
+                    options=m.options,
+                    status=VoteStatus(m.status),
+                    starts_at=m.starts_at,
+                    ends_at=m.ends_at,
+                    min_stake=m.min_stake,
+                    reward_pool=m.reward_pool,
+                    results=m.results
+                )
+                self.sessions[session.session_id] = session
+            logger.info(f"Hydrated {len(models)} active voting sessions")
+
+    async def persist_session(self, session: VotingSession) -> None:
+        """Save session state to DB."""
+        async with AsyncSessionLocal() as db:
+            model = VotingSessionModel(
+                id=session.session_id,
+                title=session.title,
+                description=session.description,
+                vote_type=session.vote_type.value,
+                options=session.options,
+                status=session.status.value,
+                starts_at=session.starts_at,
+                ends_at=session.ends_at,
+                min_stake=session.min_stake,
+                reward_pool=session.reward_pool,
+                results=session.results
+            )
+            await db.merge(model)
+            await db.commit()
     
-    def create_session(
+    async def create_session(
         self,
         title: str,
         description: str,
@@ -76,21 +125,6 @@ class VotingEngine:
         min_stake: float = 0.0,
         reward_pool: float = 0.0
     ) -> VotingSession:
-        """
-        Create a new voting session
-        
-        Args:
-            title: Session title
-            description: Session description
-            vote_type: Type of vote
-            options: Voting options
-            duration_minutes: Duration in minutes
-            min_stake: Minimum tokens required to vote
-            reward_pool: Rewards for participants
-            
-        Returns:
-            Created voting session
-        """
         session = VotingSession(
             title=title,
             description=description,
@@ -104,9 +138,10 @@ class VotingEngine:
         session.ends_at = session.starts_at + timedelta(minutes=duration_minutes)
         
         self.sessions[session.session_id] = session
+        await self.persist_session(session)
         return session
     
-    def start_session(self, session_id: str) -> bool:
+    async def start_session(self, session_id: str) -> bool:
         """Start a voting session"""
         session = self.sessions.get(session_id)
         if not session:
@@ -115,6 +150,7 @@ class VotingEngine:
         session.status = VoteStatus.ACTIVE
         session.starts_at = datetime.utcnow()
         session.ends_at = session.starts_at + timedelta(minutes=session.duration_minutes)
+        await self.persist_session(session)
         return True
     
     def cast_vote(

@@ -1,7 +1,7 @@
 """
 Solana Contract Manager
 
-Manages interactions with Solana smart contracts.
+Manages interactions with Solana smart contracts and balance reading.
 """
 
 import os
@@ -11,11 +11,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from solana.rpc.async_api import AsyncClient
-from solders.transaction import Transaction
 from solders.pubkey import Pubkey
-from solders.system_program import TransferParams, transfer
 from solders.keypair import Keypair
-from base58 import b58decode
 
 logger = logging.getLogger(__name__)
 
@@ -29,16 +26,12 @@ class SolanaAccount(BaseModel):
 
 class SolanaContractManager:
     """
-    Manager for Solana smart contract interactions
-    Handles council selection, staking, and reward contracts
+    Manager for Solana smart contract interactions.
+    Handles balance reading and reward distribution logic.
     """
     
-    def __init__(self, rpc_url: str, program_id: str):
-        self.rpc_url = rpc_url
-        self.program_id = program_id
-        self.accounts: Dict[str, SolanaAccount] = {}
-
-        # Initialize client and payer
+    def __init__(self, rpc_url: Optional[str] = None):
+        self.rpc_url = rpc_url or os.getenv("SOLANA_RPC_URL", "https://api.mainnet-beta.solana.com")
         self._payer: Optional[Keypair] = None
         self._init_payer()
 
@@ -47,255 +40,82 @@ class SolanaContractManager:
         try:
             private_key = os.getenv("SOLANA_PAYER_PRIVATE_KEY")
             if private_key:
-                # Handle base58 string or bytes
-                if isinstance(private_key, str):
-                    self._payer = Keypair.from_base58_string(private_key)
-                else:
-                    self._payer = Keypair.from_bytes(private_key)
+                self._payer = Keypair.from_base58_string(private_key)
         except Exception as e:
             logger.warning(f"Failed to initialize Solana payer: {e}")
-    
-    async def initialize_council_program(self) -> bool:
-        """Initialize the council selection program"""
-        # Placeholder for actual Solana program initialization
-        return True
-    
-    async def create_council_account(
-        self,
-        council_id: str,
-        num_seats: int
-    ) -> str:
-        """
-        Create a new council account
-        
-        Args:
-            council_id: Unique council identifier
-            num_seats: Number of council seats
-            
-        Returns:
-            Account address
-        """
-        account_address = f"council_{council_id}"
-        account = SolanaAccount(
-            address=account_address,
-            balance=0.0,
-            owner=self.program_id,
-            is_initialized=True
-        )
-        self.accounts[account_address] = account
-        return account_address
-    
-    async def get_council_members(self, council_id: str) -> List[str]:
-        """Get current council members"""
-        # Placeholder - would read from Solana account
-        return []
-    
-    async def update_council_members(
-        self,
-        council_id: str,
-        members: List[str]
-    ) -> bool:
-        """
-        Update council member list
-        
-        Args:
-            council_id: Council identifier
-            members: List of member addresses
-            
-        Returns:
-            True if successful
-        """
-        # Placeholder for actual Solana transaction
-        return True
-    
-    async def stake_tokens(
-        self,
-        user_address: str,
-        amount: float
-    ) -> bool:
-        """
-        Stake tokens for governance
-        
-        Args:
-            user_address: User's Solana address
-            amount: Amount to stake
-            
-        Returns:
-            True if successful
-        """
-        if not self._payer:
-            logger.error("No payer configured for staking")
-            return False
 
-        # Verify we can sign for this user (custodial/agent mode)
-        if user_address != str(self._payer.pubkey()):
-            logger.error(f"Cannot stake for address {user_address}. Backend can only sign for {self._payer.pubkey()}")
-            return False
-
+    async def get_balance(self, address: str) -> float:
+        """
+        Get SOL balance for an address.
+        
+        Args:
+            address: Solana wallet address
+            
+        Returns:
+            Balance in SOL
+        """
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                lamports = int(amount * 1_000_000_000)
-
-                if lamports <= 0:
-                    logger.error("Invalid stake amount")
-                    return False
-
-                # Destination: Using program_id as the staking vault/contract address
-                try:
-                    staking_vault = Pubkey.from_string(self.program_id)
-                except ValueError:
-                    logger.error(f"Invalid program ID (staking vault): {self.program_id}")
-                    return False
-
-                ix = transfer(
-                    TransferParams(
-                        from_pubkey=self._payer.pubkey(),
-                        to_pubkey=staking_vault,
-                        lamports=lamports
-                    )
-                )
-
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
-
-                # Create and sign transaction
-                # Transaction.new_signed_with_payer(instructions, payer, signing_keypairs, recent_blockhash)
-                # Note: This uses solders.transaction.Transaction which has new_signed_with_payer
-                transaction = Transaction.new_signed_with_payer(
-                    [ix],
-                    self._payer.pubkey(),
-                    [self._payer],
-                    latest_blockhash
-                )
-
-                # Send transaction
-                try:
-                    resp = await client.send_transaction(
-                        transaction
-                    )
-                    logger.info(f"Staked successfully. Signature: {resp.value}")
-                    return True
-
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
-
+                pubkey = Pubkey.from_string(address)
+                resp = await client.get_balance(pubkey)
+                # Convert lamports to SOL
+                return resp.value / 1_000_000_000
             except Exception as e:
-                logger.error(f"Error executing stake: {e}")
-                return False
-    
-    async def unstake_tokens(
-        self,
-        user_address: str,
-        amount: float
-    ) -> bool:
+                logger.error(f"Error reading balance for {address}: {e}")
+                return 0.0
+
+    async def get_token_balance(self, address: str, mint_address: str) -> float:
         """
-        Unstake tokens
+        Get SPL token balance for an address.
         
         Args:
-            user_address: User's Solana address
-            amount: Amount to unstake
+            address: Solana wallet address
+            mint_address: SPL Token mint address
             
         Returns:
-            True if successful
+            Token balance
         """
-        # Placeholder for actual unstaking transaction
-        return True
-    
-    async def get_stake_balance(self, user_address: str) -> float:
-        """Get user's staked token balance"""
-        # Placeholder - would read from Solana account
-        return 0.0
-    
-    async def distribute_rewards(
-        self,
-        recipients: Dict[str, float]
-    ) -> bool:
-        """
-        Distribute rewards to multiple recipients
-        
-        Args:
-            recipients: Dict of address -> amount (in SOL or Lamports?)
-            Assuming amount is in SOL for now, need to convert to Lamports.
-            
-        Returns:
-            True if successful
-        """
-        if not self._payer:
-            logger.error("No payer configured for reward distribution")
-            return False
-
-        if not recipients:
-            return True
-
         async with AsyncClient(self.rpc_url) as client:
             try:
-                # Create transaction
-                transaction = Transaction()
-
-                # Add transfer instructions for each recipient
-                for address, amount in recipients.items():
-                    # Convert SOL to lamports (1 SOL = 1e9 lamports)
-                    lamports = int(amount * 1_000_000_000)
-
-                    if lamports <= 0:
-                        continue
-
-                    try:
-                        to_pubkey = Pubkey.from_string(address)
-                    except ValueError:
-                        logger.error(f"Invalid recipient address: {address}")
-                        continue
-
-                    ix = transfer(
-                        TransferParams(
-                            from_pubkey=self._payer.pubkey(),
-                            to_pubkey=to_pubkey,
-                            lamports=lamports
-                        )
-                    )
-                    transaction.add(ix)
-
-                # Get recent blockhash
-                try:
-                    latest_blockhash_resp = await client.get_latest_blockhash()
-                    latest_blockhash = latest_blockhash_resp.value.blockhash
-                    transaction.recent_blockhash = latest_blockhash
-                except Exception as e:
-                    logger.error(f"Failed to get latest blockhash: {e}")
-                    return False
-
-                # Sign transaction
-                # transaction.sign(self._payer) # This might be different in newer solders/solana versions
-                # In solana-py 0.30+, we can use `send_transaction` with signers
-
-                # Send transaction
-                # We can pass the transaction object and the signer
-                try:
-                    # In newer solana-py, we might need to compile to message if using VersionedTransaction
-                    # But for legacy Transaction:
-                    resp = await client.send_transaction(
-                        transaction,
-                        self._payer
-                    )
-
-                    logger.info(f"Rewards distributed successfully. Signature: {resp.value}")
-                    return True
-
-                except Exception as e:
-                    logger.error(f"Failed to send transaction: {e}")
-                    return False
-
+                pubkey = Pubkey.from_string(address)
+                mint_pubkey = Pubkey.from_string(mint_address)
+                
+                # Get token accounts by owner
+                resp = await client.get_token_accounts_by_owner_json_parsed(
+                    pubkey,
+                    {"mint": mint_pubkey}
+                )
+                
+                if not resp.value:
+                    return 0.0
+                
+                # Sum balances if multiple accounts exist (rare but possible)
+                total = 0.0
+                for account in resp.value:
+                    amount = account.account.data.parsed['info']['tokenAmount']['uiAmount']
+                    total += float(amount or 0)
+                
+                return total
             except Exception as e:
-                logger.error(f"Error distributing rewards: {e}")
-                return False
-    
-    def get_program_accounts(self) -> List[SolanaAccount]:
-        """Get all program accounts"""
-        return list(self.accounts.values())
+                logger.error(f"Error reading token balance for {address}: {e}")
+                return 0.0
+
+    async def verify_stake_tier(self, address: str) -> str:
+        """
+        Determine voter tier based on on-chain token balance.
+        
+        Example Tiers:
+        - BRONZE: < 1 SOL
+        - SILVER: 1-10 SOL
+        - GOLD: 10-100 SOL
+        - PLATINUM: > 100 SOL
+        """
+        balance = await self.get_balance(address)
+        
+        if balance >= 100:
+            return "PLATINUM"
+        if balance >= 10:
+            return "GOLD"
+        if balance >= 1:
+            return "SILVER"
+        return "BRONZE"

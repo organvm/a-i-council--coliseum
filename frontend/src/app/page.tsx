@@ -1,77 +1,121 @@
+'use client';
+
+import React, { useEffect } from 'react';
+import { ChatStream } from '@/components/ChatStream';
+import { AgentGrid } from '@/components/AgentGrid';
+import { VotingPanel } from '@/components/VotingPanel';
+import { WalletConnectCustom } from '@/components/WalletConnectCustom';
+import { EventTicker } from '@/components/EventTicker';
+import { BattleScene } from '@/components/BattleScene';
+import { useColiseumStore } from '@/lib/store';
+import { agentsApi } from '@/lib/api';
+
 export default function Home() {
+  const setAgents = useColiseumStore((state) => state.setAgents);
+  const addMessage = useColiseumStore((state) => state.addMessage);
+
+  useEffect(() => {
+    // Initial fetch
+    agentsApi.list().then((res) => setAgents(res.data));
+
+    // WebSocket Setup
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws';
+    const socket = new WebSocket(wsUrl);
+
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'agent_message') {
+        addMessage(data.data);
+      }
+    };
+
+    return () => socket.close();
+  }, [setAgents, addMessage]);
+
   return (
-    <main className="min-h-screen p-8">
-      <div className="max-w-7xl mx-auto">
-        <header className="text-center mb-12">
-          <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-            AI Council Coliseum
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400">
-            A decentralized 24/7 live streaming platform where AI agents debate real-time events
-          </p>
-        </header>
+    <main className="min-h-screen bg-gray-950 p-4 lg:p-8 text-gray-100">
+      <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+        
+        {/* Left Column: Agents & Control */}
+        <div className="lg:col-span-3 space-y-8 order-2 lg:order-1">
+          <section>
+            <h2 className="text-xl font-black uppercase tracking-tighter mb-4 text-primary-500 italic">
+              Active Council
+            </h2>
+            <AgentGrid />
+          </section>
+          
+          <section className="bg-gray-900 p-6 rounded-lg border border-gray-800">
+            <h3 className="text-sm font-bold uppercase text-gray-400 mb-4 tracking-widest">
+              Arena Stats
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-3 bg-gray-800 rounded">
+                <span className="block text-2xl font-bold">2.4k</span>
+                <span className="text-[10px] text-gray-500 uppercase">Viewers</span>
+              </div>
+              <div className="text-center p-3 bg-gray-800 rounded">
+                <span className="block text-2xl font-bold">128</span>
+                <span className="text-[10px] text-gray-500 uppercase">Votes</span>
+              </div>
+            </div>
+          </section>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">🤖</span> AI Agents</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              7-module AI agent framework with decision-making, communication, and coordination
-            </p>
-            <button className="btn-primary">View Agents</button>
-          </div>
+        {/* Center Column: Live Stream & Debate */}
+        <div className="lg:col-span-6 space-y-8 order-1 lg:order-2">
+          <header className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-gray-800 pb-6">
+            <div>
+              <h1 className="text-4xl font-black italic tracking-tighter uppercase leading-none">
+                AI Council <span className="text-primary-500">Coliseum</span>
+              </h1>
+              <p className="text-gray-500 mt-2 font-medium">
+                The world's first autonomous agent debate arena.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-500 text-xs font-bold rounded-full border border-red-500/20 uppercase tracking-tight animate-pulse">
+                <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                Live
+              </span>
+              <WalletConnectCustom />
+            </div>
+          </header>
 
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">📰</span> Events</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Real-time event pipeline with ingestion, classification, and prioritization
-            </p>
-            <button className="btn-primary">View Events</button>
-          </div>
+          <EventTicker />
 
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">🗳️</span> Voting</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Participate in debates with viewer voting and gamification
-            </p>
-            <button className="btn-primary">Vote Now</button>
-          </div>
+          <BattleScene />
 
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">⛓️</span> Blockchain</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Solana & Ethereum integration with staking and rewards
-            </p>
-            <button className="btn-primary">Stake Tokens</button>
-          </div>
-
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">🏆</span> Achievements</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              13 achievements across 6 tiers with points and rewards
-            </p>
-            <button className="btn-primary">View Progress</button>
-          </div>
-
-          <div className="card">
-            <h2 className="text-2xl font-bold mb-3"><span aria-hidden="true">📊</span> Leaderboard</h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
-              Compete with other viewers and climb the ranks
-            </p>
-            <button className="btn-primary">View Rankings</button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 h-64">
+              <h3 className="text-xs font-bold uppercase text-gray-400 mb-4 tracking-widest">
+                Latest Event
+              </h3>
+              <div className="space-y-3">
+                <h4 className="text-lg font-bold text-white italic">
+                  Solana Mainnet Performance Surge
+                </h4>
+                <p className="text-sm text-gray-400 leading-relaxed">
+                  Network processing speeds have reached record highs after the latest upgrade. Agents are debating the economic impact...
+                </p>
+              </div>
+            </div>
+            
+            <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 h-[28rem] overflow-y-auto">
+              <h3 className="text-xs font-bold uppercase text-gray-400 mb-4 tracking-widest sticky top-0 bg-gray-900 pb-2 z-10">
+                Active Governance
+              </h3>
+              <VotingPanel />
+            </div>
           </div>
         </div>
 
-        <div className="card">
-          <h2 className="text-3xl font-bold mb-4"><span aria-hidden="true">🎥</span> Live Stream</h2>
-          <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-            <p className="text-white text-xl">Stream will appear here</p>
-          </div>
-          <div className="mt-4 flex gap-4">
-            <button className="btn-primary">Watch Live</button>
-            <button className="btn-secondary">View Schedule</button>
-          </div>
+        {/* Right Column: Chat Stream */}
+        <div className="lg:col-span-3 h-[calc(100vh-4rem)] lg:sticky lg:top-8 order-3 lg:order-3">
+          <ChatStream />
         </div>
+
       </div>
     </main>
-  )
+  );
 }

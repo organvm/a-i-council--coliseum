@@ -1,8 +1,8 @@
 """
 NLP Processing Module.
 
-Provides natural language processing capabilities for AI agents with
-an optional OpenAI-backed implementation and deterministic fallbacks.
+Provides natural language processing capabilities for AI agents using
+LiteLLM for universal model support and deterministic fallbacks.
 """
 
 from __future__ import annotations
@@ -15,27 +15,24 @@ from collections import Counter
 from typing import Any, Dict, List, Optional
 
 try:
-    from openai import AsyncOpenAI
-except Exception:  # pragma: no cover - optional dependency
-    AsyncOpenAI = None
+    import litellm
+except ImportError:
+    litellm = None
 
 logger = logging.getLogger(__name__)
 
 
 class NLPProcessor:
-    """NLP module for text understanding and lightweight generation."""
+    """NLP module for text understanding and generation using LiteLLM."""
 
-    def __init__(self, model_name: str = "gpt-4-turbo-preview"):
-        self.model_name = model_name
-        self.api_key = os.getenv("OPENAI_API_KEY")
-        self.client = None
-
-        if self.api_key and AsyncOpenAI is not None:
-            self.client = AsyncOpenAI(api_key=self.api_key)
-        elif self.api_key and AsyncOpenAI is None:
-            logger.warning("OPENAI_API_KEY is set but openai package is unavailable")
-        else:
-            logger.warning("OPENAI_API_KEY not found. NLP features will use fallbacks")
+    def __init__(self, model_name: Optional[str] = None):
+        self.model_name = model_name or os.getenv("LLM_MODEL", "gpt-4-turbo-preview")
+        self.api_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")  # allow-secret
+        
+        if not litellm:
+            logger.warning("litellm package is unavailable. NLP features will use fallbacks")
+        elif not self.api_key:
+            logger.warning("No API key found (OPENAI_API_KEY or ANTHROPIC_API_KEY). Using fallbacks")
 
     async def generate(
         self,
@@ -44,7 +41,7 @@ class NLPProcessor:
         context: Optional[Dict[str, Any]] = None,
     ) -> str:
         """Generate text response using LLM when available, otherwise fallback."""
-        if self.client:
+        if litellm and self.api_key:
             try:
                 messages = [{"role": "system", "content": system}]
 
@@ -57,7 +54,7 @@ class NLPProcessor:
                             messages.append({"role": "user", "content": f"{sender}: {text}"})
 
                 messages.append({"role": "user", "content": prompt})
-                response = await self.client.chat.completions.create(
+                response = await litellm.acompletion(
                     model=self.model_name,
                     messages=messages,
                     temperature=0.7,
@@ -66,15 +63,15 @@ class NLPProcessor:
                 if content:
                     return content
             except Exception as exc:
-                logger.error("OpenAI generation error: %s", exc)
+                logger.error("LLM generation error: %s", exc)
 
         return f"I received: {prompt}"
 
     async def analyze_sentiment(self, text: str) -> Dict[str, Any]:
-        """Analyze sentiment using OpenAI when available, otherwise heuristics."""
-        if self.client:
+        """Analyze sentiment using LLM when available, otherwise heuristics."""
+        if litellm and self.api_key:
             try:
-                response = await self.client.chat.completions.create(
+                response = await litellm.acompletion(
                     model=self.model_name,
                     messages=[
                         {
@@ -112,10 +109,10 @@ class NLPProcessor:
         return {"sentiment": sentiment, "score": score, "confidence": 0.5}
 
     async def extract_entities(self, text: str) -> List[Dict[str, Any]]:
-        """Extract named entities using OpenAI when available, otherwise heuristics."""
-        if self.client:
+        """Extract named entities using LLM when available, otherwise heuristics."""
+        if litellm and self.api_key:
             try:
-                response = await self.client.chat.completions.create(
+                response = await litellm.acompletion(
                     model=self.model_name,
                     messages=[
                         {
@@ -144,9 +141,9 @@ class NLPProcessor:
 
     async def summarize(self, text: str, max_length: int = 100) -> str:
         """Summarize text to a maximum length."""
-        if self.client:
+        if litellm and self.api_key:
             try:
-                response = await self.client.chat.completions.create(
+                response = await litellm.acompletion(
                     model=self.model_name,
                     messages=[
                         {
@@ -167,8 +164,8 @@ class NLPProcessor:
         return text[: max_length - 3] + "..."
 
     async def classify_topic(self, text: str) -> Dict[str, float]:
-        """Classify topic with OpenAI or a deterministic fallback."""
-        if not self.client:
+        """Classify topic with LLM or a deterministic fallback."""
+        if not litellm or not self.api_key:
             return {"general": 0.7, "politics": 0.2, "technology": 0.1}
 
         prompt = (
@@ -179,7 +176,7 @@ class NLPProcessor:
         )
 
         try:
-            response = await self.client.chat.completions.create(
+            response = await litellm.acompletion(
                 model=self.model_name,
                 messages=[
                     {
@@ -202,22 +199,7 @@ class NLPProcessor:
         """Extract top-k keywords by simple frequency analysis."""
         words = re.findall(r"\w+", text.lower())
         stopwords = {
-            "the",
-            "a",
-            "an",
-            "and",
-            "or",
-            "but",
-            "in",
-            "on",
-            "at",
-            "to",
-            "for",
-            "is",
-            "of",
-            "it",
-            "that",
-            "with",
+            "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "is", "of", "it", "that", "with",
         }
         filtered_words = [w for w in words if w not in stopwords and len(w) > 3]
         counts = Counter(filtered_words)

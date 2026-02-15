@@ -134,8 +134,22 @@ class Agent(BaseAgent):
     async def generate_response(
         self, prompt: str, context: Optional[Dict[str, Any]] = None
     ) -> str:
-        """Generate a role-aware response using NLP processor capabilities."""
-        generated = await self.nlp_processor.generate(self.system_prompt, prompt, context=context)
+        """Generate a role-aware response using RAG and LLM."""
+        
+        # 1. Retrieve RAG Context
+        rag_context = await self.knowledge_base.search(prompt, limit=3)
+        context_str = "\n".join([f"- {item['content']}" for item in rag_context])
+        
+        enriched_system_prompt = self.system_prompt
+        if context_str:
+            enriched_system_prompt += f"\n\nRelevant Context from History:\n{context_str}"
+
+        # 2. Generate LLM Response
+        generated = await self.nlp_processor.generate(
+            enriched_system_prompt, 
+            prompt, 
+            context=context
+        )
 
         role_prefixes = {
             AgentRole.MODERATOR: "As a moderator,",

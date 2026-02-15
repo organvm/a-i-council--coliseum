@@ -27,6 +27,8 @@ try:
         voting_router,
     )
     from backend.api.dependencies import get_orchestrator, initialize_orchestrator
+    from backend.database import engine, Base
+    from backend.event_pipeline.worker import AutonomousArenaWorker
 except ImportError:
     # Supports running from backend/ as module path main:app
     from api import (
@@ -38,22 +40,75 @@ except ImportError:
         voting_router,
     )
     from api.dependencies import get_orchestrator, initialize_orchestrator
+    from database import engine, Base
+    from event_pipeline.worker import AutonomousArenaWorker
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+class ConnectionManager:
+    """Manages WebSocket connections."""
+
+    def __init__(self):
+        self.active_connections: list[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def send_personal_message(self, message: str, websocket: WebSocket):
+        await websocket.send_text(message)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                # Handle stale connections
+                pass
+
+
+manager = ConnectionManager()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for the application."""
     logger.info("Starting AI Council Coliseum Backend")
+    
+    # Create database tables
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    
     await initialize_orchestrator()
     orchestrator = get_orchestrator()
+    
+    # Inject broadcast capability into orchestrator
+    async def socket_broadcast(event_type: str, data: dict):
+        await manager.broadcast({"type": event_type, "data": data})
+    
+    # Override broadcast methods to also send to websockets
+    original_broadcast = orchestrator.broadcast_message
+    async def enhanced_broadcast(message):
+        await original_broadcast(message)
+        await socket_broadcast("agent_message", message.model_dump())
+    
+    orchestrator.broadcast_message = enhanced_broadcast
+    
     await orchestrator.start()
+
+    # Start Autonomous Worker
+    arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=120)
+    await arena_worker.start()
 
     yield
 
     logger.info("Shutting down AI Council Coliseum Backend")
+    await arena_worker.stop()
     await orchestrator.stop()
 
 
@@ -122,12 +177,13 @@ async def health_check():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """WebSocket endpoint for real-time updates."""
-    await websocket.accept()
+    await manager.connect(websocket)
     try:
         while True:
-            data = await websocket.receive_text()
-            await websocket.send_text(f"Message received: {data}")
+            # Keep connection alive
+            await websocket.receive_text()
     except WebSocketDisconnect:
+        manager.disconnect(websocket)
         logger.info("WebSocket disconnected")
 
 
