@@ -29,6 +29,7 @@ try:
     from backend.api.dependencies import get_orchestrator, initialize_orchestrator
     from backend.database import engine, Base
     from backend.event_pipeline.worker import AutonomousArenaWorker
+    from backend.social.twitch_listener import TwitchListener
 except ImportError:
     # Supports running from backend/ as module path main:app
     from api import (
@@ -42,38 +43,9 @@ except ImportError:
     from api.dependencies import get_orchestrator, initialize_orchestrator
     from database import engine, Base
     from event_pipeline.worker import AutonomousArenaWorker
+    from social.twitch_listener import TwitchListener
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-
-class ConnectionManager:
-    """Manages WebSocket connections."""
-
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
-
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        await websocket.send_text(message)
-
-    async def broadcast(self, message: dict):
-        for connection in self.active_connections:
-            try:
-                await connection.send_json(message)
-            except Exception:
-                # Handle stale connections
-                pass
-
-
-manager = ConnectionManager()
-
+# ... (ConnectionManager and logging)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -87,11 +59,10 @@ async def lifespan(app: FastAPI):
     await initialize_orchestrator()
     orchestrator = get_orchestrator()
     
-    # Inject broadcast capability into orchestrator
+    # Inject broadcast capability
     async def socket_broadcast(event_type: str, data: dict):
         await manager.broadcast({"type": event_type, "data": data})
     
-    # Override broadcast methods to also send to websockets
     original_broadcast = orchestrator.broadcast_message
     async def enhanced_broadcast(message):
         await original_broadcast(message)
@@ -101,13 +72,30 @@ async def lifespan(app: FastAPI):
     
     await orchestrator.start()
 
-    # Start Autonomous Worker
+    # Start Workers
     arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=120)
     await arena_worker.start()
+
+    # Twitch Handler
+    async def handle_twitch_message(user: str, message: str):
+        # Broadcast chat to frontend for overlay
+        await socket_broadcast("chat_message", {"user": user, "message": message})
+        
+        # Simple command handling
+        if message.startswith("!vote"):
+            parts = message.split()
+            if len(parts) > 1:
+                target = parts[1]
+                # Logic to boost agent would go here
+                logger.info(f"Twitch vote for {target}")
+
+    twitch_listener = TwitchListener(callback=handle_twitch_message)
+    await twitch_listener.start()
 
     yield
 
     logger.info("Shutting down AI Council Coliseum Backend")
+    await twitch_listener.stop()
     await arena_worker.stop()
     await orchestrator.stop()
 

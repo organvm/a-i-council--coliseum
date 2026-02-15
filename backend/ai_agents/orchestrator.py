@@ -125,10 +125,33 @@ class SystemOrchestrator:
                 is_active=agent.state.is_active,
                 system_prompt=agent.system_prompt,
                 last_active=agent.state.last_active,
-                config=agent.state.memory
+                config=agent.state.memory,
+                # Persist RPG stats from memory if available, else default
+                level=agent.state.memory.get("level", 1),
+                xp=agent.state.memory.get("xp", 0),
+                wins=agent.state.memory.get("wins", 0),
+                losses=agent.state.memory.get("losses", 0)
             )
             await db.merge(model)
             await db.commit()
+
+    async def apply_combat_results(self, winner_id: str, loser_id: str, xp: int) -> None:
+        """Update agent stats after a battle."""
+        winner = self.agents.get(winner_id)
+        loser = self.agents.get(loser_id)
+        
+        if winner:
+            winner.state.memory["wins"] = winner.state.memory.get("wins", 0) + 1
+            winner.state.memory["xp"] = winner.state.memory.get("xp", 0) + xp
+            # Simple level up logic
+            if winner.state.memory["xp"] >= winner.state.memory.get("level", 1) * 100:
+                winner.state.memory["level"] = winner.state.memory.get("level", 1) + 1
+                winner.state.memory["xp"] = 0
+            await self.persist_agent(winner)
+            
+        if loser:
+            loser.state.memory["losses"] = loser.state.memory.get("losses", 0) + 1
+            await self.persist_agent(loser)
 
     def add_agent(self, agent: Agent) -> str:
         """Add/register an agent to orchestration and communication."""

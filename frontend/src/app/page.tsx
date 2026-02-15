@@ -6,7 +6,7 @@ import { AgentGrid } from '@/components/AgentGrid';
 import { VotingPanel } from '@/components/VotingPanel';
 import { WalletConnectCustom } from '@/components/WalletConnectCustom';
 import { EventTicker } from '@/components/EventTicker';
-import { BattleScene } from '@/components/BattleScene';
+import { Arena3D } from '@/components/Arena3D';
 import { useColiseumStore } from '@/lib/store';
 import { agentsApi } from '@/lib/api';
 
@@ -84,7 +84,7 @@ export default function Home() {
 
           <EventTicker />
 
-          <BattleScene />
+          <Arena3D />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 h-64">

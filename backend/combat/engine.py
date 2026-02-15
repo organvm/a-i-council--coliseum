@@ -135,7 +135,7 @@ class CombatEngine:
         if battle.current_turn_index == 0:
             battle.round_number += 1
 
-        return {
+        result = {
             "move": move.name,
             "damage": damage,
             "is_hit": is_hit,
@@ -143,3 +143,11 @@ class CombatEngine:
             "battle_over": not battle.is_active,
             "log": log_entry
         }
+
+        if not battle.is_active:
+            # Battle ended this turn
+            result["winner"] = agent_id
+            result["loser"] = target_id
+            result["xp_gain"] = 100 if move.fatality_trigger else 50
+        
+        return result
