@@ -233,11 +233,76 @@ class SystemOrchestrator:
         if not self.agents:
             return
 
-        # Keep the MVP loop deterministic and quiet by default.
+        # 1. Progress Active Battles
+        await self._run_battle_turns()
+        
+        # 2. Progress Autonomous Debates
+        await self._run_autonomous_debates()
+
+        # 3. Housekeeping
         now = datetime.utcnow()
-        idle_seconds = (now - self.last_activity_time).total_seconds()
-        if idle_seconds > self.silence_threshold_seconds:
-            self.last_activity_time = now
+# ... (rest of tick)
+
+    async def _run_autonomous_debates(self) -> None:
+        """Nudge random agents to debate the latest event."""
+        if random.random() > 0.1: # Only debate ~10% of ticks to avoid spam
+            return
+            
+        recent_events = self.ingestion_system.get_recent_events(limit=1)
+        if not recent_events:
+            return
+            
+        event = recent_events[0]
+        active_agents = [a for a in self.agents.values() if a.state.is_active]
+        if not active_agents:
+            return
+            
+        speaker = random.choice(active_agents)
+        
+        # Construct a nudge prompt
+        prompt = f"The current arena event is: {event.title}. {event.description}. What is your take?"
+        
+        message = Message(
+            sender_id="SYSTEM_PROMPT",
+            recipient_id=speaker.state.agent_id,
+            content=prompt
+        )
+        
+        response = await speaker.process_message(message)
+        if response:
+            await self.broadcast_message(response)
+        # ... (rest of tick)
+
+    async def _run_battle_turns(self) -> None:
+        """Automatically progress all active battles."""
+        for battle_id, battle in list(self.combat_engine.active_battles.items()):
+            if not battle.is_active:
+                continue
+            
+            # Identify current attacker/defender
+            attacker_id = battle.turn_order[battle.current_turn_index]
+            defender_id = battle.turn_order[(battle.current_turn_index + 1) % len(battle.turn_order)]
+            
+            # Execute one turn
+            result = self.combat_engine.execute_turn(battle_id, attacker_id, defender_id)
+            
+            # Broadcast the move to WebSockets for the UI
+            await self.broadcast_message(Message(
+                sender_id="SYSTEM_ARENA",
+                content=result["log"],
+                metadata={"type": "combat_update", "battle_id": battle_id, **result}
+            ))
+
+            if result["battle_over"]:
+                await self.apply_combat_results(
+                    result["winner"], 
+                    result["loser"], 
+                    result["xp_gain"]
+                )
+                logger.info(f"Battle {battle_id} concluded. Winner: {result['winner']}")
+                
+                # Close the battle
+                del self.combat_engine.active_battles[battle_id]
 
     async def broadcast_message(self, message: Message) -> None:
         """Broadcast a Message object through the communication protocol."""

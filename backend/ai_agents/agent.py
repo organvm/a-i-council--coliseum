@@ -66,8 +66,15 @@ class Agent(BaseAgent):
 
         sentiment = await self.nlp_processor.analyze_sentiment(message.content)
         topics = await self.nlp_processor.classify_topic(message.content)
+        # 3. Add to memory and return
         self.add_to_memory("last_sentiment", sentiment)
         self.add_to_memory("last_topics", topics)
+        
+        # Save state to DB
+        # Note: We assume the orchestrator will handle the actual DB merge
+        # but the agent marks itself as 'dirty' or we trigger it here if orchestrator is available
+        # For simplicity in this logic, we'll let the orchestrator tick handle it
+        # or implement a callback.
 
         response_text = await self.generate_response(
             prompt=message.content,
