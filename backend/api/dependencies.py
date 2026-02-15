@@ -40,5 +40,4 @@ async def initialize_orchestrator() -> None:
     ]
 
     for role, name in roles:
-        agent = Agent(role=role, config={"name": name})
-        orchestrator.add_agent(agent)
+        await orchestrator.create_agent(role=role, config={"name": name})

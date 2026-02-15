@@ -124,6 +124,7 @@ class SystemOrchestrator:
                 role=agent.state.role.value,
                 is_active=agent.state.is_active,
                 system_prompt=agent.system_prompt,
+                portrait_url=agent.state.memory.get("portrait_url"),
                 last_active=agent.state.last_active,
                 config=agent.state.memory,
                 # Persist RPG stats from memory if available, else default
@@ -163,15 +164,21 @@ class SystemOrchestrator:
         """Backward-compatible alias for add_agent."""
         return self.add_agent(agent)
 
-    def create_agent(self, role: AgentRole, config: Optional[Dict[str, Any]] = None) -> Agent:
-        """Create and register a new agent with shared knowledge and decision engines."""
+    async def create_agent(self, role: AgentRole, config: Optional[Dict[str, Any]] = None) -> Agent:
+        """Create and register a new agent with AI-generated visuals."""
         agent = Agent(
             role=role,
             config=config,
             knowledge_base=self.knowledge_base,
             decision_engine=self.decision_engine,
         )
+        
+        # Generate Generative Visual Asset
+        portrait_url = await agent.nlp_processor.generate_portrait(agent.name, role.value)
+        agent.state.memory["portrait_url"] = portrait_url
+        
         self.add_agent(agent)
+        await self.persist_agent(agent)
         return agent
 
     def remove_agent(self, agent_id: str) -> bool:

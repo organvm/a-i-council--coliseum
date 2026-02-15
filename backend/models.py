@@ -54,6 +54,7 @@ class AgentModel(Base):
     role: Mapped[str] = mapped_column(String(50))
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     system_prompt: Mapped[str] = mapped_column(Text)
+    portrait_url: Mapped[Optional[str]] = mapped_column(String(512))
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
     last_active: Mapped[Optional[datetime]] = mapped_column(DateTime)
     config: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)

@@ -195,6 +195,22 @@ class NLPProcessor:
 
         return {"general": 0.7, "politics": 0.2, "technology": 0.1}
 
+    async def generate_portrait(self, name: str, role: str) -> Optional[str]:
+        """Generate a character portrait URL using AI."""
+        if litellm and self.api_key:
+            try:
+                prompt = f"A high-quality, digital art portrait of an AI character named {name} who is a {role}. Cinematic lighting, 3D render style, character headshot."
+                response = await litellm.aimage_generation(
+                    model="dall-e-3",
+                    prompt=prompt
+                )
+                return response.data[0].url
+            except Exception as e:
+                logger.error(f"Error generating portrait: {e}")
+        
+        # Fallback to a high-quality placeholder service
+        return f"https://api.dicebear.com/7.x/bottts/svg?seed={name}"
+
     async def extract_keywords(self, text: str, top_k: int = 5) -> List[str]:
         """Extract top-k keywords by simple frequency analysis."""
         words = re.findall(r"\w+", text.lower())
