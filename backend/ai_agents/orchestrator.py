@@ -30,9 +30,10 @@ from .decision_engine import DecisionEngine
 from .knowledge_base import KnowledgeBase
 from .memory_manager import MemoryManager
 
-from ..models import AgentModel, EventModel, Vote as VoteModel, VotingSessionModel
-from ..database import AsyncSessionLocal
-from sqlalchemy import select, update
+from ..infrastructure.repository import SystemRepository
+from ..infrastructure.event_bus import event_bus
+
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -94,47 +95,27 @@ class SystemOrchestrator:
 
     async def load_state(self) -> None:
         """Load agents and active sessions from the database."""
-        async with AsyncSessionLocal() as db:
-            # Load Agents
-            result = await db.execute(select(AgentModel))
-            agent_models = result.scalars().all()
-            for model in agent_models:
-                if model.id not in self.agents:
-                    agent = Agent(
-                        role=AgentRole(model.role),
-                        config={**model.config, "name": model.name, "agent_id": model.id},
-                        knowledge_base=self.knowledge_base,
-                        decision_engine=self.decision_engine,
-                    )
-                    agent.state.is_active = model.is_active
-                    self.agents[model.id] = agent
-                    self.communication_protocol.register_agent(agent)
-            
-            logger.info(f"Loaded {len(agent_models)} agents from database")
+        agent_models = await SystemRepository.load_all_agent_models()
+        for model in agent_models:
+            if model.id not in self.agents:
+                agent = Agent(
+                    role=AgentRole(model.role),
+                    config={**model.config, "name": model.name, "agent_id": model.id},
+                    knowledge_base=self.knowledge_base,
+                    decision_engine=self.decision_engine,
+                )
+                agent.state.is_active = model.is_active
+                self.agents[model.id] = agent
+                self.communication_protocol.register_agent(agent)
+        
+        logger.info(f"Loaded {len(agent_models)} agents from database")
 
-            # Load Voting Sessions
-            await self.voting_engine.load_active_sessions()
+        # Load Voting Sessions
+        await self.voting_engine.load_active_sessions()
 
     async def persist_agent(self, agent: Agent) -> None:
         """Save or update an agent in the database."""
-        async with AsyncSessionLocal() as db:
-            model = AgentModel(
-                id=agent.state.agent_id,
-                name=agent.name,
-                role=agent.state.role.value,
-                is_active=agent.state.is_active,
-                system_prompt=agent.system_prompt,
-                portrait_url=agent.state.memory.get("portrait_url"),
-                last_active=agent.state.last_active,
-                config=agent.state.memory,
-                # Persist RPG stats from memory if available, else default
-                level=agent.state.memory.get("level", 1),
-                xp=agent.state.memory.get("xp", 0),
-                wins=agent.state.memory.get("wins", 0),
-                losses=agent.state.memory.get("losses", 0)
-            )
-            await db.merge(model)
-            await db.commit()
+        await SystemRepository.persist_agent(agent)
 
     async def apply_combat_results(self, winner_id: str, loser_id: str, xp: int) -> None:
         """Update agent stats after a battle."""
@@ -234,6 +215,7 @@ class SystemOrchestrator:
                 break
             except Exception as exc:
                 logger.exception("Error in orchestrator main loop: %s", exc)
+                await asyncio.sleep(self.tick_rate)
 
     async def _tick(self) -> None:
         """Single orchestrator tick."""
@@ -293,6 +275,18 @@ class SystemOrchestrator:
             # Execute one turn
             result = self.combat_engine.execute_turn(battle_id, attacker_id, defender_id)
             
+            # Get names
+            att_agent = self.agents.get(attacker_id)
+            def_agent = self.agents.get(defender_id)
+            a_name = att_agent.name if att_agent else attacker_id
+            d_name = def_agent.name if def_agent else defender_id
+            
+            result["log"] = result["log"].replace(attacker_id, a_name).replace(defender_id, d_name)
+            result["attacker_id"] = attacker_id
+            result["defender_id"] = defender_id
+            result["attacker_name"] = a_name
+            result["defender_name"] = d_name
+            
             # Broadcast the move to WebSockets for the UI
             await self.broadcast_message(Message(
                 sender_id="SYSTEM_ARENA",
@@ -314,6 +308,8 @@ class SystemOrchestrator:
     async def broadcast_message(self, message: Message) -> None:
         """Broadcast a Message object through the communication protocol."""
         await self.communication_protocol.send_message(message)
+        ws_type = message.metadata.get("type", "agent_message") if message.metadata else "agent_message"
+        await event_bus.publish(ws_type, getattr(message, "model_dump", getattr(message, "dict", lambda: {}))())
         self.last_activity_time = datetime.utcnow()
 
     async def broadcast_event(self, event_content: str) -> None:
@@ -350,22 +346,7 @@ class SystemOrchestrator:
         processed.priority_score = priority_score
 
         # Persist to DB
-        async with AsyncSessionLocal() as db:
-            event_model = EventModel(
-                id=processed.event_id,
-                title=processed.title,
-                description=processed.description,
-                source=processed.source.value,
-                category=processed.category,
-                priority_score=processed.priority_score,
-                timestamp=processed.timestamp,
-                metadata_json=processed.metadata,
-                sentiment=processed.sentiment,
-                keywords=processed.keywords,
-                summary=processed.summary
-            )
-            db.add(event_model)
-            await db.commit()
+        await SystemRepository.persist_event(processed)
 
         await self.storage.store_event(processed)
         await self.router.route_event(event, priority_score=priority_score)
@@ -450,18 +431,7 @@ class SystemOrchestrator:
 
     async def _persist_vote_to_db(self, vote: Vote) -> None:
         """Helper to persist vote object to database."""
-        async with AsyncSessionLocal() as db:
-            vote_model = VoteModel(
-                id=vote.vote_id,
-                session_id=vote.session_id,
-                user_id=int(vote.user_id),
-                choice=vote.choice,
-                weight=vote.weight,
-                tokens_staked=vote.tokens_staked,
-                timestamp=vote.timestamp
-            )
-            db.add(vote_model)
-            await db.commit()
+        await SystemRepository.persist_vote(vote)
 
     def finalize_voting_session(self, session_id: str) -> Dict[str, Any]:
         """Finalize a voting session and return final results."""

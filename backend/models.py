@@ -14,9 +14,6 @@ from pgvector.sqlalchemy import Vector
 from .database import Base
 
 
-class User(Base):
-# ... (User model)
-
 class KnowledgeEntry(Base):
     """Vector-backed knowledge entry for RAG."""
     __tablename__ = "knowledge_base"
@@ -26,6 +23,8 @@ class KnowledgeEntry(Base):
     metadata_json: Mapped[Dict[str, Any]] = mapped_column(JSON, default=dict)
     embedding: Mapped[Vector] = mapped_column(Vector(1536))  # Default for OpenAI/LiteLLM
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
+class User(Base):
     """User model for authentication and progression."""
     __tablename__ = "users"
 

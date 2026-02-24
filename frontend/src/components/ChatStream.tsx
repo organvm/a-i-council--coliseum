@@ -51,6 +51,29 @@ export const ChatStream: React.FC = () => {
               </div>
               <div className="bg-gray-800 text-gray-200 p-3 rounded-lg rounded-tl-none border-l-2 border-primary-500 text-sm leading-relaxed shadow-sm">
                 {msg.content}
+                
+                {/* Agent Thought Stream */}
+                {msg.metadata && (msg.metadata.sentiment_context || msg.metadata.topics) && (
+                  <div className="mt-3 pt-3 border-t border-gray-700/50 flex flex-wrap gap-2 text-[10px] tracking-wide font-medium">
+                    {msg.metadata.sentiment_context && msg.metadata.sentiment_context.sentiment && (
+                      <span className={`px-2 py-0.5 rounded-sm border ${
+                        msg.metadata.sentiment_context.sentiment === "positive" ? "bg-green-500/10 text-green-400 border-green-500/20" :
+                        msg.metadata.sentiment_context.sentiment === "negative" ? "bg-red-500/10 text-red-400 border-red-500/20" :
+                        "bg-gray-700/50 text-gray-400 border-gray-600/50"
+                      }`}>
+                        {msg.metadata.sentiment_context.sentiment.toUpperCase()} ({(msg.metadata.sentiment_context.score * 100).toFixed(0)}%)
+                      </span>
+                    )}
+                    {msg.metadata.topics && Object.entries(msg.metadata.topics)
+                        .sort((a: any, b: any) => b[1] - a[1])
+                        .slice(0, 2)
+                        .map(([topic, score]: any) => (
+                      <span key={topic} className="px-2 py-0.5 rounded-sm bg-primary-500/10 text-primary-400 border border-primary-500/20 uppercase">
+                        {topic} ({(score * 100).toFixed(0)}%)
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
             </motion.div>
           ))}

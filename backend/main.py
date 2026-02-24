@@ -30,6 +30,8 @@ try:
     from backend.database import engine, Base
     from backend.event_pipeline.worker import AutonomousArenaWorker
     from backend.social.twitch_listener import TwitchListener
+    from backend.infrastructure.event_bus import event_bus
+    from backend.event_pipeline.ingestion import EventSource
 except ImportError:
     # Supports running from backend/ as module path main:app
     from api import (
@@ -44,8 +46,31 @@ except ImportError:
     from database import engine, Base
     from event_pipeline.worker import AutonomousArenaWorker
     from social.twitch_listener import TwitchListener
+    from infrastructure.event_bus import event_bus
+    from event_pipeline.ingestion import EventSource
 
-# ... (ConnectionManager and logging)
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            try:
+                await connection.send_json(message)
+            except Exception:
+                pass
+
+manager = ConnectionManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -59,35 +84,33 @@ async def lifespan(app: FastAPI):
     await initialize_orchestrator()
     orchestrator = get_orchestrator()
     
-    # Inject broadcast capability
-    async def socket_broadcast(event_type: str, data: dict):
+    await event_bus.start()
+    
+    # Pass EventBus messages to WebSocket clients
+    async def ws_forwarder(event_type: str, data: dict):
+        if data is None:
+            data = {}
         await manager.broadcast({"type": event_type, "data": data})
-    
-    original_broadcast = orchestrator.broadcast_message
-    async def enhanced_broadcast(message):
-        await original_broadcast(message)
-        await socket_broadcast("agent_message", message.model_dump())
-    
-    orchestrator.broadcast_message = enhanced_broadcast
+        
+    event_bus.subscribe("*", ws_forwarder)
     
     await orchestrator.start()
 
     # Start Workers
-    arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=120)
+    arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=15)
     await arena_worker.start()
 
     # Twitch Handler
     async def handle_twitch_message(user: str, message: str):
         # Broadcast chat to frontend for overlay
-        await socket_broadcast("chat_message", {"user": user, "message": message})
+        await event_bus.publish("chat_message", {"user": user, "message": message})
         
-        # Simple command handling
-        if message.startswith("!vote"):
-            parts = message.split()
-            if len(parts) > 1:
-                target = parts[1]
-                # Logic to boost agent would go here
-                logger.info(f"Twitch vote for {target}")
+        # Ingest social event into the main pipeline instead of inline command parsing
+        await orchestrator.ingest_event(
+            source=EventSource.SOCIAL_MEDIA,
+            raw_data={"title": f"Twitch chat from {user}", "description": message, "user": user},
+            metadata={"platform": "twitch"}
+        )
 
     twitch_listener = TwitchListener(callback=handle_twitch_message)
     await twitch_listener.start()
@@ -98,6 +121,7 @@ async def lifespan(app: FastAPI):
     await twitch_listener.stop()
     await arena_worker.stop()
     await orchestrator.stop()
+    await event_bus.stop()
 
 
 app = FastAPI(

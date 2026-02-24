@@ -5,13 +5,20 @@ from fastapi.testclient import TestClient
 
 from backend.api import dependencies
 from backend.main import app
+from backend.models import User
+from backend.api.auth import get_current_user
+from unittest.mock import patch
 
 
 @pytest.fixture
 def client():
     dependencies._orchestrator_instance = None
-    with TestClient(app) as test_client:
+    app.dependency_overrides[get_current_user] = lambda: User(id=1, username="test", email="test@test.com")
+    with patch("backend.ai_agents.orchestrator.SystemOrchestrator.start"), \
+         patch("backend.ai_agents.orchestrator.SystemOrchestrator.stop"), \
+         TestClient(app) as test_client:
         yield test_client
+    app.dependency_overrides.clear()
     dependencies._orchestrator_instance = None
 
 

@@ -87,10 +87,7 @@ class AutonomousArenaWorker:
         """Main periodic loop."""
         while self.is_running:
             try:
-                # Random jitter to make it feel less robotic
-                jitter = random.randint(-30, 30)
-                await asyncio.sleep(max(10, self.interval_seconds + jitter))
-                
+                await asyncio.sleep(self.interval_seconds)
                 await self._feed_event()
             except asyncio.CancelledError:
                 break
@@ -99,29 +96,6 @@ class AutonomousArenaWorker:
 
     async def _feed_event(self):
         """Inject a random event into the arena."""
-        event_data = random.choice(SIMULATED_NEWS)
-        source = EventSource(event_data["source"])
-        
-        logger.info(f"Injecting autonomous event: {event_data['title']}")
-        
-        processed = await self.orchestrator.ingest_event(
-            source=source,
-            raw_data=event_data,
-            metadata={"autonomous": True}
-        )
-        
-        if processed:
-            # Trigger Combat if source is social_media
-            if source == EventSource.SOCIAL_MEDIA:
-                await self.orchestrator.start_battle(processed.title)
-            
-            # Also trigger a voting session if the priority is high
-            if processed.priority_score > 1.0:
-                from ..voting.voting_engine import VoteType
-                await self.orchestrator.create_voting_session(
-                    title=f"Arena Poll: {processed.title}",
-                    description=f"Based on: {processed.summary}",
-                    vote_type=VoteType.BINARY,
-                    options=["Agree", "Disagree"],
-                    duration_minutes=30
-                )
+        topic = "Should AI systems have constitutional rights?"
+        logger.info(f"Injecting autonomous demo event: {topic}")
+        await self.orchestrator.start_battle(topic)

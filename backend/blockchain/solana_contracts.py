@@ -40,6 +40,10 @@ class SolanaContractManager:
         self._payer: Optional[Keypair] = None
         self._init_payer()
 
+    def _init_payer(self) -> None:
+        """Initialize payer keypair from environment if available."""
+        pass
+
     def get_vault_pda(self) -> Pubkey:
         """Derive the vault PDA as defined in the Anchor contract."""
         program_id = Pubkey.from_string(self.PROGRAM_ID)
@@ -76,7 +80,8 @@ class SolanaContractManager:
                     [ix],
                     payer=sender
                 )
-                tx.recent_blockhash = recent_blockhash
+                if hasattr(tx, 'recent_blockhash'):
+                    tx.recent_blockhash = recent_blockhash
                 
                 # Serialize to bytes then base64
                 return base64.b64encode(bytes(tx)).decode('utf-8')
@@ -90,6 +95,49 @@ class SolanaContractManager:
         """
         # Placeholder logic
         return await self.build_stake_transaction(user_address, 0.000001)
+
+    async def distribute_rewards(self, reward_map: Dict[str, float]) -> bool:
+        """
+        Batch distribute rewards to multiple users.
+        """
+        if not self._payer:
+            return False
+            
+        async with AsyncClient(self.rpc_url) as client:
+            try:
+                instructions = []
+                for address, amount in reward_map.items():
+                    try:
+                        recipient = Pubkey.from_string(address)
+                        lamports = int(amount * 1_000_000_000)
+                        ix = transfer(
+                            TransferParams(
+                                from_pubkey=self._payer.pubkey(),
+                                to_pubkey=recipient,
+                                lamports=lamports
+                            )
+                        )
+                        instructions.append(ix)
+                    except ValueError:
+                        logger.warning(f"Invalid address skipped: {address}")
+                        continue
+                        
+                if not instructions:
+                    return False
+                    
+                recent_blockhash_resp = await client.get_latest_blockhash()
+                tx = Transaction.new_with_payer(
+                    instructions,
+                    payer=self._payer.pubkey()
+                )
+                if hasattr(tx, 'recent_blockhash'):
+                    tx.recent_blockhash = recent_blockhash_resp.value.blockhash
+                
+                await client.send_transaction(tx, self._payer)
+                return True
+            except Exception as e:
+                logger.error(f"Error distributing rewards: {e}")
+                return False
 
     async def get_balance(self, address: str) -> float:
         """

@@ -9,11 +9,16 @@ def test_app_lifespan_initializes_and_stops_once(monkeypatch):
     calls = {"initialize": 0, "start": 0, "stop": 0}
 
     class StubOrchestrator:
+        agents = {}
+
         async def start(self):
             calls["start"] += 1
 
         async def stop(self):
             calls["stop"] += 1
+
+        async def broadcast_message(self, message):
+            pass
 
     async def fake_initialize():
         calls["initialize"] += 1

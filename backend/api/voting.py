@@ -104,7 +104,7 @@ async def create_session(
     if len(request.options) < 2:
         raise HTTPException(status_code=400, detail="At least two options are required")
 
-    session = orchestrator.create_voting_session(
+    session = await orchestrator.create_voting_session(
         title=request.title,
         description=request.description,
         vote_type=request.vote_type,
@@ -150,7 +150,7 @@ async def cast_vote(
 
     try:
         # Map DB user_id to orchestrator string user_id
-        vote = orchestrator.cast_vote(
+        vote = await orchestrator.cast_vote(
             session_id=session_id,
             user_id=str(current_user.id),
             choice=request.choice,

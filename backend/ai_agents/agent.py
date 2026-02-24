@@ -66,15 +66,22 @@ class Agent(BaseAgent):
 
         sentiment = await self.nlp_processor.analyze_sentiment(message.content)
         topics = await self.nlp_processor.classify_topic(message.content)
-        # 3. Add to memory and return
         self.add_to_memory("last_sentiment", sentiment)
         self.add_to_memory("last_topics", topics)
         
+        # Save to episodic/semantic memory for long-term recall
+        await self.memory_manager.add_semantic_memory(
+            text=f"Interaction context: {message.content}",
+            agent_id=self.state.agent_id,
+            metadata={
+                "sender_id": message.sender_id,
+                "message_id": message.message_id,
+                "sentiment": sentiment,
+                "topics": topics
+            }
+        )
+
         # Save state to DB
-        # Note: We assume the orchestrator will handle the actual DB merge
-        # but the agent marks itself as 'dirty' or we trigger it here if orchestrator is available
-        # For simplicity in this logic, we'll let the orchestrator tick handle it
-        # or implement a callback.
 
         response_text = await self.generate_response(
             prompt=message.content,
@@ -143,13 +150,21 @@ class Agent(BaseAgent):
     ) -> str:
         """Generate a role-aware response using RAG and LLM."""
         
-        # 1. Retrieve RAG Context
-        rag_context = await self.knowledge_base.search(prompt, limit=3)
+        # 1. Retrieve RAG Context (Global Fact Knowledge)
+        rag_context = await self.knowledge_base.search(prompt, limit=2)
         context_str = "\n".join([f"- {item['content']}" for item in rag_context])
+        
+        # 1.5 Retrieve Personal Semantic Memory (Past Interactions)
+        personal_memories = await self.memory_manager.search_semantic_memory(prompt, self.state.agent_id, limit=3)
+        if personal_memories:
+            memory_str = "\n".join([f"- {item['content']}" for item in personal_memories])
+            if context_str:
+                context_str += "\n\n"
+            context_str += f"Personal Memories:\n{memory_str}"
         
         enriched_system_prompt = self.system_prompt
         if context_str:
-            enriched_system_prompt += f"\n\nRelevant Context from History:\n{context_str}"
+            enriched_system_prompt += f"\n\nRelevant Context:\n{context_str}"
 
         # 2. Generate LLM Response
         generated = await self.nlp_processor.generate(

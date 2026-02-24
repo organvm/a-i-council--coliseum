@@ -10,7 +10,7 @@ except Exception as exc:  # pragma: no cover - optional dependency path
 @pytest.mark.asyncio
 async def test_distribute_rewards_no_payer():
     """Test distribute_rewards returns False when no payer is configured"""
-    manager = SolanaContractManager("http://localhost:8899", "program_id")
+    manager = SolanaContractManager("http://localhost:8899")
     # Ensure no payer
     manager._payer = None
 
@@ -41,7 +41,7 @@ async def test_distribute_rewards_success():
         mock_send_resp.value = "signature"
         mock_client_instance.send_transaction.return_value = mock_send_resp
 
-        manager = SolanaContractManager("http://localhost:8899", "program_id")
+        manager = SolanaContractManager("http://localhost:8899")
         # Inject a fake payer
         manager._payer = Keypair()
 
@@ -62,7 +62,7 @@ async def test_distribute_rewards_success():
         signer = args[1]
 
         assert signer == manager._payer
-        assert len(transaction.instructions) == 2
+        assert len(transaction.message.instructions) == 2
 
 @pytest.mark.asyncio
 async def test_distribute_rewards_invalid_address():
@@ -82,7 +82,7 @@ async def test_distribute_rewards_invalid_address():
         mock_send_resp.value = "signature"
         mock_client_instance.send_transaction.return_value = mock_send_resp
 
-        manager = SolanaContractManager("http://localhost:8899", "program_id")
+        manager = SolanaContractManager("http://localhost:8899")
         manager._payer = Keypair()
 
         recipients = {
@@ -98,4 +98,4 @@ async def test_distribute_rewards_invalid_address():
         # Verify only 1 instruction added
         args, kwargs = mock_client_instance.send_transaction.call_args
         transaction = args[0]
-        assert len(transaction.instructions) == 1
+        assert len(transaction.message.instructions) == 1

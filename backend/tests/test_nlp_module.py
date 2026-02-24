@@ -37,22 +37,19 @@ async def test_extract_entities_fallback(nlp_processor):
 @pytest.mark.asyncio
 async def test_fallback_works_when_openai_unavailable_even_with_key(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
-    monkeypatch.setattr(nlp_module, "AsyncOpenAI", None)
+    monkeypatch.setattr(nlp_module, "litellm", None)
     processor = NLPProcessor()
 
-    assert processor.client is None
     response = await processor.generate("system", "prompt")
     assert response == "I received: prompt"
 
 
 @pytest.mark.asyncio
 async def test_generate_with_mocked_openai_client():
-    with patch("backend.ai_agents.nlp_module.AsyncOpenAI") as mock_openai:
-        mock_client = AsyncMock()
+    with patch("backend.ai_agents.nlp_module.litellm") as mock_litellm:
         mock_completion = MagicMock()
         mock_completion.choices = [MagicMock(message=MagicMock(content="Mocked Response"))]
-        mock_client.chat.completions.create.return_value = mock_completion
-        mock_openai.return_value = mock_client
+        mock_litellm.acompletion = AsyncMock(return_value=mock_completion)
 
         with patch.dict(os.environ, {"OPENAI_API_KEY": "sk-fake"}):
             processor = NLPProcessor()

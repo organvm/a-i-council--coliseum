@@ -19,10 +19,7 @@ interface Fighter {
 
 export const BattleScene: React.FC = () => {
   const [logs, setLogs] = useState<BattleLog[]>([]);
-  const [fighters, setFighters] = useState<{ [key: string]: Fighter }>({
-    'Atlas': { id: 'Atlas', hp: 100, maxHp: 100, isAttacking: false, isHit: false },
-    'Socrates': { id: 'Socrates', hp: 100, maxHp: 100, isAttacking: false, isHit: false }
-  });
+  const [fighters, setFighters] = useState<{ [key: string]: Fighter }>({});
 
   // Mock WebSocket listener for battle events
   useEffect(() => {
@@ -40,12 +37,40 @@ export const BattleScene: React.FC = () => {
   }, []);
 
   const handleCombatUpdate = (data: any) => {
-    // Update HP and trigger animations based on backend data
-    // This is a placeholder for the actual event mapping
+    // Add new fighters to tracking if they don't exist
+    setFighters((prev) => {
+      const next = { ...prev };
+      if (!next[data.attacker_name]) {
+        next[data.attacker_name] = { id: data.attacker_name, hp: 100, maxHp: 100, isAttacking: false, isHit: false };
+      }
+      if (!next[data.defender_name]) {
+        next[data.defender_name] = { id: data.defender_name, hp: 100, maxHp: 100, isAttacking: false, isHit: false };
+      }
+
+      // Process damage and animation flags
+      if (data.is_hit && data.damage > 0) {
+        next[data.defender_name].hp = Math.max(0, next[data.defender_name].hp - data.damage);
+        next[data.defender_name].isHit = true;
+      }
+      next[data.attacker_name].isAttacking = true;
+
+      return next;
+    });
+
+    // Reset animation flags after 1s
+    setTimeout(() => {
+      setFighters((prev) => {
+        const next = { ...prev };
+        if (next[data.attacker_name]) next[data.attacker_name].isAttacking = false;
+        if (next[data.defender_name]) next[data.defender_name].isHit = false;
+        return next;
+      });
+    }, 1000);
+
     const newLog: BattleLog = {
       message: data.log,
       timestamp: Date.now(),
-      type: data.is_fatality ? 'fatality' : 'attack'
+      type: data.is_fatality ? 'fatality' : (data.is_hit ? 'attack' : 'damage') // fallback color
     };
     setLogs(prev => [newLog, ...prev].slice(0, 5));
   };

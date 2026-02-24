@@ -7,30 +7,37 @@ import { VotingPanel } from '@/components/VotingPanel';
 import { WalletConnectCustom } from '@/components/WalletConnectCustom';
 import { EventTicker } from '@/components/EventTicker';
 import { Arena3D } from '@/components/Arena3D';
-import { useColiseumStore } from '@/lib/store';
+import { BattleScene } from '@/components/BattleScene';
+import { useColiseumStore, ColiseumState } from '@/lib/store';
 import { agentsApi } from '@/lib/api';
 
 export default function Home() {
-  const setAgents = useColiseumStore((state) => state.setAgents);
-  const addMessage = useColiseumStore((state) => state.addMessage);
+  const setAgents = useColiseumStore((state: ColiseumState) => state.setAgents);
+  const addMessage = useColiseumStore((state: ColiseumState) => state.addMessage);
+  const addChatMessage = useColiseumStore((state: ColiseumState) => state.addChatMessage);
+  const addCombatLog = useColiseumStore((state: ColiseumState) => state.addCombatLog);
 
   useEffect(() => {
     // Initial fetch
-    agentsApi.list().then((res) => setAgents(res.data));
+    agentsApi.list().then((res: any) => setAgents(res.data));
 
     // WebSocket Setup
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws';
     const socket = new WebSocket(wsUrl);
 
-    socket.onmessage = (event) => {
+    socket.onmessage = (event: MessageEvent) => {
       const data = JSON.parse(event.data);
       if (data.type === 'agent_message') {
         addMessage(data.data);
+      } else if (data.type === 'chat_message') {
+        addChatMessage(data.data);
+      } else if (data.type === 'combat_update') {
+        addCombatLog(data.data);
       }
     };
 
     return () => socket.close();
-  }, [setAgents, addMessage]);
+  }, [setAgents, addMessage, addChatMessage, addCombatLog]);
 
   return (
     <main className="min-h-screen bg-gray-950 p-4 lg:p-8 text-gray-100">
@@ -70,7 +77,7 @@ export default function Home() {
                 AI Council <span className="text-primary-500">Coliseum</span>
               </h1>
               <p className="text-gray-500 mt-2 font-medium">
-                The world's first autonomous agent debate arena.
+                The world&apos;s first autonomous agent debate arena.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -83,8 +90,8 @@ export default function Home() {
           </header>
 
           <EventTicker />
-
           <Arena3D />
+          <BattleScene />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="bg-gray-900 p-6 rounded-lg border border-gray-800 h-64">

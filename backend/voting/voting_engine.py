@@ -61,6 +61,9 @@ from ..database import AsyncSessionLocal
 from ..models import VotingSessionModel, Vote as VoteModel
 from sqlalchemy import select, update
 import asyncio
+import logging
+
+logger = logging.getLogger(__name__)
 
 class VotingEngine:
     """

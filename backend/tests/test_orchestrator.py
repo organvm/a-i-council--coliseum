@@ -40,18 +40,27 @@ async def test_orchestrator_lifecycle_start_stop():
 
 @pytest.mark.asyncio
 async def test_broadcast_event_reaches_agent_memory():
+    print("test_broadcast: start")
     orchestrator = SystemOrchestrator()
     agent = Agent(role=AgentRole.DEBATER, config={"name": "Alice"})
     orchestrator.add_agent(agent)
 
+    print("test_broadcast: orchestrator start")
     await orchestrator.start()
+    print("test_broadcast: broadcasting event")
     await orchestrator.broadcast_event("New topic: AI Safety")
+    print("test_broadcast: sleeping")
     await asyncio.sleep(0.1)
+    
+    print("test_broadcast: stopping orchestrator")
     await asyncio.wait_for(orchestrator.stop(), timeout=2.0)
+    print("test_broadcast: orchestrator stopped")
 
     memories = agent.memory_manager.get_short_term(limit=10)
+    print(f"test_broadcast: memories {memories}")
     assert any(
         m["content"]["content"] == "New topic: AI Safety"
         and m["content"]["sender_id"] == "SYSTEM"
         for m in memories
     )
+    print("test_broadcast: end")

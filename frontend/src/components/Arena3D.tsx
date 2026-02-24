@@ -1,39 +1,51 @@
 'use client';
 
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
+
 import { OrbitControls, Text } from '@react-three/drei';
 import * as THREE from 'three';
 import { useColiseumStore } from '@/lib/store';
 
-function AgentAvatar({ position, name, isAttacking, portraitUrl, role }: any) {
-  const mesh = useRef<THREE.Mesh>(null!);
-  
-  // Load texture if portraitUrl is available
-  const texture = portraitUrl ? useLoader(THREE.TextureLoader, portraitUrl) : null;
+function PortraitMaterial({ url, isHit }: { url: string; isHit: boolean }) {
+  const texture = useLoader(THREE.TextureLoader, url);
+  if (isHit) {
+    return <meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={2} />;
+  }
+  return <meshStandardMaterial map={texture as THREE.Texture} />;
+}
 
-  useFrame((state, delta) => {
+function DefaultMaterial({ role, isHit }: { role: string; isHit: boolean }) {
+  if (isHit) {
+    return <meshStandardMaterial color="#ff0000" emissive="#ff0000" emissiveIntensity={2} />;
+  }
+  const color = role === 'moderator' ? '#ef4444' : role === 'debater' ? '#3b82f6' : '#10b981';
+  return <meshStandardMaterial color={color} />;
+}
+
+function AgentAvatar({ position, name, isAttacking, isHit, portraitUrl, role }: any) {
+  const mesh = useRef<THREE.Mesh>(null!);
+
+  useFrame((state: any, delta: number) => {
     if (isAttacking && mesh.current) {
+      mesh.current.scale.setScalar(1.5);
       mesh.current.rotation.x += delta * 10;
     } else if (mesh.current) {
+      mesh.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
       mesh.current.rotation.x = 0;
       mesh.current.rotation.y += delta * 0.5;
     }
   });
 
-  const material = useMemo(() => {
-    if (texture) {
-      return <meshStandardMaterial map={texture} />;
-    }
-    const color = role === 'moderator' ? '#ef4444' : role === 'debater' ? '#3b82f6' : '#10b981';
-    return <meshStandardMaterial color={color} />;
-  }, [texture, role]);
-
   return (
     <group position={position}>
       <mesh ref={mesh}>
         <boxGeometry args={[1.2, 1.2, 1.2]} />
-        {material}
+        {portraitUrl ? (
+          <PortraitMaterial url={portraitUrl} isHit={isHit} />
+        ) : (
+          <DefaultMaterial role={role} isHit={isHit} />
+        )}
       </mesh>
       <Text
         position={[0, 1.8, 0]}
@@ -61,9 +73,31 @@ function ArenaFloor() {
 
 export const Arena3D: React.FC = () => {
   const agents = useColiseumStore((state) => state.agents);
+  const [attackingAgentId, setAttackingAgentId] = useState<string | null>(null);
+  const [hitAgentId, setHitAgentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws';
+    const socket = new WebSocket(wsUrl);
+
+    socket.onmessage = (event: MessageEvent) => {
+      const payload = JSON.parse(event.data);
+      if (payload.type === 'combat_update') {
+        const data = payload.data || payload;
+        setAttackingAgentId(data.attacker_id); 
+        setHitAgentId(data.defender_id);
+        setTimeout(() => {
+          setAttackingAgentId(null);
+          setHitAgentId(null);
+        }, 1000);
+      }
+    };
+
+    return () => socket.close();
+  }, []);
 
   return (
-    <div className="w-full h-96 bg-black rounded-lg border border-gray-800 overflow-hidden relative">
+    <div className={`w-full h-96 bg-black rounded-lg border ${attackingAgentId ? 'border-red-600 shadow-[0_0_15px_rgba(220,38,38,0.7)]' : 'border-gray-800'} overflow-hidden relative transition-all duration-300`}>
       <Canvas camera={{ position: [0, 8, 12], fov: 40 }}>
         <ambientLight intensity={0.4} />
         <pointLight position={[10, 10, 10]} intensity={1} />
@@ -78,7 +112,8 @@ export const Arena3D: React.FC = () => {
             name={agent.name}
             role={agent.role}
             portraitUrl={agent.state?.memory?.portrait_url}
-            isAttacking={false}
+            isAttacking={attackingAgentId === agent.agent_id}
+            isHit={hitAgentId === agent.agent_id}
           />
         ))}
         

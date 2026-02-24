@@ -8,6 +8,12 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from collections import deque
 import heapq
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Avoiding circular imports if necessary, or just import KnowledgeBase
+from .knowledge_base import KnowledgeBase
 
 
 class MemoryEntry:
@@ -30,12 +36,14 @@ class MemoryManager:
     Supports short-term and long-term memory with TTL
     """
     
-    def __init__(self, max_short_term: int = 100, max_long_term: int = 1000):
+    def __init__(self, max_short_term: int = 100, max_long_term: int = 1000, knowledge_base: Optional[KnowledgeBase] = None):
         self.short_term: deque = deque(maxlen=max_short_term)
         self.long_term: Dict[str, MemoryEntry] = {}
         self.max_long_term = max_long_term
         # Min-heap storing (expires_at, key) tuples for O(1) expiration check
         self.expiry_heap: List = []
+        
+        self.knowledge_base = knowledge_base or KnowledgeBase()
     
     def add_short_term(self, value: Any) -> None:
         """Add to short-term memory (FIFO queue)"""
@@ -82,6 +90,28 @@ class MemoryManager:
         """Remove from long-term memory"""
         if key in self.long_term:
             del self.long_term[key]
+            
+    async def add_semantic_memory(self, text: str, agent_id: str, metadata: Optional[Dict[str, Any]] = None) -> int:
+        """Store semantic long-term memory in the vector database."""
+        meta = {"agent_id": agent_id, "type": "agent_memory"}
+        if metadata:
+            meta.update(metadata)
+        return await self.knowledge_base.add_entry(text, metadata=meta)
+    
+    async def search_semantic_memory(self, query: str, agent_id: str, limit: int = 3) -> List[Dict[str, Any]]:
+        """Retrieve relevant long-term memories from the vector database."""
+        # We can filter by agent_id after retrieval, or if KnowledgeBase supports it, during
+        # Currently KnowledgeBase doesn't filter by metadata in the db query, so we'll filter post-retrieval
+        # or just fetch more and filter.
+        results = await self.knowledge_base.search(query, limit=limit * 3)
+        
+        filtered = []
+        for res in results:
+            if res.get("metadata", {}).get("agent_id") == agent_id:
+                filtered.append(res)
+            if len(filtered) >= limit:
+                break
+        return filtered
     
     def clear_short_term(self) -> None:
         """Clear short-term memory"""
