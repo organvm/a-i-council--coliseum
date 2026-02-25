@@ -60,10 +60,16 @@ class VotingSession(BaseModel):
 from ..database import AsyncSessionLocal
 from ..models import User, VotingSessionModel, Vote as VoteModel
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload
 import logging
 
 logger = logging.getLogger(__name__)
+
+
+class VotePersistenceConflictError(RuntimeError):
+    """Raised when DB constraints reject a vote persistence attempt."""
+    pass
 
 class VotingEngine:
     """
@@ -84,50 +90,92 @@ class VotingEngine:
                 .order_by(VotingSessionModel.starts_at.desc())
             )
             models = result.scalars().unique().all()
-            self.sessions.clear()
-            self.user_votes.clear()
-            for m in models:
-                votes: List[Vote] = []
-                for persisted_vote in sorted(m.votes, key=lambda v: v.timestamp):
-                    vote = Vote(
-                        vote_id=persisted_vote.id,
-                        session_id=persisted_vote.session_id,
-                        user_id=str(persisted_vote.user_id),
-                        choice=persisted_vote.choice,
-                        weight=persisted_vote.weight,
-                        tokens_staked=persisted_vote.tokens_staked,
-                        timestamp=persisted_vote.timestamp,
-                    )
-                    votes.append(vote)
-                    self.user_votes.setdefault(vote.user_id, []).append(vote.vote_id)
-
-                duration_minutes = 60
-                if m.starts_at and m.ends_at:
-                    duration_minutes = max(
-                        1, int(round((m.ends_at - m.starts_at).total_seconds() / 60))
-                    )
-                session = VotingSession(
-                    session_id=m.id,
-                    title=m.title,
-                    description=m.description,
-                    vote_type=VoteType(m.vote_type),
-                    options=m.options,
-                    status=VoteStatus(m.status),
-                    starts_at=m.starts_at,
-                    ends_at=m.ends_at,
-                    duration_minutes=duration_minutes,
-                    votes=votes,
-                    min_stake=m.min_stake,
-                    reward_pool=m.reward_pool,
-                    results=m.results,
-                )
-                self.sessions[session.session_id] = session
+            self._hydrate_from_models(models, replace_cache=True)
             active_count = sum(1 for s in self.sessions.values() if s.status == VoteStatus.ACTIVE)
             logger.info(
                 "Hydrated %d voting sessions from DB (%d active)",
                 len(models),
                 active_count,
             )
+
+    def snapshot_from_models(self, models: List[VotingSessionModel]) -> List[VotingSession]:
+        """Hydrate a detached snapshot of voting sessions from DB models."""
+        return self._hydrate_from_models(models, replace_cache=False)
+
+    def snapshot_one_from_model(
+        self, model: Optional[VotingSessionModel]
+    ) -> Optional[VotingSession]:
+        """Hydrate one detached voting session snapshot from a DB model."""
+        if model is None:
+            return None
+        sessions = self._hydrate_from_models([model], replace_cache=False)
+        return sessions[0] if sessions else None
+
+    def discard_vote_from_memory(self, vote: Vote) -> None:
+        """Roll back an in-memory vote append when durable persistence fails."""
+        session = self.sessions.get(vote.session_id)
+        if session is not None:
+            session.votes = [existing for existing in session.votes if existing.vote_id != vote.vote_id]
+        tracked = self.user_votes.get(vote.user_id)
+        if tracked:
+            self.user_votes[vote.user_id] = [vote_id for vote_id in tracked if vote_id != vote.vote_id]
+            if not self.user_votes[vote.user_id]:
+                self.user_votes.pop(vote.user_id, None)
+
+    def _hydrate_from_models(
+        self,
+        models: List[VotingSessionModel],
+        *,
+        replace_cache: bool,
+    ) -> List[VotingSession]:
+        sessions_by_id: Dict[str, VotingSession] = {}
+        user_votes: Dict[str, List[str]] = {}
+        hydrated_sessions: List[VotingSession] = []
+
+        for m in models:
+            votes: List[Vote] = []
+            for persisted_vote in sorted(m.votes, key=lambda v: v.timestamp):
+                vote = Vote(
+                    vote_id=persisted_vote.id,
+                    session_id=persisted_vote.session_id,
+                    user_id=str(persisted_vote.user_id),
+                    choice=persisted_vote.choice,
+                    weight=persisted_vote.weight,
+                    tokens_staked=persisted_vote.tokens_staked,
+                    timestamp=persisted_vote.timestamp,
+                )
+                votes.append(vote)
+                user_votes.setdefault(vote.user_id, []).append(vote.vote_id)
+
+            duration_minutes = 60
+            if m.starts_at and m.ends_at:
+                duration_minutes = max(
+                    1, int(round((m.ends_at - m.starts_at).total_seconds() / 60))
+                )
+
+            session = VotingSession(
+                session_id=m.id,
+                title=m.title,
+                description=m.description,
+                vote_type=VoteType(m.vote_type),
+                options=m.options,
+                status=VoteStatus(m.status),
+                starts_at=m.starts_at,
+                ends_at=m.ends_at,
+                duration_minutes=duration_minutes,
+                votes=votes,
+                min_stake=m.min_stake,
+                reward_pool=m.reward_pool,
+                results=m.results,
+            )
+            sessions_by_id[session.session_id] = session
+            hydrated_sessions.append(session)
+
+        if replace_cache:
+            self.sessions = sessions_by_id
+            self.user_votes = user_votes
+
+        return hydrated_sessions
 
     async def persist_session(self, session: VotingSession) -> None:
         """Save session state to DB."""
@@ -151,31 +199,43 @@ class VotingEngine:
     async def persist_vote(self, vote: Vote) -> None:
         """Persist a vote record for restart-safe session reconstruction."""
         async with AsyncSessionLocal() as db:
-            user_pk = int(vote.user_id)
-            existing_user = await db.get(User, user_pk)
-            if existing_user is None:
-                # Demo/synthetic votes often use numeric IDs without a pre-created user row.
-                # Create a placeholder so FK-constrained vote persistence still succeeds.
-                db.add(
-                    User(
-                        id=user_pk,
-                        username=f"viewer_{user_pk}",
-                        email=f"viewer_{user_pk}@demo.local",
-                        hashed_password="!",
+            try:
+                user_pk = int(vote.user_id)
+                existing_user = await db.get(User, user_pk)
+                if existing_user is None:
+                    # Demo/synthetic votes often use numeric IDs without a pre-created user row.
+                    # Create a placeholder so FK-constrained vote persistence still succeeds.
+                    db.add(
+                        User(
+                            id=user_pk,
+                            username=f"viewer_{user_pk}",
+                            email=f"viewer_{user_pk}@demo.local",
+                            hashed_password="!",
+                        )
                     )
-                )
 
-            vote_model = VoteModel(
-                id=vote.vote_id,
-                session_id=vote.session_id,
-                user_id=user_pk,
-                choice=vote.choice,
-                weight=vote.weight,
-                tokens_staked=vote.tokens_staked,
-                timestamp=vote.timestamp,
-            )
-            await db.merge(vote_model)
-            await db.commit()
+                vote_model = VoteModel(
+                    id=vote.vote_id,
+                    session_id=vote.session_id,
+                    user_id=user_pk,
+                    choice=vote.choice,
+                    weight=vote.weight,
+                    tokens_staked=vote.tokens_staked,
+                    timestamp=vote.timestamp,
+                )
+                await db.merge(vote_model)
+                await db.commit()
+            except IntegrityError as exc:
+                await db.rollback()
+                error_text = str(getattr(exc, "orig", exc)).lower()
+                if (
+                    "uq_votes_session_user" in error_text
+                    or "votes.session_id, votes.user_id" in error_text
+                ):
+                    raise VotePersistenceConflictError(
+                        "User has already voted in this session"
+                    ) from exc
+                raise
 
     async def finalize_session_and_persist(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Finalize a session and persist status/results."""

@@ -15,10 +15,14 @@ from pydantic import BaseModel, Field
 from ..ai_agents.orchestrator import SystemOrchestrator
 from ..event_pipeline.ingestion import EventSource
 from .dependencies import get_orchestrator
+from .mutation_controls import guard_event_ingest
 
 router = APIRouter()
 EVENT_ERROR_RESPONSES = {
     400: {"description": "Invalid event payload or rejected event"},
+    401: {"description": "Authentication required (unless local demo override is enabled)"},
+    403: {"description": "Authenticated user is inactive or forbidden"},
+    429: {"description": "Rate limit exceeded"},
 }
 
 
@@ -68,6 +72,7 @@ async def list_events(
 @router.post("/ingest", response_model=EventResponse, responses=EVENT_ERROR_RESPONSES)
 async def ingest_event(
     request: IngestEventRequest,
+    _actor = Depends(guard_event_ingest),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Ingest and process an event."""

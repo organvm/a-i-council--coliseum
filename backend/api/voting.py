@@ -15,16 +15,18 @@ from pydantic import BaseModel, Field
 from ..ai_agents.orchestrator import SystemOrchestrator
 from ..voting.voting_engine import VoteType
 from ..models import User
-from .auth import get_current_user
 from .dependencies import get_orchestrator
+from .mutation_controls import guard_voting_session_create, require_rate_limited_vote_user
 
 router = APIRouter()
 
 VOTING_ERROR_RESPONSES = {
     400: {"description": "Invalid request (invalid choice, invalid stake, or malformed payload)"},
     401: {"description": "Unauthorized"},
+    403: {"description": "Forbidden (inactive user or policy denial)"},
     404: {"description": "Voting session not found"},
     409: {"description": "Voting session inactive or duplicate vote"},
+    429: {"description": "Rate limit exceeded"},
 }
 
 
@@ -74,10 +76,8 @@ async def list_sessions(
     status: Optional[str] = Query(default=None),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
-    """List voting sessions, optionally filtered by status."""
-    sessions = list(orchestrator.voting_engine.sessions.values())
-    if status:
-        sessions = [s for s in sessions if s.status.value == status]
+    """List voting sessions from persisted storage, optionally filtered by status."""
+    sessions = await orchestrator.list_voting_sessions_snapshot(status=status)
 
     return [
         VotingSessionResponse(
@@ -98,6 +98,7 @@ async def list_sessions(
 @router.post("/sessions", response_model=VotingSessionResponse, responses=VOTING_ERROR_RESPONSES)
 async def create_session(
     request: CreateVotingSessionRequest,
+    _actor = Depends(guard_voting_session_create),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Create and activate a voting session."""
@@ -134,7 +135,7 @@ async def create_session(
 async def cast_vote(
     session_id: str,
     request: CastVoteRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_rate_limited_vote_user),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Cast a vote in a session."""
@@ -191,7 +192,10 @@ async def get_results(
     """Get voting session results; finalize by default if needed."""
     session = orchestrator.get_voting_session(session_id)
     if not session:
-        raise HTTPException(status_code=404, detail="Voting session not found")
+        persisted_session = await orchestrator.get_voting_session_snapshot(session_id)
+        if persisted_session is None:
+            raise HTTPException(status_code=404, detail="Voting session not found")
+        session = persisted_session
 
     if finalize and session.results is None:
         try:
@@ -199,9 +203,29 @@ async def get_results(
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 
+    persisted_session = await orchestrator.get_voting_session_snapshot(session_id)
+    live_session = orchestrator.get_voting_session(session_id)
+    response_session = persisted_session or live_session
+    if (
+        response_session is not None
+        and live_session is not None
+        and (
+            len(live_session.votes) > len(response_session.votes)
+            or (
+                live_session.results is not None
+                and response_session.results is None
+            )
+        )
+    ):
+        # Prefer persisted state normally, but fall back to the live session when
+        # test/dev harnesses intentionally stub persistence and the DB snapshot is stale.
+        response_session = live_session
+    if response_session is None:
+        raise HTTPException(status_code=404, detail="Voting session not found")
+
     return {
-        "session_id": session.session_id,
-        "status": session.status.value,
-        "total_votes": len(session.votes),
-        "results": session.results,
+        "session_id": response_session.session_id,
+        "status": response_session.status.value,
+        "total_votes": len(response_session.votes),
+        "results": response_session.results,
     }

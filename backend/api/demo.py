@@ -14,8 +14,17 @@ from pydantic import BaseModel, Field
 from ..ai_agents.orchestrator import SystemOrchestrator
 from ..settings import get_settings
 from .dependencies import get_orchestrator
+from .mutation_controls import guard_demo_reset, guard_demo_scenario_start
 
 router = APIRouter()
+DEMO_MUTATION_RESPONSES = {
+    400: {"description": "Invalid request or director runtime state"},
+    401: {"description": "Authentication required (unless local demo override is enabled)"},
+    403: {"description": "Forbidden by environment or policy"},
+    404: {"description": "Scenario not found"},
+    429: {"description": "Rate limit exceeded"},
+    503: {"description": "Demo director unavailable"},
+}
 
 
 class StartScenarioRequest(BaseModel):
@@ -48,11 +57,12 @@ async def demo_status(request: Request):
     return director.status_snapshot()
 
 
-@router.post("/scenarios/{scenario_name}/start")
+@router.post("/scenarios/{scenario_name}/start", responses=DEMO_MUTATION_RESPONSES)
 async def start_scenario(
     scenario_name: str,
     payload: StartScenarioRequest,
     request: Request,
+    _actor=Depends(guard_demo_scenario_start),
     _orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     director = _get_director_from_request(request)
@@ -70,9 +80,10 @@ async def start_scenario(
     return {"message": "Director Mode scenario started", "director": status}
 
 
-@router.post("/reset")
+@router.post("/reset", responses=DEMO_MUTATION_RESPONSES)
 async def reset_demo_runtime(
     request: Request,
+    _actor=Depends(guard_demo_reset),
     _orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     settings = get_settings()

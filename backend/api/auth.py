@@ -21,6 +21,7 @@ from ..settings import get_settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/users/login")
+optional_oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/users/login", auto_error=False)
 
 
 def verify_password(plain_password, hashed_password):
@@ -85,3 +86,16 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user
+
+
+async def get_optional_current_user(
+    token: str | None = Depends(optional_oauth2_scheme),  # allow-secret
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """Return authenticated user when a bearer token is provided; otherwise None."""
+    if not token:
+        return None
+    try:
+        return await get_current_user(token=token, db=db)  # allow-secret
+    except HTTPException:
+        return None

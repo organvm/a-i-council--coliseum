@@ -380,6 +380,7 @@ class DemoDirector:
                 "phase": phase,
                 "timestamp": _utcnow_iso(),
                 "mode": "director" if self.is_running else "autonomous",
+                "director_mode": self.is_running,
                 "director": self.status_snapshot(),
                 "orchestrator_running": bool(getattr(self.orchestrator, "is_running", False)),
             },

@@ -21,7 +21,14 @@ from ..event_pipeline.storage import EventStorage
 from ..voting.achievements import AchievementSystem
 from ..voting.gamification import GamificationSystem
 from ..voting.leaderboard import LeaderboardSystem
-from ..voting.voting_engine import Vote, VoteStatus, VoteType, VotingEngine, VotingSession
+from ..voting.voting_engine import (
+    Vote,
+    VotePersistenceConflictError,
+    VoteStatus,
+    VoteType,
+    VotingEngine,
+    VotingSession,
+)
 from ..combat.engine import CombatEngine
 from .agent import Agent
 from .base_agent import AgentRole, Message
@@ -349,6 +356,26 @@ class SystemOrchestrator:
 
         # Persist to DB
         await SystemRepository.persist_event(processed)
+        logger.info(
+            "Persisted event (event_id=%s source=%s category=%s priority=%.3f)",
+            processed.event_id,
+            processed.source.value,
+            processed.category,
+            float(processed.priority_score or 0.0),
+        )
+
+        await event_bus.publish(
+            "event_update",
+            {
+                "event_id": processed.event_id,
+                "source": processed.source.value,
+                "title": processed.title,
+                "description": processed.description,
+                "category": processed.category,
+                "tags": list(processed.tags),
+                "timestamp": processed.timestamp.isoformat() + "Z",
+            },
+        )
 
         await self.storage.store_event(processed)
         await self.router.route_event(event, priority_score=priority_score)
@@ -363,8 +390,56 @@ class SystemOrchestrator:
         limit: int = 10,
         source: Optional[EventSource] = None,
     ) -> List[NormalizedEvent]:
-        """List recent normalized events from ingestion history."""
-        return self.ingestion_system.get_recent_events(limit=limit, source=source)
+        """List recent normalized events from persisted storage."""
+        models = await SystemRepository.list_event_models(
+            limit=limit,
+            source=source.value if source else None,
+        )
+        events: List[NormalizedEvent] = []
+        for model in models:
+            try:
+                event_source = EventSource(model.source)
+            except ValueError:
+                logger.warning(
+                    "Unknown persisted event source '%s' for event_id=%s; defaulting to internal",
+                    model.source,
+                    model.id,
+                )
+                event_source = EventSource.INTERNAL
+
+            metadata = dict(model.metadata_json or {})
+            tags = metadata.get("tags")
+            if not isinstance(tags, list):
+                tags = list(model.keywords or [])
+
+            events.append(
+                NormalizedEvent(
+                    event_id=model.id,
+                    source=event_source,
+                    title=model.title,
+                    description=model.description,
+                    category=model.category,
+                    tags=[str(tag) for tag in tags],
+                    timestamp=model.timestamp,
+                    metadata=metadata,
+                )
+            )
+        return events
+
+    async def list_voting_sessions_snapshot(
+        self,
+        *,
+        status: Optional[str] = None,
+        limit: Optional[int] = None,
+    ) -> List[VotingSession]:
+        """Read persisted voting sessions as detached snapshots for API/bootstrap responses."""
+        models = await SystemRepository.list_voting_session_models(status=status, limit=limit)
+        return self.voting_engine.snapshot_from_models(models)
+
+    async def get_voting_session_snapshot(self, session_id: str) -> Optional[VotingSession]:
+        """Read one persisted voting session snapshot for API responses."""
+        model = await SystemRepository.get_voting_session_model(session_id)
+        return self.voting_engine.snapshot_one_from_model(model)
 
     async def create_voting_session(
         self,
@@ -400,6 +475,10 @@ class SystemOrchestrator:
             raise ValueError("Voting session not found")
         if session.status != VoteStatus.ACTIVE:
             raise ValueError("Voting session is not active")
+        if session.ends_at and datetime.utcnow() > session.ends_at:
+            self.voting_engine.close_session(session_id)
+            await self.voting_engine.persist_session(session)
+            raise ValueError("Voting session is not active")
         if tokens_staked < session.min_stake:
             raise ValueError("Insufficient stake for this session")
         if any(v.user_id == user_id for v in session.votes):
@@ -427,7 +506,33 @@ class SystemOrchestrator:
         self.achievement_system.track_progress(user_id, "democratic_champion", votes_cast)
 
         # Persist before returning so API responses reflect durable state.
-        await self._persist_vote_to_db(vote)
+        try:
+            await self._persist_vote_to_db(vote)
+        except VotePersistenceConflictError:
+            self.voting_engine.discard_vote_from_memory(vote)
+            logger.warning(
+                "Duplicate vote rejected by DB constraint (session_id=%s user_id=%s)",
+                session_id,
+                user_id,
+            )
+            raise ValueError("User has already voted in this session")
+        except Exception:
+            self.voting_engine.discard_vote_from_memory(vote)
+            logger.exception(
+                "Vote persistence failed after in-memory cast (session_id=%s user_id=%s)",
+                session_id,
+                user_id,
+            )
+            raise
+
+        await event_bus.publish("vote_update", self._serialize_vote_update(session, simulated=False))
+        logger.info(
+            "Vote persisted (session_id=%s user_id=%s total_votes=%s status=%s)",
+            session_id,
+            user_id,
+            len(session.votes),
+            session.status.value,
+        )
 
         return vote
 
@@ -447,6 +552,14 @@ class SystemOrchestrator:
         results = await self.voting_engine.finalize_session_and_persist(session_id)
         if results is None:
             raise ValueError("Voting session not found")
+        session = self.voting_engine.sessions.get(session_id)
+        if session is not None:
+            await event_bus.publish("vote_update", self._serialize_vote_update(session, simulated=False))
+            logger.info(
+                "Voting session finalized (session_id=%s total_votes=%s)",
+                session_id,
+                len(session.votes),
+            )
         return results
 
     def get_voting_session(self, session_id: str) -> Optional[VotingSession]:
@@ -477,6 +590,27 @@ class SystemOrchestrator:
                 return False
             return 1 <= float(choice) <= 5
         return True
+
+    @staticmethod
+    def _serialize_vote_update(session: VotingSession, *, simulated: bool) -> Dict[str, Any]:
+        """Create a UI-friendly vote update payload shared across runtime and demo modes."""
+        choice_counts: Dict[str, float] = {}
+        for vote in session.votes:
+            key = str(vote.choice)
+            choice_counts[key] = choice_counts.get(key, 0.0) + float(vote.weight)
+
+        return {
+            "session_id": session.session_id,
+            "title": session.title,
+            "status": session.status.value,
+            "options": [str(opt) for opt in session.options],
+            "total_votes": len(session.votes),
+            "choice_weights": choice_counts,
+            "results": session.results,
+            "simulated": simulated,
+            "director_mode": False,
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+        }
 
     def get_user_profile(self, user_id: str) -> Dict[str, Any]:
         """Get user profile and progression stats."""

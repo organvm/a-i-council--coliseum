@@ -113,11 +113,13 @@ class Arena3DErrorBoundary extends React.Component<
 
 export default function Home() {
   const setAgents = useColiseumStore((state: ColiseumState) => state.setAgents);
+  const setEvents = useColiseumStore((state: ColiseumState) => state.setEvents);
   const setSessions = useColiseumStore((state: ColiseumState) => state.setSessions);
   const addMessage = useColiseumStore((state: ColiseumState) => state.addMessage);
   const addChatMessage = useColiseumStore((state: ColiseumState) => state.addChatMessage);
   const addCombatLog = useColiseumStore((state: ColiseumState) => state.addCombatLog);
   const addDemoMarker = useColiseumStore((state: ColiseumState) => state.addDemoMarker);
+  const upsertEvent = useColiseumStore((state: ColiseumState) => state.upsertEvent);
   const upsertVoteUpdate = useColiseumStore((state: ColiseumState) => state.upsertVoteUpdate);
   const setSystemStatus = useColiseumStore((state: ColiseumState) => state.setSystemStatus);
   const setWsConnectionStatus = useColiseumStore((state: ColiseumState) => state.setWsConnectionStatus);
@@ -154,6 +156,9 @@ export default function Home() {
         if (isDisposed) return;
         if (Array.isArray(res.data?.agents)) {
           setAgents(res.data.agents);
+        }
+        if (Array.isArray(res.data?.events)) {
+          setEvents(res.data.events);
         }
         if (Array.isArray(res.data?.voting?.sessions)) {
           setSessions(res.data.voting.sessions);
@@ -224,6 +229,8 @@ export default function Home() {
           addCombatLog(parsed.data);
         } else if (parsed.type === 'demo_marker') {
           addDemoMarker(parsed.data);
+        } else if (parsed.type === 'event_update') {
+          upsertEvent(parsed.data);
         } else if (parsed.type === 'vote_update') {
           upsertVoteUpdate(parsed.data);
         } else if (parsed.type === 'system_status') {
@@ -247,11 +254,13 @@ export default function Home() {
     };
   }, [
     setAgents,
+    setEvents,
     setSessions,
     addMessage,
     addChatMessage,
     addCombatLog,
     addDemoMarker,
+    upsertEvent,
     upsertVoteUpdate,
     setSystemStatus,
     setWsConnectionStatus,

@@ -109,10 +109,17 @@ def _next_ws_sequence(app: FastAPI) -> int:
     return current
 
 
-def _build_ws_event_payload(app: FastAPI, event_type: str, data: dict[str, Any] | None) -> dict[str, Any]:
+def _build_ws_event_payload(
+    app: FastAPI,
+    event_type: str,
+    data: dict[str, Any] | None,
+    *,
+    source: str = "runtime",
+) -> dict[str, Any]:
     return {
         "version": "1",
         "type": event_type,
+        "source": source,
         "timestamp": _utcnow_iso(),
         "event_id": str(uuid.uuid4()),
         "sequence": _next_ws_sequence(app),
@@ -169,7 +176,15 @@ async def lifespan(app: FastAPI):
     async def ws_forwarder(event_type: str, data: dict | None):
         payload_data = data or {}
         try:
-            await manager.broadcast(_build_ws_event_payload(app, event_type, payload_data))
+            payload_source = "director" if bool(payload_data.get("director_mode")) else "runtime"
+            await manager.broadcast(
+                _build_ws_event_payload(
+                    app,
+                    event_type,
+                    payload_data,
+                    source=payload_source,
+                )
+            )
         except Exception:
             logger.exception("Failed forwarding event_bus message to websockets (event_type=%s)", event_type)
 
@@ -362,6 +377,7 @@ async def health_ready():
         "db": {"ready": db_ready, "error": db_error},
         "orchestrator": {"ready": bool(getattr(orchestrator, "is_running", False))},
         "event_bus": {"ready": bool(getattr(event_bus, "is_started", False))},
+        "websocket": {"ready": True, "active_connections": len(manager.active_connections)},
         "arena_worker": {"ready": bool(getattr(arena_worker, "is_running", False))},
         "twitch_listener": {"ready": bool(getattr(twitch_listener, "is_running", False))},
         "demo_director": {"ready": director is not None, "running": bool(getattr(director, "is_running", False))},

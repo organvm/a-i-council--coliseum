@@ -1,5 +1,7 @@
 """Integration tests for core API MVP flows."""
 
+from datetime import datetime
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -7,6 +9,11 @@ from backend.api import dependencies
 from backend.main import app
 from backend.models import User
 from backend.api.auth import get_current_user
+from backend.database import AsyncSessionLocal, Base, engine
+from backend.event_pipeline.ingestion import EventSource
+from backend.event_pipeline.processing import ProcessedEvent
+from backend.infrastructure.repository import SystemRepository
+from backend.voting.voting_engine import VoteType, VotingEngine
 from unittest.mock import patch
 
 
@@ -152,3 +159,79 @@ def test_voting_end_to_end_and_negative_paths(client: TestClient):
         json={"user_id": "user_c", "choice": "alpha", "tokens_staked": 2.0},
     )
     assert inactive_vote_resp.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_persisted_read_paths_drive_voting_events_and_bootstrap(client: TestClient):
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with AsyncSessionLocal() as db:
+        db.add(
+            User(
+                id=11,
+                username="persist_api_user",
+                email="persist_api_user@example.test",
+                hashed_password="not-used",
+            )
+        )
+        await db.commit()
+
+    voting_engine = VotingEngine()
+    session = await voting_engine.create_session(
+        title="Persisted poll",
+        description="Poll seeded directly in DB to validate API read convergence",
+        vote_type=VoteType.MULTIPLE_CHOICE,
+        options=["alpha", "beta"],
+        duration_minutes=15,
+    )
+    await voting_engine.start_session(session.session_id)
+    vote = voting_engine.cast_vote(
+        session_id=session.session_id,
+        user_id="11",
+        choice="alpha",
+        weight=1.0,
+        tokens_staked=0.0,
+    )
+    assert vote is not None
+    await voting_engine.persist_vote(vote)
+    await voting_engine.finalize_session_and_persist(session.session_id)
+
+    await SystemRepository.persist_event(
+        ProcessedEvent(
+            event_id="persisted-event-1",
+            source=EventSource.API,
+            title="Persisted event",
+            description="Event seeded directly in DB",
+            category="technology",
+            tags=["technology"],
+            timestamp=datetime.utcnow(),
+            metadata={"seeded": True},
+            summary="Event seeded directly in DB",
+            keywords=["technology"],
+        )
+    )
+
+    sessions_resp = client.get("/api/voting/sessions")
+    assert sessions_resp.status_code == 200
+    sessions_payload = sessions_resp.json()
+    seeded_session = next((s for s in sessions_payload if s["session_id"] == session.session_id), None)
+    assert seeded_session is not None
+    assert seeded_session["total_votes"] == 1
+    assert seeded_session["status"] == "finalized"
+
+    results_resp = client.get(f"/api/voting/sessions/{session.session_id}/results", params={"finalize": False})
+    assert results_resp.status_code == 200
+    assert results_resp.json()["total_votes"] == 1
+    assert results_resp.json()["results"]["total_votes"] == 1
+
+    events_resp = client.get("/api/events", params={"limit": 10})
+    assert events_resp.status_code == 200
+    assert any(e["event_id"] == "persisted-event-1" for e in events_resp.json())
+
+    bootstrap_resp = client.get("/api/state/bootstrap")
+    assert bootstrap_resp.status_code == 200
+    bootstrap = bootstrap_resp.json()
+    assert any(s["session_id"] == session.session_id for s in bootstrap["voting"]["sessions"])
+    assert any(e["event_id"] == "persisted-event-1" for e in bootstrap["events"])

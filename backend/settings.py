@@ -48,10 +48,19 @@ class Settings(BaseSettings):
     )
     demo_scenario_dir: str = Field(default="backend/demo/scenarios", alias="DEMO_SCENARIO_DIR")
     demo_local_reset_enabled: bool = Field(default=True, alias="DEMO_LOCAL_RESET_ENABLED")
+    demo_allow_unauthenticated_mutations: bool = Field(
+        default=True,
+        alias="DEMO_ALLOW_UNAUTHENTICATED_MUTATIONS",
+    )
 
     @property
     def is_development(self) -> bool:
         return self.app_env.lower() in {"dev", "development", "local", "test", "testing"}
+
+    @property
+    def allow_local_unauthenticated_mutations(self) -> bool:
+        """Allow demo-oriented local mutation calls without auth in development/test."""
+        return self.is_development and self.demo_allow_unauthenticated_mutations
 
     @property
     def database_url_async(self) -> str:

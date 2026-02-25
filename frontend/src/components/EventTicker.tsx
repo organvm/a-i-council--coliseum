@@ -1,27 +1,21 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
-import { motion, AnimatePresence } from 'framer-motion';
-
-interface Event {
-  event_id: string;
-  title: string;
-  category: string;
-  timestamp: string;
-}
+import React, { useEffect } from 'react';
+import { eventsApi } from '@/lib/api';
+import { useColiseumStore } from '@/lib/store';
 
 export const EventTicker: React.FC = () => {
-  const [events, setEvents] = useState<Event[]>([]);
+  const events = useColiseumStore((state) => state.events);
+  const setStoreEvents = useColiseumStore((state) => state.setEvents);
 
   useEffect(() => {
     const fetchEvents = () => {
-      api.get('/api/events?limit=10').then((res) => setEvents(res.data));
+      eventsApi.list(10).then((res) => setStoreEvents(res.data));
     };
     fetchEvents();
     const interval = setInterval(fetchEvents, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [setStoreEvents]);
 
   return (
     <div className="bg-primary-900/20 border-y border-primary-900/30 py-2 overflow-hidden whitespace-nowrap">

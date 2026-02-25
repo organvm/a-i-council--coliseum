@@ -13,10 +13,18 @@ from pydantic import BaseModel, Field
 
 from ..ai_agents.agent import Agent, AgentRole
 from ..ai_agents.orchestrator import SystemOrchestrator
+from ..models import User
 from .dependencies import get_orchestrator
+from .mutation_controls import guard_agent_mutation
 
 router = APIRouter()
 AGENT_NOT_FOUND_RESPONSE = {404: {"description": "Agent not found"}}
+AGENT_MUTATION_RESPONSES = {
+    **AGENT_NOT_FOUND_RESPONSE,
+    401: {"description": "Authentication required"},
+    403: {"description": "Forbidden (inactive user or policy denial)"},
+    429: {"description": "Rate limit exceeded"},
+}
 
 
 class CreateAgentRequest(BaseModel):
@@ -52,9 +60,10 @@ async def list_agents(orchestrator: SystemOrchestrator = Depends(get_orchestrato
     ]
 
 
-@router.post("/", response_model=AgentResponse)
+@router.post("/", response_model=AgentResponse, responses=AGENT_MUTATION_RESPONSES)
 async def create_agent(
     request: CreateAgentRequest,
+    _current_user: User = Depends(guard_agent_mutation),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Create a new agent."""
@@ -110,9 +119,10 @@ async def get_agent_memory(
     }
 
 
-@router.delete("/{agent_id}", responses=AGENT_NOT_FOUND_RESPONSE)
+@router.delete("/{agent_id}", responses=AGENT_MUTATION_RESPONSES)
 async def delete_agent(
     agent_id: str,
+    _current_user: User = Depends(guard_agent_mutation),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Delete an agent."""
@@ -121,9 +131,10 @@ async def delete_agent(
     return {"status": "deleted", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/activate", responses=AGENT_NOT_FOUND_RESPONSE)
+@router.post("/{agent_id}/activate", responses=AGENT_MUTATION_RESPONSES)
 async def activate_agent(
     agent_id: str,
+    _current_user: User = Depends(guard_agent_mutation),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Activate an agent."""
@@ -135,9 +146,10 @@ async def activate_agent(
     return {"status": "activated", "agent_id": agent_id}
 
 
-@router.post("/{agent_id}/deactivate", responses=AGENT_NOT_FOUND_RESPONSE)
+@router.post("/{agent_id}/deactivate", responses=AGENT_MUTATION_RESPONSES)
 async def deactivate_agent(
     agent_id: str,
+    _current_user: User = Depends(guard_agent_mutation),
     orchestrator: SystemOrchestrator = Depends(get_orchestrator),
 ):
     """Deactivate an agent."""

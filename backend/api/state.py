@@ -24,7 +24,7 @@ async def bootstrap_state(
 ):
     settings = get_settings()
     events = await orchestrator.list_events(limit=10)
-    sessions = list(orchestrator.voting_engine.sessions.values())
+    sessions = await orchestrator.list_voting_sessions_snapshot(limit=25)
     director = getattr(request.app.state, "demo_director", None)
 
     return {

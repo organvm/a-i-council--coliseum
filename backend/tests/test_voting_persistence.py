@@ -4,7 +4,13 @@ import pytest
 
 from backend.database import AsyncSessionLocal, Base, engine
 from backend.models import User
-from backend.voting.voting_engine import VoteStatus, VoteType, VotingEngine
+from backend.voting.voting_engine import (
+    Vote,
+    VotePersistenceConflictError,
+    VoteStatus,
+    VoteType,
+    VotingEngine,
+)
 
 
 @pytest.mark.asyncio
@@ -57,3 +63,39 @@ async def test_voting_engine_reload_restores_votes_and_final_results():
     assert restored.votes[0].vote_id == vote.vote_id
     assert restored.votes[0].user_id == "1"
     assert engine_two.get_user_votes("1")[0].vote_id == vote.vote_id
+
+
+@pytest.mark.asyncio
+async def test_vote_persistence_duplicate_session_user_conflict_raises_domain_error():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
+
+    async with AsyncSessionLocal() as db:
+        db.add(
+            User(
+                id=7,
+                username="dupe_user",
+                email="dupe_user@example.test",
+                hashed_password="not-used",
+            )
+        )
+        await db.commit()
+
+    voting_engine = VotingEngine()
+    session = await voting_engine.create_session(
+        title="Duplicate guard poll",
+        description="Ensure DB uniqueness backs duplicate vote protection",
+        vote_type=VoteType.MULTIPLE_CHOICE,
+        options=["alpha", "beta"],
+        duration_minutes=15,
+    )
+    await voting_engine.start_session(session.session_id)
+
+    first_vote = Vote(session_id=session.session_id, user_id="7", choice="alpha")
+    second_vote = Vote(session_id=session.session_id, user_id="7", choice="beta")
+
+    await voting_engine.persist_vote(first_vote)
+
+    with pytest.raises(VotePersistenceConflictError, match="already voted"):
+        await voting_engine.persist_vote(second_vote)
