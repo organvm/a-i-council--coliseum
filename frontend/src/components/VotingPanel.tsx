@@ -1,26 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { votingApi, api } from '@/lib/api';
+import { votingApi, type VoteChoice, type VotingSessionSummary } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface Session {
-  session_id: string;
-  title: string;
-  description: string;
-  options: string[];
-  status: string;
-}
-
 export const VotingPanel: React.FC = () => {
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<VotingSessionSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [votingFor, setVotingFor] = useState<string | null>(null);
 
   const fetchSessions = async () => {
     try {
       const res = await votingApi.listSessions();
-      setSessions(res.data.filter((s: Session) => s.status === 'active'));
+      setSessions(res.data.filter((s) => s.status === 'active'));
     } catch (err) {
       console.error('Failed to fetch sessions', err);
     } finally {
@@ -34,7 +26,7 @@ export const VotingPanel: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleVote = async (sessionId: string, choice: string) => {
+  const handleVote = async (sessionId: string, choice: VoteChoice) => {
     setVotingFor(sessionId);
     try {
       await votingApi.castVote(sessionId, choice);
@@ -46,6 +38,9 @@ export const VotingPanel: React.FC = () => {
       setVotingFor(null);
     }
   };
+
+  const getOptionLabel = (option: VoteChoice) =>
+    typeof option === 'string' ? option : JSON.stringify(option);
 
   if (loading) return <div className="animate-pulse bg-gray-800 h-48 rounded-lg"></div>;
 
@@ -73,12 +68,12 @@ export const VotingPanel: React.FC = () => {
             <div className="grid grid-cols-1 gap-2">
               {session.options.map((option) => (
                 <button
-                  key={option}
+                  key={`${session.session_id}-${getOptionLabel(option)}`}
                   disabled={votingFor === session.session_id}
                   onClick={() => handleVote(session.session_id, option)}
                   className="w-full py-3 px-4 bg-gray-800 hover:bg-primary-600/20 hover:border-primary-500/50 text-left text-sm font-medium rounded border border-gray-700 transition-all group flex items-center justify-between disabled:opacity-50"
                 >
-                  <span className="group-hover:text-white transition-colors">{option}</span>
+                  <span className="group-hover:text-white transition-colors">{getOptionLabel(option)}</span>
                   <div className="w-4 h-4 rounded-full border border-gray-600 group-hover:border-primary-500 flex items-center justify-center">
                     <div className="w-2 h-2 bg-primary-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   </div>

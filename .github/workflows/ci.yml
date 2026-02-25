@@ -1,19 +1,21 @@
-name: Python CI
+name: Monorepo CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  test:
+  backend-tests:
+    name: Backend Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
 
@@ -21,82 +23,62 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Detect dependency file
-        id: detect
-        run: |
-          if [ -f "pyproject.toml" ]; then
-            echo "deps=pyproject" >> $GITHUB_OUTPUT
-          elif [ -f "requirements.txt" ]; then
-            echo "deps=requirements" >> $GITHUB_OUTPUT
-          elif [ -f "setup.py" ]; then
-            echo "deps=setup" >> $GITHUB_OUTPUT
-          else
-            echo "deps=none" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Install dependencies (pyproject.toml)
-        if: steps.detect.outputs.deps == 'pyproject'
+      - name: Install backend dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev] || pip install -e . || true
-          pip install pytest pytest-cov ruff mypy || true
+          pip install -r backend/requirements-test.txt
 
-      - name: Install dependencies (requirements.txt)
-        if: steps.detect.outputs.deps == 'requirements'
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt || true
-          pip install pytest pytest-cov ruff mypy || true
+      - name: Run backend test suite
+        run: pytest -q backend/tests
 
-      - name: Install dependencies (setup.py)
-        if: steps.detect.outputs.deps == 'setup'
-        run: |
-          python -m pip install --upgrade pip
-          pip install -e . || true
-          pip install pytest pytest-cov ruff mypy || true
+  frontend-checks:
+    name: Frontend Checks
+    runs-on: ubuntu-latest
 
-      - name: Lint with ruff
-        continue-on-error: true
-        run: |
-          if command -v ruff &> /dev/null; then
-            ruff check --output-format=github . || echo "::warning::Ruff found issues"
-          else
-            echo "::notice::Ruff not installed, skipping linting"
-          fi
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Type check with mypy
-        continue-on-error: true
-        run: |
-          if command -v mypy &> /dev/null; then
-            mypy . --ignore-missing-imports || echo "::warning::Mypy found type issues"
-          else
-            echo "::notice::Mypy not installed, skipping type checking"
-          fi
-
-      - name: Test with pytest
-        run: |
-          if command -v pytest &> /dev/null; then
-            if [ -d "tests" ] || [ -d "test" ] || ls test_*.py 2>/dev/null | grep -q .; then
-              pytest --cov=. --cov-report=xml --cov-report=term --cov-report=html || exit 1
-            else
-              echo "::notice::No tests directory found, skipping tests"
-              exit 0
-            fi
-          else
-            echo "::notice::Pytest not installed and no tests found, passing"
-            exit 0
-          fi
-
-      - name: Upload coverage to Codecov
-        if: success() && hashFiles('coverage.xml') != ''
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          file: ./coverage.xml
-          fail_ci_if_error: false
-          flags: unittests
-          name: codecov-${{ matrix.python-version }}
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: pnpm -C frontend install --frozen-lockfile
+
+      - name: Lint frontend
+        run: pnpm -C frontend run lint
+
+      - name: Run frontend unit tests
+        run: pnpm -C frontend run test:ci
+
+      - name: Build frontend
+        run: pnpm -C frontend run build
+
+  anchor-checks:
+    name: Anchor Contract Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Run Anchor program tests
+        working-directory: anchor/programs/ai-coliseum
+        run: cargo test

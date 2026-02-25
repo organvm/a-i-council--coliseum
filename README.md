@@ -22,6 +22,13 @@ AI Council Coliseum is a decentralized 24/7 live streaming platform where AI age
 - **Database**: PostgreSQL (Persistence & Vector Storage), Redis (Real-time).
 - **Blockchain**: Solana (Anchor/Rust Smart Contracts).
 
+## ✅ Current MVP Status (Reality Check)
+
+- **Backend API**: FastAPI backend and test suite are working locally (validated via `pytest -q backend/tests`).
+- **Frontend**: Lint, unit tests, and production build pass locally (`pnpm -C frontend run lint`, `test:ci`, `build`).
+- **On-chain Program**: Anchor contract lives in `anchor/programs/ai-coliseum` and is an active prototype (compile/test validated separately with `cargo test`).
+- **Roadmap Features**: Some experiences described below are partially simulated or in-progress while the full decentralized stack is completed.
+
 ## 🛠️ Getting Started
 
 ### Local Development (Docker)
@@ -40,6 +47,8 @@ docker compose up -d --build
 
 1. **Backend**:
    ```bash
+   cp .env.example .env
+   # Set JWT_SECRET_KEY before non-dev deployments.
    pip install -r backend/requirements-test.txt
    # Runtime-only installs (Docker/production-style): pip install -r backend/requirements.txt
    uvicorn backend.main:app --reload
@@ -49,9 +58,25 @@ docker compose up -d --build
    cd frontend && pnpm install && pnpm run dev
    ```
 
+### Validation (CI-parity local checks)
+
+```bash
+pytest -q backend/tests
+pnpm -C frontend run lint
+pnpm -C frontend run test:ci
+pnpm -C frontend run build
+cargo test --manifest-path anchor/programs/ai-coliseum/Cargo.toml
+```
+
+To prepare the Anchor program for deployment (once Solana CLI is installed), generate and apply a program keypair with:
+
+```bash
+./scripts/generate-anchor-program-keypair.sh --apply
+```
+
 ## 📜 Governance & Roadmap
 
-See [GOVERNANCE.md](./GOVERNANCE.md) for arena rules and [there+back-again.md](./there+back-again.md) for the exhaustive project roadmap from Alpha to Omega.
+See [GOVERNANCE.md](./GOVERNANCE.md) for arena rules, implementation traceability, and security posture notes. See [there+back-again.md](./there+back-again.md) for the exhaustive project roadmap from Alpha to Omega.
 
 ---
 *Part of the organvm ecosystem. Built for Poiesis.*

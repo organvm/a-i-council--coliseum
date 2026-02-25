@@ -4,23 +4,13 @@ Database Configuration.
 Handles connection to PostgreSQL using SQLAlchemy and asyncpg.
 """
 
-import os
 from typing import AsyncGenerator
-from dotenv import load_dotenv
-
-load_dotenv()
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
+from .settings import get_settings
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", "postgresql+asyncpg://council_user:council_pass@localhost:5432/ai_council"
-)
-
-
-# Replace postgresql:// with postgresql+asyncpg:// if not already present
-if DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+DATABASE_URL = get_settings().database_url_async
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(

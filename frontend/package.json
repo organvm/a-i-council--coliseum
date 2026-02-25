@@ -6,8 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
+    "test:ci": "jest --runInBand",
     "test:watch": "jest --watch"
   },
   "dependencies": {

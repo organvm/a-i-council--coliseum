@@ -87,8 +87,8 @@ export const Arena3D: React.FC = () => {
 
   useEffect(() => {
     if (latestCombatEvent) {
-      setAttackingAgentId(latestCombatEvent.attacker_id); 
-      setHitAgentId(latestCombatEvent.defender_id);
+      setAttackingAgentId(latestCombatEvent.attacker_id ?? null);
+      setHitAgentId(latestCombatEvent.defender_id ?? null);
       
       const timer = setTimeout(() => {
         setAttackingAgentId(null);

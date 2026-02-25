@@ -5,7 +5,7 @@ seeds = false
 skip-lint = false
 
 [programs.localnet]
-ai_coliseum = "Coli111111111111111111111111111111111111111"
+ai_coliseum = "2L2savqgibmLNmumGDkwDPUwzAXbJeBULRZwV6oyWfAN"
 
 [registry]
 url = "https://api.apr.dev"

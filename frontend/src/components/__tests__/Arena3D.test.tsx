@@ -21,12 +21,36 @@ jest.mock('@/lib/store', () => ({
   useColiseumStore: jest.fn(),
 }));
 
+const originalConsoleError = console.error;
+
 describe('Arena3D', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error').mockImplementation((...args) => {
+      const first = args[0];
+      if (
+        typeof first === 'string' &&
+        (first.includes('incorrect casing') || first.includes('unrecognized in this browser'))
+      ) {
+        return;
+      }
+      originalConsoleError(...args);
+    });
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders correctly with agents', () => {
-    (useColiseumStore as unknown as jest.Mock).mockReturnValue([
-      { agent_id: '1', name: 'Alpha', role: 'debater' },
-      { agent_id: '2', name: 'Beta', role: 'moderator' },
-    ]);
+    (useColiseumStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector({
+        agents: [
+          { agent_id: '1', name: 'Alpha', role: 'debater' },
+          { agent_id: '2', name: 'Beta', role: 'moderator' },
+        ],
+        latestCombatEvent: null,
+      })
+    );
 
     const { getByTestId, getByText } = render(<Arena3D />);
     

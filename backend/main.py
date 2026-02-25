@@ -7,8 +7,8 @@ Main entry point for the AI Council Coliseum backend.
 from __future__ import annotations
 
 import logging
-import os
 from contextlib import asynccontextmanager
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -31,6 +31,7 @@ try:
     from backend.social.twitch_listener import TwitchListener
     from backend.infrastructure.event_bus import event_bus
     from backend.event_pipeline.ingestion import EventSource
+    from backend.settings import get_settings
 except ImportError:
     # Supports running from backend/ as module path main:app
     from api import (
@@ -47,80 +48,139 @@ except ImportError:
     from social.twitch_listener import TwitchListener
     from infrastructure.event_bus import event_bus
     from event_pipeline.ingestion import EventSource
+    from settings import get_settings
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
 class ConnectionManager:
     def __init__(self):
-        self.active_connections = []
+        self.active_connections: list[WebSocket] = []
 
     async def connect(self, websocket: WebSocket):
         await websocket.accept()
         self.active_connections.append(websocket)
+        logger.info(
+            "WebSocket connected (active_connections=%s)",
+            len(self.active_connections),
+        )
 
     def disconnect(self, websocket: WebSocket):
-        self.active_connections.remove(websocket)
+        if websocket in self.active_connections:
+            self.active_connections.remove(websocket)
+            logger.info(
+                "WebSocket disconnected (active_connections=%s)",
+                len(self.active_connections),
+            )
 
-    async def broadcast(self, message: dict):
-        for connection in self.active_connections:
+    async def broadcast(self, message: dict[str, Any]):
+        failed_connections: list[WebSocket] = []
+        for connection in self.active_connections[:]:
             try:
                 await connection.send_json(message)
             except Exception:
-                pass
+                failed_connections.append(connection)
+                logger.warning("WebSocket broadcast failed; pruning connection", exc_info=True)
+
+        for connection in failed_connections:
+            self.disconnect(connection)
 
 manager = ConnectionManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifecycle manager for the application."""
-    logger.info("Starting AI Council Coliseum Backend")
-    
-    # Create database tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    
-    await initialize_orchestrator()
-    orchestrator = get_orchestrator()
-    
-    await event_bus.start()
-    
+    logger.info("Lifespan startup begin")
+
+    orchestrator = None
+    arena_worker: AutonomousArenaWorker | None = None
+    twitch_listener: TwitchListener | None = None
+    subscribed_ws_forwarder = False
+
+    async def stop_component(name: str, stop_callable):
+        try:
+            await stop_callable()
+        except Exception:
+            logger.exception("Failed to stop component: %s", name)
+
     # Pass EventBus messages to WebSocket clients
-    async def ws_forwarder(event_type: str, data: dict):
-        if data is None:
-            data = {}
-        await manager.broadcast({"type": event_type, "data": data})
-        
-    event_bus.subscribe("*", ws_forwarder)
-    
-    await orchestrator.start()
+    async def ws_forwarder(event_type: str, data: dict | None):
+        payload_data = data or {}
+        try:
+            await manager.broadcast({"type": event_type, "data": payload_data})
+        except Exception:
+            logger.exception("Failed forwarding event_bus message to websockets (event_type=%s)", event_type)
 
-    # Start Workers
-    arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=15)
-    await arena_worker.start()
+    try:
+        logger.info("Startup step: create database tables")
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
 
-    # Twitch Handler
-    async def handle_twitch_message(user: str, message: str):
-        # Broadcast chat to frontend for overlay
-        await event_bus.publish("chat_message", {"user": user, "message": message})
-        
-        # Ingest social event into the main pipeline instead of inline command parsing
-        await orchestrator.ingest_event(
-            source=EventSource.SOCIAL_MEDIA,
-            raw_data={"title": f"Twitch chat from {user}", "description": message, "user": user},
-            metadata={"platform": "twitch"}
-        )
+        logger.info("Startup step: initialize orchestrator")
+        await initialize_orchestrator()
+        orchestrator = get_orchestrator()
 
-    twitch_listener = TwitchListener(callback=handle_twitch_message)
-    await twitch_listener.start()
+        logger.info("Startup step: start event bus")
+        await event_bus.start()
 
-    yield
+        event_bus.subscribe("*", ws_forwarder)
+        subscribed_ws_forwarder = True
 
-    logger.info("Shutting down AI Council Coliseum Backend")
-    await twitch_listener.stop()
-    await arena_worker.stop()
-    await orchestrator.stop()
-    await event_bus.stop()
+        logger.info("Startup step: start orchestrator")
+        await orchestrator.start()
+
+        logger.info("Startup step: start arena worker")
+        arena_worker = AutonomousArenaWorker(orchestrator, interval_seconds=15)
+        await arena_worker.start()
+
+        # Twitch Handler
+        async def handle_twitch_message(user: str, message: str):
+            try:
+                # Broadcast chat to frontend for overlay
+                await event_bus.publish("chat_message", {"user": user, "message": message})
+
+                # Ingest social event into the main pipeline instead of inline command parsing
+                await orchestrator.ingest_event(
+                    source=EventSource.SOCIAL_MEDIA,
+                    raw_data={
+                        "title": f"Twitch chat from {user}",
+                        "description": message,
+                        "user": user,
+                    },
+                    metadata={"platform": "twitch"},
+                )
+            except Exception:
+                logger.exception("Failed handling Twitch message (user=%s)", user)
+                raise
+
+        logger.info("Startup step: start twitch listener")
+        twitch_listener = TwitchListener(callback=handle_twitch_message)
+        await twitch_listener.start()
+
+        logger.info("Lifespan startup complete")
+        yield
+    except Exception:
+        logger.exception("Lifespan startup/runtime failure")
+        raise
+    finally:
+        logger.info("Lifespan shutdown begin")
+        if subscribed_ws_forwarder:
+            try:
+                event_bus.unsubscribe("*", ws_forwarder)
+            except Exception:
+                logger.exception("Failed to unsubscribe websocket forwarder")
+
+        if twitch_listener is not None:
+            await stop_component("twitch_listener", twitch_listener.stop)
+
+        if arena_worker is not None:
+            await stop_component("arena_worker", arena_worker.stop)
+
+        if orchestrator is not None:
+            await stop_component("orchestrator", orchestrator.stop)
+
+        await stop_component("event_bus", event_bus.stop)
+        logger.info("Lifespan shutdown complete")
 
 
 app = FastAPI(
@@ -134,11 +194,7 @@ app = FastAPI(
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-origins = [
-    origin.strip()
-    for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")
-    if origin.strip()
-]
+origins = get_settings().cors_origins_list
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -205,8 +261,11 @@ async def websocket_endpoint(websocket: WebSocket):
             # Keep connection alive
             await websocket.receive_text()
     except WebSocketDisconnect:
+        logger.info("WebSocket client closed connection")
+    except Exception:
+        logger.exception("WebSocket endpoint error")
+    finally:
         manager.disconnect(websocket)
-        logger.info("WebSocket disconnected")
 
 
 if __name__ == "__main__":

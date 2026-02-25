@@ -8,7 +8,7 @@ import { VotingPanel } from '@/components/VotingPanel';
 import { WalletConnectCustom } from '@/components/WalletConnectCustom';
 import { EventTicker } from '@/components/EventTicker';
 import { useColiseumStore, ColiseumState } from '@/lib/store';
-import { agentsApi } from '@/lib/api';
+import { agentsApi, isColiseumSocketEvent } from '@/lib/api';
 
 const Arena3D = dynamic(
   () => import('@/components/Arena3D').then((mod) => mod.Arena3D),
@@ -34,13 +34,23 @@ export default function Home() {
     const socket = new WebSocket(wsUrl);
 
     socket.onmessage = (event: MessageEvent) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'agent_message') {
-        addMessage(data.data);
-      } else if (data.type === 'chat_message') {
-        addChatMessage(data.data);
-      } else if (data.type === 'combat_update') {
-        addCombatLog(data.data);
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
+      if (!isColiseumSocketEvent(parsed)) {
+        return;
+      }
+
+      if (parsed.type === 'agent_message') {
+        addMessage(parsed.data);
+      } else if (parsed.type === 'chat_message') {
+        addChatMessage(parsed.data);
+      } else if (parsed.type === 'combat_update') {
+        addCombatLog(parsed.data);
       }
     };
 
