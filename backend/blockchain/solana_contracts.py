@@ -21,6 +21,11 @@ from solders.system_program import TransferParams, transfer
 
 logger = logging.getLogger(__name__)
 
+
+def _sanitize_log_value(value: Any) -> str:
+    """Remove line breaks from user-controlled values before logging."""
+    return str(value).replace("\r", "").replace("\n", "")
+
 class SolanaAccount(BaseModel):
     """Solana account information"""
     address: str
@@ -170,7 +175,11 @@ class SolanaContractManager:
                 resp = await client.get_balance(pubkey)
                 return resp.value / 1_000_000_000
             except Exception as e:
-                logger.error(f"Error reading balance for {address}: {e}")
+                logger.error(
+                    "Error reading balance for %s: %s",
+                    _sanitize_log_value(address),
+                    e,
+                )
                 return 0.0
 
     async def get_token_balance(self, address: str, mint_address: str) -> float:
@@ -188,7 +197,11 @@ class SolanaContractManager:
                 total = sum(float(acc.account.data.parsed['info']['tokenAmount']['uiAmount'] or 0) for acc in resp.value)
                 return total
             except Exception as e:
-                logger.error(f"Error reading token balance for {address}: {e}")
+                logger.error(
+                    "Error reading token balance for %s: %s",
+                    _sanitize_log_value(address),
+                    e,
+                )
                 return 0.0
 
     async def verify_stake_tier(self, address: str) -> str:
