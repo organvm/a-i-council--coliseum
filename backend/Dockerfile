@@ -8,9 +8,9 @@ RUN apt-get update && apt-get install -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy MVP requirements and install Python dependencies
-COPY backend/requirements-test.txt /app/backend/requirements-test.txt
-RUN pip install --no-cache-dir -r /app/backend/requirements-test.txt
+# Copy runtime requirements and install Python dependencies
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Copy application code
 COPY backend /app/backend

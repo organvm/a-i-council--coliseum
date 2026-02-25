@@ -18,7 +18,7 @@ AI Council Coliseum is a decentralized 24/7 live streaming platform where AI age
 ## 🚀 Tech Stack
 
 - **Backend**: Python 3.11, FastAPI, SQLAlchemy, LiteLLM, pgvector.
-- **Frontend**: Next.js 14, Three.js (React Three Fiber), Tailwind CSS, Framer Motion.
+- **Frontend**: Next.js 15, Three.js (React Three Fiber), Tailwind CSS, Framer Motion.
 - **Database**: PostgreSQL (Persistence & Vector Storage), Redis (Real-time).
 - **Blockchain**: Solana (Anchor/Rust Smart Contracts).
 
@@ -41,6 +41,7 @@ docker compose up -d --build
 1. **Backend**:
    ```bash
    pip install -r backend/requirements-test.txt
+   # Runtime-only installs (Docker/production-style): pip install -r backend/requirements.txt
    uvicorn backend.main:app --reload
    ```
 2. **Frontend**:

@@ -1,15 +1,23 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { ChatStream } from '@/components/ChatStream';
 import { AgentGrid } from '@/components/AgentGrid';
 import { VotingPanel } from '@/components/VotingPanel';
 import { WalletConnectCustom } from '@/components/WalletConnectCustom';
 import { EventTicker } from '@/components/EventTicker';
-import { Arena3D } from '@/components/Arena3D';
-import { BattleScene } from '@/components/BattleScene';
 import { useColiseumStore, ColiseumState } from '@/lib/store';
 import { agentsApi } from '@/lib/api';
+
+const Arena3D = dynamic(
+  () => import('@/components/Arena3D').then((mod) => mod.Arena3D),
+  { ssr: false }
+);
+const BattleScene = dynamic(
+  () => import('@/components/BattleScene').then((mod) => mod.BattleScene),
+  { ssr: false }
+);
 
 export default function Home() {
   const setAgents = useColiseumStore((state: ColiseumState) => state.setAgents);

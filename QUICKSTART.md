@@ -32,6 +32,7 @@ BACKEND_PORT=18000 docker compose down
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements-test.txt
+# runtime-only installs use backend/requirements.txt
 uvicorn backend.main:app --reload
 ```
 
@@ -67,4 +68,3 @@ python -m compileall backend
 python -m pytest -q backend/tests
 cd frontend && pnpm run lint && pnpm run build
 ```
-
