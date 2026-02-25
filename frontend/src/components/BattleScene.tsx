@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useColiseumStore } from '@/lib/store';
+import type { CombatUpdateEvent } from '@/lib/api';
 
 interface Fighter {
   id: string;
@@ -17,6 +18,10 @@ export const BattleScene: React.FC = () => {
   const combatLogs = useColiseumStore((state) => state.combatLogs);
   const [fighters, setFighters] = useState<{ [key: string]: Fighter }>({});
   const [isActive, setIsActive] = useState(false);
+  const [impactOverlay, setImpactOverlay] = useState<{
+    text: string;
+    tone: 'hit' | 'fatality';
+  } | null>(null);
 
   useEffect(() => {
     if (latestCombatEvent) {
@@ -27,12 +32,16 @@ export const BattleScene: React.FC = () => {
     }
   }, [latestCombatEvent]);
 
-  const handleCombatUpdate = (data: any) => {
+  const handleCombatUpdate = (data: CombatUpdateEvent) => {
+    const aName = data.attacker_name || data.attacker_id;
+    const dName = data.defender_name || data.defender_id;
+    if (!aName || !dName) {
+      return;
+    }
+
     // Add new fighters to tracking if they don't exist
     setFighters((prev) => {
       const next = { ...prev };
-      const aName = data.attacker_name || data.attacker_id;
-      const dName = data.defender_name || data.defender_id;
 
       if (!next[aName]) {
         next[aName] = { id: aName, hp: 100, maxHp: 100, isAttacking: false, isHit: false };
@@ -42,8 +51,9 @@ export const BattleScene: React.FC = () => {
       }
 
       // Process damage and animation flags
-      if (data.is_hit && data.damage > 0) {
-        next[dName].hp = Math.max(0, next[dName].hp - data.damage);
+      const damage = typeof data.damage === 'number' ? data.damage : 0;
+      if (data.is_hit && damage > 0) {
+        next[dName].hp = Math.max(0, next[dName].hp - damage);
         next[dName].isHit = true;
       }
       next[aName].isAttacking = true;
@@ -55,13 +65,18 @@ export const BattleScene: React.FC = () => {
     setTimeout(() => {
       setFighters((prev) => {
         const next = { ...prev };
-        const aName = data.attacker_name || data.attacker_id;
-        const dName = data.defender_name || data.defender_id;
         if (next[aName]) next[aName].isAttacking = false;
         if (next[dName]) next[dName].isHit = false;
         return next;
       });
     }, 1000);
+
+    if (data.is_fatality) {
+      setImpactOverlay({ text: 'FATALITY', tone: 'fatality' });
+    } else if (data.is_hit && typeof data.damage === 'number' && data.damage > 0) {
+      setImpactOverlay({ text: `-${data.damage} HP`, tone: 'hit' });
+    }
+    setTimeout(() => setImpactOverlay(null), 900);
   };
 
   return (
@@ -118,12 +133,33 @@ export const BattleScene: React.FC = () => {
                   log.is_fatality ? 'text-red-500 font-black animate-pulse' : 'text-gray-300'
                 }`}
               >
-                <span className="opacity-50">[{new Date().toLocaleTimeString()}]</span> {log.log}
+                <span className="opacity-50">
+                  [{log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}]
+                </span>{' '}
+                {log.log}
               </motion.p>
             ))}
           </AnimatePresence>
         </div>
       </div>
+
+      <AnimatePresence>
+        {impactOverlay && (
+          <motion.div
+            key={`${impactOverlay.text}-${impactOverlay.tone}`}
+            initial={{ opacity: 0, y: 10, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 1.05 }}
+            className={`absolute top-5 left-1/2 -translate-x-1/2 px-4 py-2 rounded-lg border font-black uppercase tracking-[0.18em] text-sm shadow-2xl ${
+              impactOverlay.tone === 'fatality'
+                ? 'bg-red-600/20 border-red-500 text-red-300'
+                : 'bg-amber-500/15 border-amber-400/60 text-amber-200'
+            }`}
+          >
+            {impactOverlay.text}
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* VS Badge */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-6xl font-black text-red-600/10 italic select-none">

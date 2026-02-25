@@ -157,7 +157,7 @@ async def cast_vote(
             tokens_staked=request.tokens_staked,
         )
         
-        # TODO: Persist the vote to the database EventModel or VoteModel
+        # Vote persistence is handled inside orchestrator.cast_vote() before returning.
         
     except ValueError as exc:
         detail = str(exc)
@@ -195,7 +195,7 @@ async def get_results(
 
     if finalize and session.results is None:
         try:
-            orchestrator.finalize_voting_session(session_id)
+            await orchestrator.finalize_voting_session_durable(session_id)
         except ValueError as exc:
             raise HTTPException(status_code=404, detail=str(exc))
 

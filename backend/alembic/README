@@ -1,0 +1,10 @@
+Alembic migration environment for backend schema changes.
+
+Common usage (from repo root):
+
+  export DATABASE_URL="sqlite+aiosqlite:///$(pwd)/coliseum_demo.db"
+  .venv/bin/alembic upgrade head
+
+Create a new migration:
+
+  .venv/bin/alembic revision -m "describe change"

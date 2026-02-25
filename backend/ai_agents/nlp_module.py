@@ -20,6 +20,21 @@ except ImportError:
     litellm = None
 
 logger = logging.getLogger(__name__)
+_warned_missing_litellm = False
+_warned_missing_api_key = False
+
+
+def _warn_fallback_once(kind: str, message: str) -> None:
+    global _warned_missing_litellm, _warned_missing_api_key
+    if kind == "litellm":
+        if _warned_missing_litellm:
+            return
+        _warned_missing_litellm = True
+    elif kind == "api_key":
+        if _warned_missing_api_key:
+            return
+        _warned_missing_api_key = True
+    logger.warning(message)
 
 
 class NLPProcessor:
@@ -30,9 +45,15 @@ class NLPProcessor:
         self.api_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")  # allow-secret
         
         if not litellm:
-            logger.warning("litellm package is unavailable. NLP features will use fallbacks")
+            _warn_fallback_once(
+                "litellm",
+                "litellm package is unavailable. NLP features will use fallbacks",
+            )
         elif not self.api_key:
-            logger.warning("No API key found (OPENAI_API_KEY or ANTHROPIC_API_KEY). Using fallbacks")
+            _warn_fallback_once(
+                "api_key",
+                "No API key found (OPENAI_API_KEY or ANTHROPIC_API_KEY). Using fallbacks",
+            )
 
     async def generate(
         self,

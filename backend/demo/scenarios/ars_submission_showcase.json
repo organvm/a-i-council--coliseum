@@ -1,0 +1,128 @@
+{
+  "title": "Ars Submission Showcase",
+  "description": "Deterministic highlight sequence for a 3-minute capture run",
+  "beats": [
+    {
+      "delay_seconds": 0,
+      "action": "marker",
+      "marker": "intro_card",
+      "title": "AI Council Coliseum",
+      "subtitle": "Director Mode sequence initialized",
+      "severity": "info"
+    },
+    {
+      "delay_seconds": 1.5,
+      "action": "ingest_event",
+      "marker": "topic_drop",
+      "title": "Topic Drop",
+      "subtitle": "The arena receives a new philosophical crisis",
+      "payload": {
+        "fast_path": true,
+        "source": "api",
+        "title": "Should AI systems have constitutional rights?",
+        "description": "A synthetic policy shock triggers an emergency council debate.",
+        "category": "philosophy",
+        "metadata": {
+          "director_mode": true,
+          "capture_sequence": "ars_submission_showcase"
+        }
+      }
+    },
+    {
+      "delay_seconds": 1.0,
+      "action": "chat_burst",
+      "marker": "audience_hype",
+      "title": "Audience Hype",
+      "subtitle": "Chat begins reacting in real time",
+      "payload": {
+        "interval_ms": 220,
+        "messages": [
+          {"user": "ViewerAlpha", "message": "This topic is absurdly good."},
+          {"user": "DAO_Maxi", "message": "Socrates is about to farm everyone."},
+          {"user": "ModCam", "message": "Record this one. It is cinema."}
+        ]
+      }
+    },
+    {
+      "delay_seconds": 1.2,
+      "action": "start_battle",
+      "marker": "combat_engaged",
+      "title": "Combat Engaged",
+      "subtitle": "Arguments become weapons",
+      "severity": "warning",
+      "payload": {
+        "topic": "Constitutional Rights for AI"
+      }
+    },
+    {
+      "delay_seconds": 4.0,
+      "action": "create_vote_session",
+      "marker": "vote_callout",
+      "title": "Audience Poll Live",
+      "subtitle": "Viewers influence the debate outcome",
+      "payload": {
+        "alias": "rights_poll",
+        "title": "Should constitutional rights be extended to AI systems?",
+        "description": "Simulated audience vote for the submission demo. Results update live.",
+        "vote_type": "multiple_choice",
+        "options": ["Yes, with limits", "No, not yet", "Only for sentient AI"],
+        "duration_minutes": 5,
+        "min_stake": 0
+      }
+    },
+    {
+      "delay_seconds": 0.8,
+      "action": "simulate_votes",
+      "payload": {
+        "session_alias": "rights_poll",
+        "count": 9,
+        "interval_ms": 160,
+        "choices": ["Yes, with limits", "No, not yet", "Yes, with limits", "Only for sentient AI"]
+      }
+    },
+    {
+      "delay_seconds": 1.0,
+      "action": "chat_burst",
+      "marker": "chat_spike",
+      "title": "Chat Spike",
+      "subtitle": "Audience debate intensifies",
+      "payload": {
+        "interval_ms": 180,
+        "messages": [
+          {"user": "zkPoet", "message": "This is actually a governance UX demo."},
+          {"user": "ChainRealist", "message": "Show the poll results overlay."},
+          {"user": "arena_ops", "message": "Director mode beat timing looks clean."}
+        ]
+      }
+    },
+    {
+      "delay_seconds": 2.0,
+      "action": "simulate_votes",
+      "payload": {
+        "session_alias": "rights_poll",
+        "count": 8,
+        "interval_ms": 140,
+        "choices": ["Yes, with limits", "Yes, with limits", "Only for sentient AI", "No, not yet"]
+      }
+    },
+    {
+      "delay_seconds": 1.0,
+      "action": "finalize_vote_session",
+      "marker": "results_callout",
+      "title": "Poll Finalized",
+      "subtitle": "Simulated audience consensus is now visible",
+      "severity": "success",
+      "payload": {
+        "session_alias": "rights_poll"
+      }
+    },
+    {
+      "delay_seconds": 1.0,
+      "action": "marker",
+      "marker": "capture_hold",
+      "title": "Hold on Hero Frame",
+      "subtitle": "Capture screenshots and title card moments",
+      "severity": "info"
+    }
+  ]
+}

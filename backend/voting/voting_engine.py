@@ -4,7 +4,7 @@ Voting Engine Module
 Handles viewer voting on council debates and decisions.
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -58,9 +58,9 @@ class VotingSession(BaseModel):
 
 
 from ..database import AsyncSessionLocal
-from ..models import VotingSessionModel, Vote as VoteModel
-from sqlalchemy import select, update
-import asyncio
+from ..models import User, VotingSessionModel, Vote as VoteModel
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 import logging
 
 logger = logging.getLogger(__name__)
@@ -76,13 +76,36 @@ class VotingEngine:
         self.user_votes: Dict[str, List[str]] = {}
 
     async def load_active_sessions(self) -> None:
-        """Hydrate the in-memory engine from the database."""
+        """Hydrate in-memory state from the database (all persisted voting sessions)."""
         async with AsyncSessionLocal() as db:
             result = await db.execute(
-                select(VotingSessionModel).where(VotingSessionModel.status == "active")
+                select(VotingSessionModel)
+                .options(selectinload(VotingSessionModel.votes))
+                .order_by(VotingSessionModel.starts_at.desc())
             )
-            models = result.scalars().all()
+            models = result.scalars().unique().all()
+            self.sessions.clear()
+            self.user_votes.clear()
             for m in models:
+                votes: List[Vote] = []
+                for persisted_vote in sorted(m.votes, key=lambda v: v.timestamp):
+                    vote = Vote(
+                        vote_id=persisted_vote.id,
+                        session_id=persisted_vote.session_id,
+                        user_id=str(persisted_vote.user_id),
+                        choice=persisted_vote.choice,
+                        weight=persisted_vote.weight,
+                        tokens_staked=persisted_vote.tokens_staked,
+                        timestamp=persisted_vote.timestamp,
+                    )
+                    votes.append(vote)
+                    self.user_votes.setdefault(vote.user_id, []).append(vote.vote_id)
+
+                duration_minutes = 60
+                if m.starts_at and m.ends_at:
+                    duration_minutes = max(
+                        1, int(round((m.ends_at - m.starts_at).total_seconds() / 60))
+                    )
                 session = VotingSession(
                     session_id=m.id,
                     title=m.title,
@@ -92,12 +115,19 @@ class VotingEngine:
                     status=VoteStatus(m.status),
                     starts_at=m.starts_at,
                     ends_at=m.ends_at,
+                    duration_minutes=duration_minutes,
+                    votes=votes,
                     min_stake=m.min_stake,
                     reward_pool=m.reward_pool,
-                    results=m.results
+                    results=m.results,
                 )
                 self.sessions[session.session_id] = session
-            logger.info(f"Hydrated {len(models)} active voting sessions")
+            active_count = sum(1 for s in self.sessions.values() if s.status == VoteStatus.ACTIVE)
+            logger.info(
+                "Hydrated %d voting sessions from DB (%d active)",
+                len(models),
+                active_count,
+            )
 
     async def persist_session(self, session: VotingSession) -> None:
         """Save session state to DB."""
@@ -117,6 +147,45 @@ class VotingEngine:
             )
             await db.merge(model)
             await db.commit()
+
+    async def persist_vote(self, vote: Vote) -> None:
+        """Persist a vote record for restart-safe session reconstruction."""
+        async with AsyncSessionLocal() as db:
+            user_pk = int(vote.user_id)
+            existing_user = await db.get(User, user_pk)
+            if existing_user is None:
+                # Demo/synthetic votes often use numeric IDs without a pre-created user row.
+                # Create a placeholder so FK-constrained vote persistence still succeeds.
+                db.add(
+                    User(
+                        id=user_pk,
+                        username=f"viewer_{user_pk}",
+                        email=f"viewer_{user_pk}@demo.local",
+                        hashed_password="!",
+                    )
+                )
+
+            vote_model = VoteModel(
+                id=vote.vote_id,
+                session_id=vote.session_id,
+                user_id=user_pk,
+                choice=vote.choice,
+                weight=vote.weight,
+                tokens_staked=vote.tokens_staked,
+                timestamp=vote.timestamp,
+            )
+            await db.merge(vote_model)
+            await db.commit()
+
+    async def finalize_session_and_persist(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Finalize a session and persist status/results."""
+        results = self.finalize_session(session_id)
+        if results is None:
+            return None
+        session = self.sessions.get(session_id)
+        if session is not None:
+            await self.persist_session(session)
+        return results
     
     async def create_session(
         self,

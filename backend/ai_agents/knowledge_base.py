@@ -6,6 +6,7 @@ using pgvector and LiteLLM embeddings.
 """
 
 import logging
+import os
 from typing import Any, Dict, List, Optional
 
 import litellm
@@ -16,15 +17,34 @@ from ..database import AsyncSessionLocal
 from ..models import KnowledgeEntry as KnowledgeEntryModel
 
 logger = logging.getLogger(__name__)
+_warned_missing_embedding_keys_global = False
 
 class KnowledgeBase:
     """RAG-enabled knowledge base using pgvector."""
 
     def __init__(self, model_name: str = "text-embedding-3-small"):
         self.model_name = model_name
+        self._warned_missing_embedding_keys = False
+
+    def _has_embedding_credentials(self) -> bool:
+        return bool(os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY"))
+
+    def _warn_missing_keys_once(self) -> None:
+        global _warned_missing_embedding_keys_global
+        if self._warned_missing_embedding_keys or _warned_missing_embedding_keys_global:
+            return
+        self._warned_missing_embedding_keys = True
+        _warned_missing_embedding_keys_global = True
+        logger.warning(
+            "Knowledge base embeddings disabled: no OPENAI_API_KEY/ANTHROPIC_API_KEY configured; "
+            "RAG add/search will use no-op fallback"
+        )
 
     async def add_entry(self, content: str, metadata: Optional[Dict[str, Any]] = None) -> int:
         """Embed content and save to the vector database."""
+        if not self._has_embedding_credentials():
+            self._warn_missing_keys_once()
+            return -1
         try:
             response = await litellm.aembedding(
                 model=self.model_name,
@@ -48,6 +68,9 @@ class KnowledgeBase:
 
     async def search(self, query: str, limit: int = 5) -> List[Dict[str, Any]]:
         """Perform a vector similarity search."""
+        if not self._has_embedding_credentials():
+            self._warn_missing_keys_once()
+            return []
         try:
             response = await litellm.aembedding(
                 model=self.model_name,

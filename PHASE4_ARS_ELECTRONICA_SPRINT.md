@@ -1,8 +1,8 @@
 # Ars Electronica Submission Sprint
 
 **Deadline:** March 4, 2026 (Prix Ars Electronica Interactive Art+)
-**Current Date:** February 24, 2026
-**Remaining Days:** 8
+**Current Date:** February 25, 2026
+**Remaining Days:** 7
 
 ## Issue Categorization & Assignment
 
@@ -14,6 +14,9 @@
 | #159 | Fix frontend WebSocket handling and wire BattleScene | **High (P2)** | Gemini CLI | Feb 25 | ✅ Resolved |
 | #160 | Visual polish for demo video recording | **Medium (P3)** | Gemini CLI | Feb 26 | ✅ Resolved |
 | #161 | Record 3-minute demo video and capture screenshots | **Medium (P4)** | User | Feb 27 | ⏳ Ready for User |
+| #162 | Add Director Mode deterministic demo sequence + demo markers | **High (P1)** | Codex | Feb 25 | ✅ Resolved |
+| #163 | Add demo readiness APIs/scripts (`/health/ready`, bootstrap, preflight/smoke) | **High (P1)** | Codex | Feb 25 | ✅ Resolved |
+| #164 | Frontend demo overlays, WS reconnect status, simulated vote visuals | **High (P2)** | Codex | Feb 25 | ✅ Resolved |
 
 ## Dependency Map
 - **#156** ✅
@@ -22,6 +25,9 @@
 - **#159** ✅
 - **#160** ✅
 - **#161** ⏳
+- **#162** ✅
+- **#163** ✅
+- **#164** ✅
 
 ## Verification Summary
 
@@ -60,3 +66,32 @@
      - 3D Arena attack animations.
      - BattleScene HP bars and combat logs.
   5. Take 4 high-res screenshots of the key components.
+
+### P1: #162 - Director Mode Deterministic Sequence ✅
+- Added Director Mode scenario runner with JSON beat sequencing in `backend/demo/director.py`.
+- Added default capture scenario: `backend/demo/scenarios/ars_submission_showcase.json`.
+- Emits explicit websocket `demo_marker` events for title/topic/combat/results moments.
+
+### P1: #163 - Demo Readiness APIs + Scripts ✅
+- Added `GET /health/ready` readiness endpoint.
+- Added `GET /api/state/bootstrap` frontend hydration snapshot.
+- Added demo API controls under `/api/demo/*` (list/status/start/reset).
+- Added scripts:
+  - `scripts/demo_reset.sh`
+  - `scripts/demo_start.sh`
+  - `scripts/demo_preflight.sh`
+  - `scripts/demo_smoke.py`
+- Demo startup scripts now default to local fallback mode (external LLM calls disabled unless explicitly allowed).
+- Knowledge-base embedding calls now no-op without API keys to avoid demo-time 401 spam.
+
+### P2: #164 - Frontend Demo Overlay / Reliability ✅
+- Added websocket reconnect status badge and mode badge (`director` / `autonomous`) in the main header.
+- Added cinematic `DemoOverlay` for `demo_marker` events.
+- Added typed handling for websocket `demo_marker`, `vote_update`, and `system_status`.
+- Voting panel now renders live simulated audience updates and finalized result snapshots.
+- BattleScene readability improved with timestamped logs + impact overlays.
+
+## Known Warnings (Non-Blocking, Tracked)
+
+- Frontend `next build` emits Node warning: ``--localstorage-file`` provided without valid path.
+- Anchor `cargo test` emits `unexpected cfg` warnings from macro/toolchain compatibility, but tests pass.

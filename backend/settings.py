@@ -32,6 +32,7 @@ class Settings(BaseSettings):
         alias="DATABASE_URL",
     )
     cors_origins: str = Field(default="http://localhost:3000", alias="CORS_ORIGINS")
+    frontend_url: str = Field(default="http://localhost:3000", alias="FRONTEND_URL")
 
     jwt_secret_key: str | None = Field(default=None, alias="JWT_SECRET_KEY")
     jwt_secret: str | None = Field(default=None, alias="JWT_SECRET")
@@ -40,6 +41,13 @@ class Settings(BaseSettings):
     jwt_access_token_expire_minutes: int = Field(
         default=60 * 24, alias="JWT_ACCESS_TOKEN_EXPIRE_MINUTES"
     )
+
+    demo_director_enabled: bool = Field(default=False, alias="DEMO_DIRECTOR_ENABLED")
+    demo_director_autostart_scenario: str | None = Field(
+        default=None, alias="DEMO_DIRECTOR_AUTOSTART_SCENARIO"
+    )
+    demo_scenario_dir: str = Field(default="backend/demo/scenarios", alias="DEMO_SCENARIO_DIR")
+    demo_local_reset_enabled: bool = Field(default=True, alias="DEMO_LOCAL_RESET_ENABLED")
 
     @property
     def is_development(self) -> bool:

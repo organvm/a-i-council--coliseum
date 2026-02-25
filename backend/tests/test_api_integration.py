@@ -28,6 +28,32 @@ def test_health(client: TestClient):
     assert response.json()["status"] == "healthy"
 
 
+def test_health_ready_and_bootstrap_and_demo_routes_exist(client: TestClient):
+    ready_resp = client.get("/health/ready")
+    assert ready_resp.status_code == 200
+    assert ready_resp.json()["status"] in {"ready", "degraded"}
+
+    bootstrap_resp = client.get("/api/state/bootstrap")
+    assert bootstrap_resp.status_code == 200
+    payload = bootstrap_resp.json()
+    assert "agents" in payload
+    assert "voting" in payload
+    assert "runtime" in payload
+
+    scenarios_resp = client.get("/api/demo/scenarios")
+    assert scenarios_resp.status_code == 200
+    data = scenarios_resp.json()
+    assert "scenarios" in data
+    assert "ars_submission_showcase" in data["scenarios"]
+
+    start_resp = client.post(
+        "/api/demo/scenarios/ars_submission_showcase/start",
+        json={"restart_if_running": True, "speed_multiplier": 10.0},
+    )
+    assert start_resp.status_code == 200
+    assert start_resp.json()["director"]["scenario"] == "ars_submission_showcase"
+
+
 def test_agents_create_and_list(client: TestClient):
     create_resp = client.post(
         "/api/agents/",
@@ -126,4 +152,3 @@ def test_voting_end_to_end_and_negative_paths(client: TestClient):
         json={"user_id": "user_c", "choice": "alpha", "tokens_staked": 2.0},
     )
     assert inactive_vote_resp.status_code == 409
-

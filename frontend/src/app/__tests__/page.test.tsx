@@ -12,6 +12,7 @@ jest.mock('@/components/WalletConnectCustom', () => ({ WalletConnectCustom: () =
 jest.mock('@/components/EventTicker', () => ({ EventTicker: () => <div data-testid="event-ticker" /> }));
 jest.mock('@/components/Arena3D', () => ({ Arena3D: () => <div data-testid="arena-3d" /> }));
 jest.mock('@/components/BattleScene', () => ({ BattleScene: () => <div data-testid="battle-scene" /> }));
+jest.mock('@/components/DemoOverlay', () => ({ DemoOverlay: () => <div data-testid="demo-overlay" /> }));
 
 // Mock the store
 jest.mock('@/lib/store', () => ({
@@ -23,6 +24,10 @@ jest.mock('@/lib/api', () => ({
   agentsApi: {
     list: jest.fn().mockResolvedValue({ data: [] }),
   },
+  stateApi: {
+    bootstrap: jest.fn().mockRejectedValue(new Error('no bootstrap')),
+  },
+  isColiseumSocketEvent: jest.fn().mockReturnValue(false),
 }));
 
 describe('Home Page', () => {

@@ -14,8 +14,8 @@
   "dependencies": {
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.1.1",
-    "@react-three/drei": "^9.96.1",
-    "@react-three/fiber": "^8.15.14",
+    "@react-three/drei": "10.7.7",
+    "@react-three/fiber": "9.5.0",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/wallet-adapter-phantom": "0.9.28",
     "@solana/wallet-adapter-react": "^0.15.35",
@@ -28,8 +28,8 @@
     "date-fns": "^3.3.1",
     "framer-motion": "^11.0.3",
     "next": "15.5.10",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "recharts": "^2.10.4",
     "socket.io-client": "^4.6.1",
     "swr": "^2.2.4",
@@ -43,8 +43,8 @@
     "@testing-library/user-event": "14.6.1",
     "@types/jest": "30.0.0",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "15.5.10",
@@ -55,8 +55,10 @@
     "ts-node": "10.9.2",
     "typescript": "^5"
   },
-  "pnpm": {
-    "overrides": {
+    "pnpm": {
+      "overrides": {
+      "react": "19.2.0",
+      "react-dom": "19.2.0",
       "ajv@6.12.6": "6.14.0",
       "glob@10.3.10": "10.5.0",
       "lodash@4.17.21": "4.17.23",

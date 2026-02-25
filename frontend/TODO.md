@@ -1,5 +1,18 @@
 # Frontend Implementation Todos
 
+## Status Note (2026-02-25)
+
+- This file is now a **long-range backlog** and is not the source of truth for the Ars Electronica sprint.
+- Current submission-critical work is tracked in:
+  - `docs/ARS_SPRINT_BOARD_2026-03-04.md`
+  - `PHASE4_ARS_ELECTRONICA_SPRINT.md`
+- The following items below are already implemented in some form and should not be treated as missing:
+  - Dashboard layout (`src/app/page.tsx`)
+  - WebSocket integration (root page websocket client + reconnect)
+  - `Arena3D`, `BattleScene`, `ChatStream`, `EventTicker`, `VotingPanel`
+  - Zustand state store and typed API client
+  - Demo overlays / Director Mode event handling (current sprint implementation)
+
 This file tracks granular tasks for the frontend development.
 
 ## 🧩 Components (`src/components/`)

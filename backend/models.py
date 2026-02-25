@@ -7,7 +7,19 @@ SQLAlchemy models for persisting Coliseum state.
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, Text, JSON
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    JSON,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 
@@ -87,6 +99,9 @@ class EventModel(Base):
 class VotingSessionModel(Base):
     """Voting session persistence model."""
     __tablename__ = "voting_sessions"
+    __table_args__ = (
+        Index("ix_voting_sessions_status_starts_at", "status", "starts_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     title: Mapped[str] = mapped_column(String(255))
@@ -106,6 +121,10 @@ class VotingSessionModel(Base):
 class Vote(Base):
     """Individual vote persistence model."""
     __tablename__ = "votes"
+    __table_args__ = (
+        UniqueConstraint("session_id", "user_id", name="uq_votes_session_user"),
+        Index("ix_votes_session_timestamp", "session_id", "timestamp"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     session_id: Mapped[str] = mapped_column(String(36), ForeignKey("voting_sessions.id"))

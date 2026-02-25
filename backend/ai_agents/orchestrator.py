@@ -426,18 +426,25 @@ class SystemOrchestrator:
         self.achievement_system.track_progress(user_id, "voting_veteran", votes_cast)
         self.achievement_system.track_progress(user_id, "democratic_champion", votes_cast)
 
-        # Persist to DB
-        asyncio.create_task(self._persist_vote_to_db(vote))
+        # Persist before returning so API responses reflect durable state.
+        await self._persist_vote_to_db(vote)
 
         return vote
 
     async def _persist_vote_to_db(self, vote: Vote) -> None:
         """Helper to persist vote object to database."""
-        await SystemRepository.persist_vote(vote)
+        await self.voting_engine.persist_vote(vote)
 
     def finalize_voting_session(self, session_id: str) -> Dict[str, Any]:
         """Finalize a voting session and return final results."""
         results = self.voting_engine.finalize_session(session_id)
+        if results is None:
+            raise ValueError("Voting session not found")
+        return results
+
+    async def finalize_voting_session_durable(self, session_id: str) -> Dict[str, Any]:
+        """Finalize and persist session status/results for restart consistency."""
+        results = await self.voting_engine.finalize_session_and_persist(session_id)
         if results is None:
             raise ValueError("Voting session not found")
         return results

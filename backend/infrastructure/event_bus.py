@@ -23,9 +23,11 @@ class EventBus:
         self.redis = None
         self.pubsub = None
         self._listener_task = None
+        self._started = False
 
     async def start(self):
         """Start the EventBus (connects to Redis if enabled)."""
+        self._started = True
         if self.use_redis:
             try:
                 import redis.asyncio as redis
@@ -40,6 +42,7 @@ class EventBus:
 
     async def stop(self):
         """Stop the EventBus."""
+        self._started = False
         if self._listener_task:
             self._listener_task.cancel()
             try:
@@ -113,6 +116,10 @@ class EventBus:
                     callback(event_type, data)
             except Exception as e:
                 logger.error(f"Error in event bus subscriber for {event_type}: {e}")
+
+    @property
+    def is_started(self) -> bool:
+        return self._started
 
 # Global singleton event bus
 event_bus = EventBus()
