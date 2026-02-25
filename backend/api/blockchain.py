@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..blockchain.solana_contracts import SolanaContractManager
 from .auth import get_current_user
@@ -20,8 +20,8 @@ router = APIRouter()
 
 class StakeRequest(BaseModel):
     """Request to stake tokens."""
-    amount: float
-    lock_period_days: int = 0
+    amount: float = Field(gt=0, description="Amount of tokens to stake (must be positive)")
+    lock_period_days: int = Field(default=0, ge=0, description="Optional lock-in period in days")
 
 
 class UnsignedTxResponse(BaseModel):

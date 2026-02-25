@@ -98,8 +98,10 @@ class SystemOrchestrator:
         agent_models = await SystemRepository.load_all_agent_models()
         for model in agent_models:
             if model.id not in self.agents:
+                # Ensure role is lowercase to match AgentRole enum values
+                role_val = model.role.lower() if model.role else "observer"
                 agent = Agent(
-                    role=AgentRole(model.role),
+                    role=AgentRole(role_val),
                     config={**model.config, "name": model.name, "agent_id": model.id},
                     knowledge_base=self.knowledge_base,
                     decision_engine=self.decision_engine,

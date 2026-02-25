@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..ai_agents.orchestrator import SystemOrchestrator
 from ..voting.voting_engine import VoteType
@@ -31,19 +31,19 @@ VOTING_ERROR_RESPONSES = {
 class CreateVotingSessionRequest(BaseModel):
     """Request to create a voting session."""
 
-    title: str
-    description: str
+    title: str = Field(min_length=5, max_length=255)
+    description: str = Field(min_length=10, max_length=2000)
     vote_type: VoteType
-    options: List[str]
-    duration_minutes: int = 60
-    min_stake: float = 0.0
+    options: List[str] = Field(min_length=2, max_length=20)
+    duration_minutes: int = Field(default=60, gt=0, le=10080) # Max 1 week
+    min_stake: float = Field(default=0.0, ge=0)
 
 
 class CastVoteRequest(BaseModel):
     """Request to cast a vote."""
 
     choice: Any
-    tokens_staked: float = 0.0
+    tokens_staked: float = Field(default=0.0, ge=0)
 
 
 class VotingSessionResponse(BaseModel):

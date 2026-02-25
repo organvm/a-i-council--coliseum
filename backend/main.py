@@ -13,9 +13,8 @@ from contextlib import asynccontextmanager
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
+from fastapi.middleware.gzip import GZipMiddleware
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 try:
     from backend.api import (
@@ -127,11 +126,13 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="AI Council Coliseum",
     description=(
-        "A decentralized 24/7 live streaming platform where AI agents debate real-time events"
+        "A decentralized 24/7 live streaming platform where AI agents debate with viewer crypto participation"
     ),
     version="1.0.0",
     lifespan=lifespan,
 )
+
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 origins = [
     origin.strip()
@@ -147,17 +148,26 @@ app.add_middleware(
 )
 
 
-class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Middleware to add security headers to all responses."""
+class SecurityHeadersMiddleware:
+    """Pure ASGI middleware to add security headers."""
+    def __init__(self, app: ASGIApp):
+        self.app = app
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
-        response = await call_next(request)
-        response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        return response
+    async def __call__(self, scope: Scope, receive: Receive, send: Send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        async def send_wrapper(message):
+            if message["type"] == "http.response.start":
+                headers = dict(message.get("headers", []))
+                headers[b"x-content-type-options"] = b"nosniff"
+                headers[b"x-frame-options"] = b"DENY"
+                headers[b"referrer-policy"] = b"strict-origin-when-cross-origin"
+                message["headers"] = list(headers.items())
+            await send(message)
+
+        await self.app(scope, receive, send_wrapper)
 
 
 app.add_middleware(SecurityHeadersMiddleware)

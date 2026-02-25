@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ..ai_agents.agent import Agent, AgentRole
 from ..ai_agents.orchestrator import SystemOrchestrator
@@ -23,7 +23,7 @@ class CreateAgentRequest(BaseModel):
     """Request to create an agent."""
 
     role: AgentRole
-    name: str
+    name: str = Field(min_length=1, max_length=50)
     config: Optional[Dict[str, Any]] = None
 
 

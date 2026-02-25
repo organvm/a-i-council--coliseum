@@ -26,6 +26,15 @@ function DefaultMaterial({ role, isHit }: { role: string; isHit: boolean }) {
 function AgentAvatar({ position, name, isAttacking, isHit, portraitUrl, role }: any) {
   const mesh = useRef<THREE.Mesh>(null!);
 
+  const geometry = useMemo(() => {
+    switch (role) {
+      case 'moderator': return <octahedronGeometry args={[0.8]} />;
+      case 'debater': return <sphereGeometry args={[0.7, 32, 32]} />;
+      case 'analyst': return <dodecahedronGeometry args={[0.75]} />;
+      default: return <boxGeometry args={[1.2, 1.2, 1.2]} />;
+    }
+  }, [role]);
+
   useFrame((state: any, delta: number) => {
     if (isAttacking && mesh.current) {
       mesh.current.scale.setScalar(1.5);
@@ -40,7 +49,7 @@ function AgentAvatar({ position, name, isAttacking, isHit, portraitUrl, role }: 
   return (
     <group position={position}>
       <mesh ref={mesh}>
-        <boxGeometry args={[1.2, 1.2, 1.2]} />
+        {geometry}
         {portraitUrl ? (
           <PortraitMaterial url={portraitUrl} isHit={isHit} />
         ) : (
@@ -53,7 +62,6 @@ function AgentAvatar({ position, name, isAttacking, isHit, portraitUrl, role }: 
         color="white"
         anchorX="center"
         anchorY="middle"
-        font="/fonts/Geist-Black.ttf"
       >
         {name}
       </Text>
@@ -73,28 +81,23 @@ function ArenaFloor() {
 
 export const Arena3D: React.FC = () => {
   const agents = useColiseumStore((state) => state.agents);
+  const latestCombatEvent = useColiseumStore((state) => state.latestCombatEvent);
   const [attackingAgentId, setAttackingAgentId] = useState<string | null>(null);
   const [hitAgentId, setHitAgentId] = useState<string | null>(null);
 
   useEffect(() => {
-    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:8000/ws';
-    const socket = new WebSocket(wsUrl);
-
-    socket.onmessage = (event: MessageEvent) => {
-      const payload = JSON.parse(event.data);
-      if (payload.type === 'combat_update') {
-        const data = payload.data || payload;
-        setAttackingAgentId(data.attacker_id); 
-        setHitAgentId(data.defender_id);
-        setTimeout(() => {
-          setAttackingAgentId(null);
-          setHitAgentId(null);
-        }, 1000);
-      }
-    };
-
-    return () => socket.close();
-  }, []);
+    if (latestCombatEvent) {
+      setAttackingAgentId(latestCombatEvent.attacker_id); 
+      setHitAgentId(latestCombatEvent.defender_id);
+      
+      const timer = setTimeout(() => {
+        setAttackingAgentId(null);
+        setHitAgentId(null);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [latestCombatEvent]);
 
   return (
     <div className={`w-full h-96 bg-black rounded-lg border ${attackingAgentId ? 'border-red-600 shadow-[0_0_15px_rgba(220,38,38,0.7)]' : 'border-gray-800'} overflow-hidden relative transition-all duration-300`}>

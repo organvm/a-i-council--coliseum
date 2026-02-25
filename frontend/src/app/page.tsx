@@ -40,7 +40,7 @@ export default function Home() {
   }, [setAgents, addMessage, addChatMessage, addCombatLog]);
 
   return (
-    <main className="min-h-screen bg-gray-950 p-4 lg:p-8 text-gray-100">
+    <main id="main-content" tabIndex={-1} className="min-h-screen bg-gray-950 p-4 lg:p-8 text-gray-100 outline-none">
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
         
         {/* Left Column: Agents & Control */}

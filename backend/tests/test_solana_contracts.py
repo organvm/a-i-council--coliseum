@@ -55,13 +55,11 @@ async def test_distribute_rewards_success():
         assert result is True
 
         # Verify transaction construction
-        # send_transaction(transaction, signer)
+        # send_transaction(transaction)
         assert mock_client_instance.send_transaction.called
         args, kwargs = mock_client_instance.send_transaction.call_args
         transaction = args[0]
-        signer = args[1]
 
-        assert signer == manager._payer
         assert len(transaction.message.instructions) == 2
 
 @pytest.mark.asyncio

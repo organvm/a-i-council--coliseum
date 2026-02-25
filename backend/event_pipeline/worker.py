@@ -58,7 +58,7 @@ SIMULATED_NEWS = [
 class AutonomousArenaWorker:
     """Task worker that feeds events into the SystemOrchestrator."""
 
-    def __init__(self, orchestrator: SystemOrchestrator, interval_seconds: int = 300):
+    def __init__(self, orchestrator: SystemOrchestrator, interval_seconds: int = 15):
         self.orchestrator = orchestrator
         self.interval_seconds = interval_seconds
         self.is_running = False
@@ -85,10 +85,12 @@ class AutonomousArenaWorker:
 
     async def _loop(self):
         """Main periodic loop."""
+        # Initial delay to let agents load
+        await asyncio.sleep(5)
         while self.is_running:
             try:
-                await asyncio.sleep(self.interval_seconds)
                 await self._feed_event()
+                await asyncio.sleep(self.interval_seconds)
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -96,6 +98,7 @@ class AutonomousArenaWorker:
 
     async def _feed_event(self):
         """Inject a random event into the arena."""
-        topic = "Should AI systems have constitutional rights?"
+        news = random.choice(SIMULATED_NEWS)
+        topic = news["title"]
         logger.info(f"Injecting autonomous demo event: {topic}")
         await self.orchestrator.start_battle(topic)
