@@ -1,0 +1,2685 @@
+[
+  {
+    "number": 6,
+    "title": "Implement Solana Staking Logic",
+    "headRefName": "solana-staking-implementation-4755943510825594584",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 147,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "f2b1b93e5a88c05ecb729ec111aa8c858e7aa664"
+  },
+  {
+    "number": 7,
+    "title": "Implement NLP-based text summarization",
+    "headRefName": "nlp-summarization-implementation-8302135707580407645",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 33,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "65e9178ae78a89a50b7f141655194fa333d3a0f3"
+  },
+  {
+    "number": 9,
+    "title": "Implement real sentiment analysis in NLPProcessor",
+    "headRefName": "nlp-sentiment-analysis-6682488477329068145",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 49,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "00ac968e93e6c2a0d573c5e613482dbe4d09bc1f"
+  },
+  {
+    "number": 10,
+    "title": "Implement actual entity extraction in NLPProcessor",
+    "headRefName": "nlp-entity-extraction-14616795516656704660",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 45,
+        "deletions": 4
+      },
+      {
+        "path": "backend/ai_agents/test_nlp_module.py",
+        "additions": 43,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "358a5715049a99d2dcb4dcf94fcfdaff3fdb367c"
+  },
+  {
+    "number": 11,
+    "title": "Implement Solana Program Initialization",
+    "headRefName": "solana-initialization-783868414048411329",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 92,
+        "deletions": 8
+      },
+      {
+        "path": "backend/tests/test_solana_contracts.py",
+        "additions": 78,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "c86677a26db9f40c832d96092b9c4c53b74dff5e"
+  },
+  {
+    "number": 12,
+    "title": "Implement Ethereum Token Transfer Logic",
+    "headRefName": "feature-eth-tx-implementation-15752912679968118455",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 208,
+        "deletions": 14
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ad17ff5ddd8cfa0e99c8393a242489433e802b2e"
+  },
+  {
+    "number": 13,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix permissive CORS and add security headers",
+    "headRefName": "sentinel/fix-cors-security-headers-15137104950878573790",
+    "cluster": "Sentinel",
+    "subcluster": "security_headers",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/main.py",
+        "additions": 14,
+        "deletions": 2
+      },
+      {
+        "path": "backend/tests/test_security.py",
+        "additions": 40,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9fd85ff4a4bf1f82d304bfe580d3b1426e835750"
+  },
+  {
+    "number": 14,
+    "title": "\ud83c\udfa8 Palette: Enhance Live Stream Placeholder",
+    "headRefName": "palette-live-stream-placeholder-2247012831272199589",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4259,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 33,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9a72a632b6ffd262d96f9200ce661be77f0e7385"
+  },
+  {
+    "number": 15,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel/fix-cors-config-16519380531536230189",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 12,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_cors.py",
+        "additions": 48,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "111681a748f794176efd9f2b5c131a1936bd030d"
+  },
+  {
+    "number": 16,
+    "title": "\u26a1 Bolt: Optimize event prioritization concurrency",
+    "headRefName": "bolt-optimize-event-prioritization-7783416478702402484",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/prioritization.py",
+        "additions": 10,
+        "deletions": 4
+      },
+      {
+        "path": "backend/tests/event_pipeline/__init__.py",
+        "additions": 0,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "6e309c88c97f5d9e84a7c7b09f987957bcc22a9c"
+  },
+  {
+    "number": 17,
+    "title": "\ud83c\udfa8 Palette: Add focus states to buttons for accessibility",
+    "headRefName": "palette-focus-states-17351382806062089582",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".Jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4259,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "8d3121c0f320f10ef1aed767d2dea4877f0b5f43"
+  },
+  {
+    "number": 18,
+    "title": "\u26a1 Bolt: optimize event processing with concurrent execution",
+    "headRefName": "bolt-perf-event-prioritizer-6647171762721591045",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/prioritization.py",
+        "additions": 7,
+        "deletions": 4
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 7,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "f4536c1ca13817cdc1f1fe86dfce2b9c1ce02ba3"
+  },
+  {
+    "number": 19,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel-fix-cors-vulnerability-6748860073341731152",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_cors.py",
+        "additions": 42,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "382f6e3aed7dcdc40b540f1c1c7c91dcc0323aaa"
+  },
+  {
+    "number": 20,
+    "title": "UX: Improve accessibility and fix CSS build",
+    "headRefName": "palette-ux-improvements-11899457051988823809",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4252,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 7,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "b6910c6b25d233549f4f54f3259d6b5b974fe2c2"
+  },
+  {
+    "number": 21,
+    "title": "Implement Event Pipeline Processing Logic",
+    "headRefName": "feature/event-pipeline-implementation-3209488433687305470",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/TODO.md",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 137,
+        "deletions": 26
+      },
+      {
+        "path": "backend/cache.py",
+        "additions": 96,
+        "deletions": 0
+      },
+      {
+        "path": "backend/database.py",
+        "additions": 40,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 57,
+        "deletions": 16
+      },
+      {
+        "path": "backend/event_pipeline/storage.py",
+        "additions": 119,
+        "deletions": 86
+      },
+      {
+        "path": "backend/models.py",
+        "additions": 109,
+        "deletions": 0
+      },
+      {
+        "path": "backend/tests/test_event_pipeline.py",
+        "additions": 107,
+        "deletions": 0
+      },
+      {
+        "path": "backend/tests/test_infrastructure.py",
+        "additions": 95,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 2,
+    "singleCommitOid": null
+  },
+  {
+    "number": 22,
+    "title": "Integrate voting API with VotingEngine",
+    "headRefName": "integrate-voting-api-11264882359641286875",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/api/dependencies.py",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 100,
+        "deletions": 18
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9df9307964d885937d0a96d644fde2ead6683db4"
+  },
+  {
+    "number": 23,
+    "title": "Integrate voting API with VotingEngine",
+    "headRefName": "integrate-voting-api-16076201931976907034",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/api/dependencies.py",
+        "additions": 12,
+        "deletions": 0
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 102,
+        "deletions": 15
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "e60f92c0209440472f77f407b0bbcf23a1a5105c"
+  },
+  {
+    "number": 24,
+    "title": "Integrate create_agent API with SystemOrchestrator",
+    "headRefName": "integrate-agent-creation-14473106705564142573",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/api/agents.py",
+        "additions": 53,
+        "deletions": 16
+      },
+      {
+        "path": "backend/tests/test_agents_api.py",
+        "additions": 51,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "e84e3fcbd8953098f7d77fdf980d14e0e88ffb9d"
+  },
+  {
+    "number": 25,
+    "title": "Implement achievement count logic for leaderboard",
+    "headRefName": "leaderboard-achievements-logic-5695060051861023718",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/voting/leaderboard.py",
+        "additions": 10,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "8c0706c3b23727515822956aee3d07a2f832d076"
+  },
+  {
+    "number": 26,
+    "title": "\u26a1 Bolt: Concurrent event processing",
+    "headRefName": "bolt-concurrency-optimization-10776688425655063225",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 11,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "c81c73f494bc864b0004a63d2fe549c22ad54743"
+  },
+  {
+    "number": 27,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel-fix-cors-config-5550084313880239358",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 12,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_cors.py",
+        "additions": 31,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5f94ebd1891cfa4277858918bef2abfcdf606d49"
+  },
+  {
+    "number": 28,
+    "title": "\ud83c\udfa8 Palette: Focus styles and a11y fixes",
+    "headRefName": "palette-ux-fix-focus-styles-15553426834621848622",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4252,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 7,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "287540e9440be407075e38b8be6737baede4233f"
+  },
+  {
+    "number": 29,
+    "title": "\u26a1 Bolt: Optimize event ingestion history retrieval",
+    "headRefName": "bolt-ingestion-optimization-13455634452102694449",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 7,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_event_ingestion_perf.py",
+        "additions": 37,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5194a30fceddf9b9b8a6ccd51fd5cf097e5c0063"
+  },
+  {
+    "number": 30,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix insecure CORS configuration",
+    "headRefName": "sentinel-fix-cors-vuln-17848400822528686808",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 13,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "3d456906cbb9391c60f4ba92a63c7591c645b8d1"
+  },
+  {
+    "number": 31,
+    "title": "\u26a1 Bolt: Optimize event batch processing",
+    "headRefName": "bolt-perf-event-processing-6912403605563400978",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 4,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "93778f579890bddf33bf3bc5890ce98d94f0863d"
+  },
+  {
+    "number": 32,
+    "title": "\ud83c\udfa8 Palette: Enhance accessibility with hidden emojis and focus states",
+    "headRefName": "palette-ux-a11y-improvements-8915230955208924912",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 18,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "8eda210f7aff833c9742b00f21d22a7c88056d92"
+  },
+  {
+    "number": 33,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "headRefName": "bolt-perf-event-concurrency-3915379051695502716",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 4,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "566a520b7721c5c5684861f83cb2b0957f62de25"
+  },
+  {
+    "number": 34,
+    "title": "\ud83c\udfa8 Palette: Enhance button accessibility and interaction",
+    "headRefName": "palette-button-a11y-7413277532083725984",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4252,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.cjs",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 7,
+        "deletions": 7
+      },
+      {
+        "path": "verification/focus_state.png",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "verification/verify_buttons.py",
+        "additions": 44,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "6fd3f8f758b5d4a253c6489ce00b291f80ed516d"
+  },
+  {
+    "number": 35,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel-security-fix-cors-config-12384604095297759074",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 11,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "6defa950cbbc8c99de333808de5323af85920c2f"
+  },
+  {
+    "number": 36,
+    "title": "\u26a1 Bolt: optimize batch event processing",
+    "headRefName": "bolt-concurrent-processing-8596118844826169435",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 3,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "61462341bb4511245625ca55ce99947bfe6b1c5f"
+  },
+  {
+    "number": 37,
+    "title": "\ud83c\udfa8 Palette: Enhance button focus states and hide decorative emojis",
+    "headRefName": "palette-button-focus-and-emojis-2328353520884081766",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".Jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 21,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "cbc7973275f854aeab51d39089d88355843bb994"
+  },
+  {
+    "number": 38,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix CORS misconfiguration and add security headers",
+    "headRefName": "sentinel-security-fix-cors-headers-14746788601126694081",
+    "cluster": "Sentinel",
+    "subcluster": "security_headers",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 21,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "902246d35960d4ada3c1ab824e1ec0e602cdfb18"
+  },
+  {
+    "number": 39,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel/fix-cors-config-2910958761820317373",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 7,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "467ea5c6169b0960bf599437e1c489988c00b130"
+  },
+  {
+    "number": 40,
+    "title": "\u26a1 Bolt: Optimize get_recent_events with heapq.nlargest",
+    "headRefName": "bolt-perf-ingestion-heapq-5716966508357761853",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".Jules/bolt.md",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 4,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_ingestion.py",
+        "additions": 106,
+        "deletions": 0
+      },
+      {
+        "path": "backend/tests/test_ingestion_perf.py",
+        "additions": 59,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "17e9bd5943e92d09b0eac65808d832db289f1b23"
+  },
+  {
+    "number": 41,
+    "title": "\ud83c\udfa8 Palette: Add focus rings to buttons and fix styles",
+    "headRefName": "palette-button-focus-rings-3821344802931354642",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4252,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 7,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "0d0fbd5466d3f78734ebe280df6bb0477877ed72"
+  },
+  {
+    "number": 42,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel-fix-cors-vulnerability-16677670123966948805",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": ".env.example",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/main.py",
+        "additions": 4,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5c2e5e136b26e381924e2d9612a74885dea70b40"
+  },
+  {
+    "number": 43,
+    "title": "\u26a1 Bolt: Optimize event processing concurrency",
+    "headRefName": "bolt-concurrent-processing-10086390083379725770",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 23,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "fe7603a50a5062237aae32253e55015e051e9ac5"
+  },
+  {
+    "number": 44,
+    "title": "\ud83c\udfa8 Palette: Accessible Buttons & Semantic Content",
+    "headRefName": "palette-button-a11y-682806668128868216",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".Jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4252,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 21,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "c3edb5857457ad6a3b711ddc0a1c12cbb734baa6"
+  },
+  {
+    "number": 45,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "headRefName": "bolt-perf-batch-processing-7995918966187089148",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".Jules/bolt.md",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 10,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "211ae6ad18a184bf387d3c9a687881183fcdbee6"
+  },
+  {
+    "number": 46,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "headRefName": "sentinel-fix-cors-config-12045893998201154118",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": ".env.example",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/main.py",
+        "additions": 6,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_cors.py",
+        "additions": 44,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "225e50868c25427440d532a572ceca28baf4cf20"
+  },
+  {
+    "number": 47,
+    "title": "\ud83c\udfa8 Palette: Enhance button interaction and accessibility",
+    "headRefName": "palette-ux-improvements-10475162339953763814",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 7,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "961e4c1a471d7e2a81df868db10b8db9444a2e03"
+  },
+  {
+    "number": 48,
+    "title": "\u26a1 Bolt: Optimize event batch processing",
+    "headRefName": "bolt-perf-event-processing-7301963982227962548",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 4,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "cb33e27ebd4385878cd2da347cf07e0b3de0f878"
+  },
+  {
+    "number": 49,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix overly permissive CORS configuration",
+    "headRefName": "sentinel/fix-cors-config-11469986317752178497",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 5,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "4685d51378390192115578a649a2840370b74199"
+  },
+  {
+    "number": 50,
+    "title": "\ud83c\udfa8 Palette: Accessibility and Button Polish",
+    "headRefName": "palette-ux-improvements-1303415929962937969",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".Jules/palette.md",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 28,
+        "deletions": 7
+      },
+      {
+        "path": "verification/ux_verification.png",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "verification/verify_ux.py",
+        "additions": 38,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "549ab88277df5654c51f3ff823ead8344236797b"
+  },
+  {
+    "number": 51,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix Critical CORS Vulnerability",
+    "headRefName": "sentinel-cors-fix-11318330261158574821",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/main.py",
+        "additions": 4,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "62da0771b7fb908ab02e26aacb74931a35b0d1da"
+  },
+  {
+    "number": 52,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "headRefName": "bolt-perf-event-processing-16392546152050038496",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 5,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "a5c5d7bd5715be9dd7d82b107ee30ed50d2a6cf7"
+  },
+  {
+    "number": 53,
+    "title": "\ud83c\udfa8 Palette: Add accessible focus states and tactile feedback",
+    "headRefName": "palette-button-focus-17981727123836556579",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": ".Jules/palette.md",
+        "additions": 9,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/postcss.config.js",
+        "additions": 6,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "4f0ec1c1cd56a899434b49e3dae22ec993c54030"
+  },
+  {
+    "number": 54,
+    "title": "Optimize MemoryManager LRU Eviction",
+    "headRefName": "memory-manager-lru-optimization-9311857902177515346",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 10,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "d59e0dbb8f3253c98b86c125f2d86e83f2468891"
+  },
+  {
+    "number": 55,
+    "title": "Optimize `get_popular_entries` performance",
+    "headRefName": "perf/knowledge-base-optimization-1968374482546504460",
+    "cluster": "Other",
+    "subcluster": "other",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 5,
+        "deletions": 4
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "137f20f393306350f1ab3980e2588a24731fe6a1"
+  },
+  {
+    "number": 56,
+    "title": "Optimize batch event processing using asyncio.gather",
+    "headRefName": "batch-process-concurrency-1976448705994792219",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 7,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "06175b9fad739d0526dd75e4bffaf5551618749e"
+  },
+  {
+    "number": 57,
+    "title": "Fix blocking VRF simulation",
+    "headRefName": "blocking-vrf-simulation-6614803753991214422",
+    "cluster": "Other",
+    "subcluster": "other",
+    "files": [
+      {
+        "path": "backend/blockchain/chainlink_vrf.py",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "012657539edcefa4a46cd18a97cebdfbdde0cb46"
+  },
+  {
+    "number": 58,
+    "title": "Agent Broadcast Concurrency Optimization",
+    "headRefName": "agent-broadcast-concurrency-2810301396400765001",
+    "cluster": "Bolt",
+    "subcluster": "batch_concurrency",
+    "files": [
+      {
+        "path": "backend/ai_agents/communication.py",
+        "additions": 10,
+        "deletions": 3
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "7969c8d3cb0edb69c88ba5bf1dd494c3210b4ee3"
+  },
+  {
+    "number": 59,
+    "title": "Optimize KnowledgeBase search with inverted index",
+    "headRefName": "knowledge-base-optimization-2989810028268141219",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 28,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "10cc3e225af2cc78d19dd79ac61f0b4135adc842"
+  },
+  {
+    "number": 60,
+    "title": "Optimize MemoryManager expiration logic",
+    "headRefName": "feature/memory-expiration-optimization-1600601424454404851",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 33,
+        "deletions": 15
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "58bd1bc7f53afa49ad20ecc587f1038ec454f4b9"
+  },
+  {
+    "number": 62,
+    "title": "\u26a1 Bolt: Optimize event ingestion query speed",
+    "headRefName": "bolt-optimize-ingestion-query-1804630156857118313",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".Jules/bolt.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 18,
+        "deletions": 4
+      },
+      {
+        "path": "backend/tests/test_ingestion.py",
+        "additions": 94,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "eded22cfe69c68755da1a96425683ead07150a16"
+  },
+  {
+    "number": 63,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix insecure CORS configuration",
+    "headRefName": "sentinel-fix-cors-security-18230752977920748728",
+    "cluster": "Sentinel",
+    "subcluster": "cors",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/main.py",
+        "additions": 6,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_cors_security.py",
+        "additions": 44,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "7f8c88ed3218f53763a93d60e6815c518ed7f8cf"
+  },
+  {
+    "number": 64,
+    "title": "\ud83c\udfa8 Palette: Button Accessibility Improvements",
+    "headRefName": "palette-button-a11y-2983379759854978567",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "frontend/src/app/verification/.keep",
+        "additions": 0,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "c7bef2c58d7a4c0ed5c9969407f006d75476f210"
+  },
+  {
+    "number": 66,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [MEDIUM] Add basic security headers",
+    "headRefName": "sentinel-security-headers-12914130264784549018",
+    "cluster": "Sentinel",
+    "subcluster": "security_headers",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 10,
+        "deletions": 0
+      },
+      {
+        "path": "backend/tests/test_security_headers.py",
+        "additions": 18,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "7990cbb8de37c7abf0e7ac8d79da2a55b3111b55"
+  },
+  {
+    "number": 67,
+    "title": "\ud83c\udfa8 Palette: Add disabled states to buttons",
+    "headRefName": "palette-disabled-button-states-2642690034922676213",
+    "cluster": "Palette",
+    "subcluster": "button_a11y",
+    "files": [
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/globals.css",
+        "additions": 2,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "440aac8a147f6d4616b1a13229f91f8caef0f6af"
+  },
+  {
+    "number": 68,
+    "title": "\u26a1 Bolt: Optimize MemoryManager performance",
+    "headRefName": "bolt-memory-optimization-13323577601643578385",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 33,
+        "deletions": 16
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "4ffdae9524a7fdfc463005be2825c5104e5c1df5"
+  },
+  {
+    "number": 69,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase sorting with heapq",
+    "headRefName": "bolt/optimize-knowledge-base-heapq-155279521988265201",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 10,
+        "deletions": 8
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "a56168328c6f3ace2024add33d280598defa014f"
+  },
+  {
+    "number": 70,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Add Security Headers Middleware",
+    "headRefName": "sentinel-security-headers-18404879430170754317",
+    "cluster": "Sentinel",
+    "subcluster": "security_headers",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 22,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_security_headers.py",
+        "additions": 29,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "a18219b20a2177cbdf7c396468a42b93b1ea237a"
+  },
+  {
+    "number": 71,
+    "title": "Add \"Skip to content\" link for accessibility",
+    "headRefName": "palette-skip-link-7429120537729789941",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "3f8ba4078cdb2c70f186d3fafce16a727358bfc5"
+  },
+  {
+    "number": 72,
+    "title": "Implement NLP Summarization",
+    "headRefName": "nlp-summarization-implementation-1686588178262361815",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 40,
+        "deletions": 4
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "d1f3d4d4f049d82bfa8cf5c0ab269edfa6e4201e"
+  },
+  {
+    "number": 73,
+    "title": "Implement topic classification with fallback heuristic",
+    "headRefName": "nlp-topic-classification-4527222308535902792",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 70,
+        "deletions": 12
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "38afdd8a820b31f081711243092138271ac2fdbe"
+  },
+  {
+    "number": 74,
+    "title": "Implement Solana Program Initialization",
+    "headRefName": "solana-initialization-12243703043467185670",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 43,
+        "deletions": 2
+      },
+      {
+        "path": "backend/tests/test_solana_contracts.py",
+        "additions": 92,
+        "deletions": 74
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "0b2eac5b39f4b1a1d2e76e30d1932cfd8383dba6"
+  },
+  {
+    "number": 75,
+    "title": "Implement Solana reward distribution logic",
+    "headRefName": "solana-rewards-distribution-4545190152559402271",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 60,
+        "deletions": 52
+      },
+      {
+        "path": "backend/tests/test_solana_rewards_mock.py",
+        "additions": 102,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "2ccae485d9c6867c33fe6eb33d3a57530ff093df"
+  },
+  {
+    "number": 76,
+    "title": "Implement NLP entity extraction",
+    "headRefName": "nlp-entity-extraction-13559531642555241686",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 57,
+        "deletions": 2
+      },
+      {
+        "path": "backend/tests/test_nlp_module.py",
+        "additions": 42,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "b76d80e94245911a12764a93008875e1124fc741"
+  },
+  {
+    "number": 77,
+    "title": "Implement AsyncWeb3 Connection",
+    "headRefName": "eth-connection-implementation-11597750245791256047",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 4,
+        "deletions": 4
+      },
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9535e0cf16903c1d970489350469c8653ca536d4"
+  },
+  {
+    "number": 78,
+    "title": "Implement heuristic topic classification fallback",
+    "headRefName": "nlp-topic-classification-15642149026415156386",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 77,
+        "deletions": 11
+      },
+      {
+        "path": "backend/tests/test_nlp_topic.py",
+        "additions": 56,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "0005a2b4f3c5ca505430c953cfaa7698464c15d3"
+  },
+  {
+    "number": 79,
+    "title": "Implement batched reward distribution on Solana",
+    "headRefName": "feature/solana-reward-distribution-3240895994465389286",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 61,
+        "deletions": 50
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "06c0068afa2ba179703c3eb7b8d78ee1feb47ddf"
+  },
+  {
+    "number": 80,
+    "title": "Implement Solana rewards distribution transaction logic",
+    "headRefName": "solana-rewards-distribution-4388972475469022696",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 32,
+        "deletions": 34
+      },
+      {
+        "path": "backend/tests/test_solana_rewards.py",
+        "additions": 161,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "d6ea12b30210e7d0a566d963778c3c994d40a502"
+  },
+  {
+    "number": 81,
+    "title": "Implement Ethereum token transfer logic",
+    "headRefName": "eth-transfer-impl-13144202169180385868",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 72,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "54493af7b6420a06e919e16cb1b760452de1b024"
+  },
+  {
+    "number": 82,
+    "title": "Implement Ethereum token transfer logic with AsyncWeb3",
+    "headRefName": "eth-transfer-tokens-9407955727924875770",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 114,
+        "deletions": 9
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "1e5722321c2ba1a3adab963d9c829860352b3126"
+  },
+  {
+    "number": 83,
+    "title": "Implement actual sentiment analysis using Transformers and OpenAI fallback",
+    "headRefName": "nlp-sentiment-analysis-14520272026655466146",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 96,
+        "deletions": 3
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "8123f2b9bcb1e7c9ec591dea3a8fbe82873ec578"
+  },
+  {
+    "number": 84,
+    "title": "Implement Solana staking logic",
+    "headRefName": "feature/solana-stake-tokens-2217138998065294611",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 85,
+        "deletions": 17
+      },
+      {
+        "path": "backend/tests/test_solana_contracts.py",
+        "additions": 70,
+        "deletions": 12
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5f12169ad5f6317064335e3444916b5a43c1501e"
+  },
+  {
+    "number": 85,
+    "title": "Implement topic classification with local and keyword fallbacks",
+    "headRefName": "feature/nlp-topic-classification-2887928656568684953",
+    "cluster": "NLP",
+    "subcluster": "nlp",
+    "files": [
+      {
+        "path": "backend/ai_agents/nlp_module.py",
+        "additions": 88,
+        "deletions": 34
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ad2b53e32b33abb746c0a7e3b46c8fc8094e5c10"
+  },
+  {
+    "number": 86,
+    "title": "Implement Solana staking transaction logic",
+    "headRefName": "solana-staking-implementation-9890694889778666616",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 101,
+        "deletions": 15
+      },
+      {
+        "path": "backend/tests/test_solana_contracts.py",
+        "additions": 50,
+        "deletions": 13
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "1933e6fc1ea0ab375029aff3bc47bc9effd654f5"
+  },
+  {
+    "number": 87,
+    "title": "feat(a11y): add accessible skip-to-content link",
+    "headRefName": "palette-skip-link-2614378897773063730",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5242e908dbc2a41f55828fbe1b4fecae48b4c9a9"
+  },
+  {
+    "number": 88,
+    "title": "\u26a1 Bolt: Optimize MemoryManager expiration with min-heap",
+    "headRefName": "bolt-optimize-memory-manager-4814843537392971274",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 22,
+        "deletions": 7
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "83aa4a075e3aae770463c4427c4096ab25df1fd5"
+  },
+  {
+    "number": 89,
+    "title": "Implement Solana reward distribution with batching and solders",
+    "headRefName": "solana-rewards-distribution-7720502563146827908",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 41,
+        "deletions": 35
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "2a823300a31c25dc7e6d0f0c92c8fe23b41aeacb"
+  },
+  {
+    "number": 90,
+    "title": "Add Skip to Content Link",
+    "headRefName": "palette-skip-link-15382117385633722380",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "0225f6c95f893af61631abcd203b3b30049fccf7"
+  },
+  {
+    "number": 91,
+    "title": "Add Security Headers Middleware",
+    "headRefName": "sentinel-security-headers-12605553481758673520",
+    "cluster": "Sentinel",
+    "subcluster": "security_headers",
+    "files": [
+      {
+        "path": "backend/main.py",
+        "additions": 19,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ec94050fa87124cd6fc08b870cc152dc50c9d80e"
+  },
+  {
+    "number": 92,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase.get_popular_entries",
+    "headRefName": "bolt-optimize-knowledge-base-631752825821468656",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 4,
+        "deletions": 4
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "a067f345399d5a941a9e31286a2038756f683ae8"
+  },
+  {
+    "number": 94,
+    "title": "\u26a1 Bolt: Optimize MemoryManager expiration with Min-Heap",
+    "headRefName": "bolt-memory-optimization-2706888848393998072",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 10,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "f70edd21fd926f64178e192908aa70ad23ee663e"
+  },
+  {
+    "number": 95,
+    "title": "Add accessible Skip to Content link",
+    "headRefName": "palette-skip-link-9277097823990309816",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "bdb3e498720e47717f5d49607630b303be9fc52e"
+  },
+  {
+    "number": 96,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [CRITICAL] Fix hardcoded private key in Solana contract manager",
+    "headRefName": "sentinel-fix-hardcoded-secret-solana-1568087213360806544",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/blockchain/solana_contracts.py",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "backend/tests/test_solana_contracts.py",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "36fd937c287799a6d5ef205c0c6797860c154146"
+  },
+  {
+    "number": 97,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix Stored XSS in Event Ingestion",
+    "headRefName": "sentinel-xss-fix-13545425307252449808",
+    "cluster": "Sentinel",
+    "subcluster": "xss",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 10,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ed369b5be33aa742f729b8765f2e88318b9a906d"
+  },
+  {
+    "number": 98,
+    "title": "\u26a1 Bolt: Optimize keyword extraction",
+    "headRefName": "bolt/optimize-keyword-extraction-12424665956431383870",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 5,
+        "deletions": 2
+      },
+      {
+        "path": "backend/tests/benchmark_keywords.py",
+        "additions": 52,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9943f7242c60d54aec0603e613115f171775d67e"
+  },
+  {
+    "number": 99,
+    "title": "Add Skip to Content Link",
+    "headRefName": "palette-skip-link-16942158476639863538",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "a001f34bf6db85965a29310007a2d265284a47a3"
+  },
+  {
+    "number": 100,
+    "title": "\u26a1 Bolt: Optimize keyword extraction with heapq",
+    "headRefName": "bolt-optimize-keywords-heapq-9316639758459471555",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/processing.py",
+        "additions": 4,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "35b8ede4a08dbaabfccd84aa3d760764d4beef92"
+  },
+  {
+    "number": 101,
+    "title": "Add Skip to Content Link",
+    "headRefName": "palette-skip-link-18214462126448498892",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 7,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "745972215c3b77d798fa139f72508f21eaf665e8"
+  },
+  {
+    "number": 102,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval methods",
+    "headRefName": "bolt-knowledge-base-optimization-747398631657476118",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 9,
+        "deletions": 8
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ab66136eed0c048fdb2a69631b5c20188ee4ad7d"
+  },
+  {
+    "number": 103,
+    "title": "Add accessible Skip to Content link",
+    "headRefName": "palette-skip-link-7268249817512410800",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/next-env.d.ts",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/pnpm-lock.yaml",
+        "additions": 4239,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 9,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "044e9443835a3ed3d134297a8ba2e475d8f796ec"
+  },
+  {
+    "number": 104,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [CRITICAL/HIGH] Fix XSS vulnerability in event ingestion",
+    "headRefName": "sentinel-xss-fix-3245507546280847048",
+    "cluster": "Sentinel",
+    "subcluster": "xss",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 13,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "9a0bb7a744524aa34b5453e1055b1ec68921c981"
+  },
+  {
+    "number": 108,
+    "title": "\ud83c\udfa8 Fix broken 'Skip to content' link target",
+    "headRefName": "palette-ux-fix-skip-link-1158544930180096464",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "55807c66fe02f408bb7372692cbb7b855bde4743"
+  },
+  {
+    "number": 109,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval with heapq",
+    "headRefName": "bolt-kb-heap-optimization-2991149502993500805",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 5,
+        "deletions": 4
+      },
+      {
+        "path": "backend/tests/test_knowledge_base.py",
+        "additions": 48,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "6629a9f2d9450f3581f5d46fc83dbdb56ba6a227"
+  },
+  {
+    "number": 110,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix information leak in Ethereum contract manager",
+    "headRefName": "sentinel-fix-eth-leak-15056472117839812900",
+    "cluster": "Solana/Ethereum",
+    "subcluster": "blockchain",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 9,
+        "deletions": 58
+      },
+      {
+        "path": "backend/blockchain/ethereum_contracts.py",
+        "additions": 2,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "92a595cbf75e13c9e58dcdd7c7ed82dd535614ca"
+  },
+  {
+    "number": 111,
+    "title": "\ud83c\udfa8 Palette: Fix broken 'Skip to content' link",
+    "headRefName": "palette-ux-fix-skip-link-13334106688925214882",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/layout.tsx",
+        "additions": 1,
+        "deletions": 1
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 5,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ececa55725c280e72222dfa0ec5d03389afe581a"
+  },
+  {
+    "number": 112,
+    "title": "\u26a1 Bolt: Optimize MemoryManager eviction to O(1)",
+    "headRefName": "bolt-memory-optimization-4186426160361128159",
+    "cluster": "Bolt",
+    "subcluster": "memory",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 2,
+        "deletions": 61
+      },
+      {
+        "path": "backend/ai_agents/memory_manager.py",
+        "additions": 11,
+        "deletions": 8
+      },
+      {
+        "path": "backend/tests/test_agent.py",
+        "additions": 16,
+        "deletions": 4
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "3d5e7968e7b23b22a383333059efc43898033135"
+  },
+  {
+    "number": 113,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Add input validation to API endpoints",
+    "headRefName": "sentinel-api-validation-6675012327141779541",
+    "cluster": "Sentinel",
+    "subcluster": "input_validation",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 0,
+        "deletions": 58
+      },
+      {
+        "path": "backend/api/blockchain.py",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 7,
+        "deletions": 7
+      },
+      {
+        "path": "backend/tests/test_api_security.py",
+        "additions": 50,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "86da28790921dae9c071c7fe3ea6b8445e591f3c"
+  },
+  {
+    "number": 114,
+    "title": "\ud83c\udfa8 Palette: Fix skip-to-content link & add visual polish",
+    "headRefName": "palette-skip-link-fix-6517619891190616260",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 1,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 6,
+        "deletions": 2
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ff675e5f8e3e01004888cd4730b9d11122cd1fcf"
+  },
+  {
+    "number": 115,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval using heapq",
+    "headRefName": "bolt-kb-optimization-6031646638309913815",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": ".jules/bolt.md",
+        "additions": 0,
+        "deletions": 0
+      },
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 7,
+        "deletions": 77
+      },
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 5,
+        "deletions": 4
+      },
+      {
+        "path": "backend/tests/test_agent.py",
+        "additions": 4,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "98f00001c2e90d255d7b408c479d206684ed284a"
+  },
+  {
+    "number": 116,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix missing input validation in API endpoints",
+    "headRefName": "sentinel-input-validation-fix-11165276134219097005",
+    "cluster": "Sentinel",
+    "subcluster": "input_validation",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 1,
+        "deletions": 64
+      },
+      {
+        "path": "backend/api/blockchain.py",
+        "additions": 6,
+        "deletions": 3
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 3,
+        "deletions": 3
+      },
+      {
+        "path": "backend/tests/test_agent.py",
+        "additions": 17,
+        "deletions": 4
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "d420c02ea0539cf33b865a345be95cdb1f93649c"
+  },
+  {
+    "number": 117,
+    "title": "\ud83c\udfa8 Palette: Fix broken \"Skip to content\" link",
+    "headRefName": "palette-ux-fix-skip-link-10533955804613160608",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "c6d503dc81f3cf82de620ad8e03db1b3ff1e56ef"
+  },
+  {
+    "number": 118,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase.get_recent_entries",
+    "headRefName": "bolt-optimize-kb-recent-entries-2971803268308079864",
+    "cluster": "Bolt",
+    "subcluster": "knowledge_base",
+    "files": [
+      {
+        "path": "backend/ai_agents/knowledge_base.py",
+        "additions": 5,
+        "deletions": 4
+      },
+      {
+        "path": "backend/tests/test_knowledge_base.py",
+        "additions": 51,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "8951dea92e8585d5aa81103d7b7b07ecdf3b5524"
+  },
+  {
+    "number": 119,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix XSS vulnerability in event ingestion",
+    "headRefName": "sentinel-fix-xss-ingestion-13335322750244801575",
+    "cluster": "Sentinel",
+    "subcluster": "xss",
+    "files": [
+      {
+        "path": ".jules/sentinel.md",
+        "additions": 4,
+        "deletions": 0
+      },
+      {
+        "path": "backend/event_pipeline/ingestion.py",
+        "additions": 11,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "ea5393b16dc5c004d01752f47e627a015778a439"
+  },
+  {
+    "number": 120,
+    "title": "\u26a1 Bolt: Optimize event prioritization loop",
+    "headRefName": "bolt-optimize-prioritization-10267616262586992553",
+    "cluster": "Event Pipeline / Integrations",
+    "subcluster": "integrations",
+    "files": [
+      {
+        "path": "backend/event_pipeline/prioritization.py",
+        "additions": 16,
+        "deletions": 6
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "954f3cd7d1abe1070716810d680372b70b2993ca"
+  },
+  {
+    "number": 121,
+    "title": "\ud83c\udfa8 Palette: Fix broken skip link and polish stream placeholder",
+    "headRefName": "palette-skip-link-fix-12025285390623159168",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/.eslintrc.json",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 10,
+        "deletions": 3
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "3455c4279fac074a3b05a93ff25b1c54bf5e4be3"
+  },
+  {
+    "number": 122,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Add API Input Validation",
+    "headRefName": "sentinel-api-validation-2849219881441936158",
+    "cluster": "Sentinel",
+    "subcluster": "input_validation",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 22,
+        "deletions": 60
+      },
+      {
+        "path": "backend/api/blockchain.py",
+        "additions": 11,
+        "deletions": 5
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "backend/tests/test_api_security_validation.py",
+        "additions": 70,
+        "deletions": 0
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "2066aeb3087f8a045f958d319c9d26206cfda316"
+  },
+  {
+    "number": 123,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix API Input Validation & Range Limits",
+    "headRefName": "sentinel-security-fix-input-validation-15454313581290640899",
+    "cluster": "Sentinel",
+    "subcluster": "input_validation",
+    "files": [
+      {
+        "path": "backend/ai_agents/agent.py",
+        "additions": 2,
+        "deletions": 61
+      },
+      {
+        "path": "backend/api/agents.py",
+        "additions": 2,
+        "deletions": 2
+      },
+      {
+        "path": "backend/api/blockchain.py",
+        "additions": 5,
+        "deletions": 5
+      },
+      {
+        "path": "backend/api/voting.py",
+        "additions": 5,
+        "deletions": 5
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "4e3470fe34854e0471e12012ec4cc14ff3182d3f"
+  },
+  {
+    "number": 124,
+    "title": "\ud83c\udfa8 Palette: Fix broken Skip to Content link",
+    "headRefName": "palette-ux-fix-skip-link-15947715567041495745",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 3,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 5,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "5b404bae1b4c220167675c92543ffe61c8de52e0"
+  },
+  {
+    "number": 125,
+    "title": "\ud83c\udfa8 Palette: Fix broken skip-to-content link accessibility",
+    "headRefName": "palette-skip-link-fix-6033682961336460305",
+    "cluster": "Palette",
+    "subcluster": "skip_link",
+    "files": [
+      {
+        "path": ".jules/palette.md",
+        "additions": 5,
+        "deletions": 0
+      },
+      {
+        "path": "frontend/src/app/page.tsx",
+        "additions": 1,
+        "deletions": 1
+      }
+    ],
+    "commitCount": 1,
+    "singleCommitOid": "0297ee88d302f5769e428637b511ac15f6676883"
+  }
+]

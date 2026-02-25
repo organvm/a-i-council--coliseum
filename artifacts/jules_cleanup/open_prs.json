@@ -1,0 +1,1584 @@
+[
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-11T11:37:28Z",
+    "headRefName": "palette-skip-link-fix-6033682961336460305",
+    "isDraft": true,
+    "number": 125,
+    "title": "\ud83c\udfa8 Palette: Fix broken skip-to-content link accessibility",
+    "updatedAt": "2026-01-11T11:37:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/125"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-10T23:49:06Z",
+    "headRefName": "palette-ux-fix-skip-link-15947715567041495745",
+    "isDraft": true,
+    "number": 124,
+    "title": "\ud83c\udfa8 Palette: Fix broken Skip to Content link",
+    "updatedAt": "2026-01-10T23:49:24Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/124"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-10T11:41:10Z",
+    "headRefName": "sentinel-security-fix-input-validation-15454313581290640899",
+    "isDraft": true,
+    "number": 123,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix API Input Validation & Range Limits",
+    "updatedAt": "2026-01-10T11:41:27Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/123"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-09T12:05:25Z",
+    "headRefName": "sentinel-api-validation-2849219881441936158",
+    "isDraft": true,
+    "number": 122,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Add API Input Validation",
+    "updatedAt": "2026-01-09T12:05:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/122"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-07T11:40:38Z",
+    "headRefName": "palette-skip-link-fix-12025285390623159168",
+    "isDraft": true,
+    "number": 121,
+    "title": "\ud83c\udfa8 Palette: Fix broken skip link and polish stream placeholder",
+    "updatedAt": "2026-01-07T11:40:57Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/121"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-07T11:37:37Z",
+    "headRefName": "bolt-optimize-prioritization-10267616262586992553",
+    "isDraft": true,
+    "number": 120,
+    "title": "\u26a1 Bolt: Optimize event prioritization loop",
+    "updatedAt": "2026-01-07T11:37:57Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/120"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-06T11:39:46Z",
+    "headRefName": "sentinel-fix-xss-ingestion-13335322750244801575",
+    "isDraft": true,
+    "number": 119,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix XSS vulnerability in event ingestion",
+    "updatedAt": "2026-01-06T11:40:04Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/119"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-06T11:38:09Z",
+    "headRefName": "bolt-optimize-kb-recent-entries-2971803268308079864",
+    "isDraft": true,
+    "number": 118,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase.get_recent_entries",
+    "updatedAt": "2026-01-06T11:38:26Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/118"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-06T11:37:26Z",
+    "headRefName": "palette-ux-fix-skip-link-10533955804613160608",
+    "isDraft": true,
+    "number": 117,
+    "title": "\ud83c\udfa8 Palette: Fix broken \"Skip to content\" link",
+    "updatedAt": "2026-01-06T11:37:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/117"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-05T11:40:24Z",
+    "headRefName": "sentinel-input-validation-fix-11165276134219097005",
+    "isDraft": true,
+    "number": 116,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix missing input validation in API endpoints",
+    "updatedAt": "2026-01-05T11:40:41Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/116"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-05T11:40:11Z",
+    "headRefName": "bolt-kb-optimization-6031646638309913815",
+    "isDraft": true,
+    "number": 115,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval using heapq",
+    "updatedAt": "2026-01-05T11:40:31Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/115"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-05T11:35:31Z",
+    "headRefName": "palette-skip-link-fix-6517619891190616260",
+    "isDraft": true,
+    "number": 114,
+    "title": "\ud83c\udfa8 Palette: Fix skip-to-content link & add visual polish",
+    "updatedAt": "2026-01-05T11:35:49Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/114"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-04T11:47:08Z",
+    "headRefName": "sentinel-api-validation-6675012327141779541",
+    "isDraft": true,
+    "number": 113,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Add input validation to API endpoints",
+    "updatedAt": "2026-01-04T11:47:27Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/113"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-04T11:42:41Z",
+    "headRefName": "bolt-memory-optimization-4186426160361128159",
+    "isDraft": true,
+    "number": 112,
+    "title": "\u26a1 Bolt: Optimize MemoryManager eviction to O(1)",
+    "updatedAt": "2026-01-04T11:42:59Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/112"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-04T11:37:31Z",
+    "headRefName": "palette-ux-fix-skip-link-13334106688925214882",
+    "isDraft": true,
+    "number": 111,
+    "title": "\ud83c\udfa8 Palette: Fix broken 'Skip to content' link",
+    "updatedAt": "2026-01-04T11:37:49Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/111"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-03T11:44:09Z",
+    "headRefName": "sentinel-fix-eth-leak-15056472117839812900",
+    "isDraft": true,
+    "number": 110,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix information leak in Ethereum contract manager",
+    "updatedAt": "2026-01-03T11:44:28Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/110"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-03T11:38:47Z",
+    "headRefName": "bolt-kb-heap-optimization-2991149502993500805",
+    "isDraft": true,
+    "number": 109,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval with heapq",
+    "updatedAt": "2026-01-03T11:39:03Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/109"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-03T11:36:39Z",
+    "headRefName": "palette-ux-fix-skip-link-1158544930180096464",
+    "isDraft": true,
+    "number": 108,
+    "title": "\ud83c\udfa8 Fix broken 'Skip to content' link target",
+    "updatedAt": "2026-01-03T11:36:57Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/108"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-02T11:39:01Z",
+    "headRefName": "sentinel-xss-fix-3245507546280847048",
+    "isDraft": true,
+    "number": 104,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [CRITICAL/HIGH] Fix XSS vulnerability in event ingestion",
+    "updatedAt": "2026-01-02T11:39:20Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/104"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-02T11:36:59Z",
+    "headRefName": "palette-skip-link-7268249817512410800",
+    "isDraft": true,
+    "number": 103,
+    "title": "Add accessible Skip to Content link",
+    "updatedAt": "2026-01-02T11:37:16Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/103"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-02T11:36:01Z",
+    "headRefName": "bolt-knowledge-base-optimization-747398631657476118",
+    "isDraft": true,
+    "number": 102,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase retrieval methods",
+    "updatedAt": "2026-01-02T11:36:19Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/102"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-01T11:41:16Z",
+    "headRefName": "palette-skip-link-18214462126448498892",
+    "isDraft": true,
+    "number": 101,
+    "title": "Add Skip to Content Link",
+    "updatedAt": "2026-01-01T11:41:33Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/101"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2026-01-01T11:40:31Z",
+    "headRefName": "bolt-optimize-keywords-heapq-9316639758459471555",
+    "isDraft": true,
+    "number": 100,
+    "title": "\u26a1 Bolt: Optimize keyword extraction with heapq",
+    "updatedAt": "2026-01-01T11:40:50Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/100"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-31T11:40:41Z",
+    "headRefName": "palette-skip-link-16942158476639863538",
+    "isDraft": true,
+    "number": 99,
+    "title": "Add Skip to Content Link",
+    "updatedAt": "2025-12-31T11:41:00Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/99"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-31T11:39:19Z",
+    "headRefName": "bolt/optimize-keyword-extraction-12424665956431383870",
+    "isDraft": true,
+    "number": 98,
+    "title": "\u26a1 Bolt: Optimize keyword extraction",
+    "updatedAt": "2025-12-31T11:39:37Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/98"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-31T11:36:54Z",
+    "headRefName": "sentinel-xss-fix-13545425307252449808",
+    "isDraft": true,
+    "number": 97,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix Stored XSS in Event Ingestion",
+    "updatedAt": "2025-12-31T11:37:16Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/97"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-30T11:38:27Z",
+    "headRefName": "sentinel-fix-hardcoded-secret-solana-1568087213360806544",
+    "isDraft": true,
+    "number": 96,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [CRITICAL] Fix hardcoded private key in Solana contract manager",
+    "updatedAt": "2025-12-30T11:38:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/96"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-30T11:38:19Z",
+    "headRefName": "palette-skip-link-9277097823990309816",
+    "isDraft": true,
+    "number": 95,
+    "title": "Add accessible Skip to Content link",
+    "updatedAt": "2025-12-30T11:38:36Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/95"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-30T11:38:03Z",
+    "headRefName": "bolt-memory-optimization-2706888848393998072",
+    "isDraft": true,
+    "number": 94,
+    "title": "\u26a1 Bolt: Optimize MemoryManager expiration with Min-Heap",
+    "updatedAt": "2025-12-30T11:38:21Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/94"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-29T11:40:22Z",
+    "headRefName": "bolt-optimize-knowledge-base-631752825821468656",
+    "isDraft": true,
+    "number": 92,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase.get_popular_entries",
+    "updatedAt": "2025-12-29T11:40:39Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/92"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-29T11:40:04Z",
+    "headRefName": "sentinel-security-headers-12605553481758673520",
+    "isDraft": true,
+    "number": 91,
+    "title": "Add Security Headers Middleware",
+    "updatedAt": "2025-12-29T11:40:23Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/91"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-29T11:38:16Z",
+    "headRefName": "palette-skip-link-15382117385633722380",
+    "isDraft": true,
+    "number": 90,
+    "title": "Add Skip to Content Link",
+    "updatedAt": "2025-12-29T11:38:36Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/90"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-29T10:41:11Z",
+    "headRefName": "solana-rewards-distribution-7720502563146827908",
+    "isDraft": true,
+    "number": 89,
+    "title": "Implement Solana reward distribution with batching and solders",
+    "updatedAt": "2025-12-29T10:41:31Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/89"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:41:13Z",
+    "headRefName": "bolt-optimize-memory-manager-4814843537392971274",
+    "isDraft": true,
+    "number": 88,
+    "title": "\u26a1 Bolt: Optimize MemoryManager expiration with min-heap",
+    "updatedAt": "2025-12-28T11:41:31Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/88"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:36:55Z",
+    "headRefName": "palette-skip-link-2614378897773063730",
+    "isDraft": true,
+    "number": 87,
+    "title": "feat(a11y): add accessible skip-to-content link",
+    "updatedAt": "2025-12-28T11:37:14Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/87"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:35:48Z",
+    "headRefName": "solana-staking-implementation-9890694889778666616",
+    "isDraft": true,
+    "number": 86,
+    "title": "Implement Solana staking transaction logic",
+    "updatedAt": "2025-12-28T11:36:07Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/86"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:31:40Z",
+    "headRefName": "feature/nlp-topic-classification-2887928656568684953",
+    "isDraft": true,
+    "number": 85,
+    "title": "Implement topic classification with local and keyword fallbacks",
+    "updatedAt": "2025-12-28T11:31:56Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/85"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:30:49Z",
+    "headRefName": "feature/solana-stake-tokens-2217138998065294611",
+    "isDraft": true,
+    "number": 84,
+    "title": "Implement Solana staking logic",
+    "updatedAt": "2025-12-28T11:31:07Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/84"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:30:15Z",
+    "headRefName": "nlp-sentiment-analysis-14520272026655466146",
+    "isDraft": true,
+    "number": 83,
+    "title": "Implement actual sentiment analysis using Transformers and OpenAI fallback",
+    "updatedAt": "2025-12-28T11:30:32Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/83"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:29:47Z",
+    "headRefName": "eth-transfer-tokens-9407955727924875770",
+    "isDraft": true,
+    "number": 82,
+    "title": "Implement Ethereum token transfer logic with AsyncWeb3",
+    "updatedAt": "2025-12-28T11:30:04Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/82"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:28:18Z",
+    "headRefName": "eth-transfer-impl-13144202169180385868",
+    "isDraft": true,
+    "number": 81,
+    "title": "Implement Ethereum token transfer logic",
+    "updatedAt": "2025-12-28T11:28:35Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/81"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:27:39Z",
+    "headRefName": "solana-rewards-distribution-4388972475469022696",
+    "isDraft": true,
+    "number": 80,
+    "title": "Implement Solana rewards distribution transaction logic",
+    "updatedAt": "2025-12-28T11:27:59Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/80"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:27:25Z",
+    "headRefName": "feature/solana-reward-distribution-3240895994465389286",
+    "isDraft": true,
+    "number": 79,
+    "title": "Implement batched reward distribution on Solana",
+    "updatedAt": "2025-12-28T11:27:41Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/79"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:25:53Z",
+    "headRefName": "nlp-topic-classification-15642149026415156386",
+    "isDraft": true,
+    "number": 78,
+    "title": "Implement heuristic topic classification fallback",
+    "updatedAt": "2025-12-28T11:26:12Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/78"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:25:44Z",
+    "headRefName": "eth-connection-implementation-11597750245791256047",
+    "isDraft": true,
+    "number": 77,
+    "title": "Implement AsyncWeb3 Connection",
+    "updatedAt": "2025-12-28T11:26:03Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/77"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:25:02Z",
+    "headRefName": "nlp-entity-extraction-13559531642555241686",
+    "isDraft": true,
+    "number": 76,
+    "title": "Implement NLP entity extraction",
+    "updatedAt": "2025-12-28T11:25:18Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/76"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:24:59Z",
+    "headRefName": "solana-rewards-distribution-4545190152559402271",
+    "isDraft": true,
+    "number": 75,
+    "title": "Implement Solana reward distribution logic",
+    "updatedAt": "2025-12-28T11:25:17Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/75"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:24:05Z",
+    "headRefName": "solana-initialization-12243703043467185670",
+    "isDraft": true,
+    "number": 74,
+    "title": "Implement Solana Program Initialization",
+    "updatedAt": "2025-12-28T11:24:24Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/74"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:23:09Z",
+    "headRefName": "nlp-topic-classification-4527222308535902792",
+    "isDraft": true,
+    "number": 73,
+    "title": "Implement topic classification with fallback heuristic",
+    "updatedAt": "2025-12-28T11:23:25Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/73"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-28T11:22:02Z",
+    "headRefName": "nlp-summarization-implementation-1686588178262361815",
+    "isDraft": true,
+    "number": 72,
+    "title": "Implement NLP Summarization",
+    "updatedAt": "2025-12-28T11:22:19Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/72"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-27T11:39:27Z",
+    "headRefName": "palette-skip-link-7429120537729789941",
+    "isDraft": true,
+    "number": 71,
+    "title": "Add \"Skip to content\" link for accessibility",
+    "updatedAt": "2025-12-27T11:39:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/71"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-27T11:38:47Z",
+    "headRefName": "sentinel-security-headers-18404879430170754317",
+    "isDraft": true,
+    "number": 70,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Add Security Headers Middleware",
+    "updatedAt": "2025-12-27T11:39:04Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/70"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-27T11:35:41Z",
+    "headRefName": "bolt/optimize-knowledge-base-heapq-155279521988265201",
+    "isDraft": true,
+    "number": 69,
+    "title": "\u26a1 Bolt: Optimize KnowledgeBase sorting with heapq",
+    "updatedAt": "2025-12-27T11:35:58Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/69"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-26T11:43:06Z",
+    "headRefName": "bolt-memory-optimization-13323577601643578385",
+    "isDraft": true,
+    "number": 68,
+    "title": "\u26a1 Bolt: Optimize MemoryManager performance",
+    "updatedAt": "2025-12-26T11:43:23Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/68"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-26T11:42:30Z",
+    "headRefName": "palette-disabled-button-states-2642690034922676213",
+    "isDraft": true,
+    "number": 67,
+    "title": "\ud83c\udfa8 Palette: Add disabled states to buttons",
+    "updatedAt": "2025-12-26T11:42:49Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/67"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-26T11:39:30Z",
+    "headRefName": "sentinel-security-headers-12914130264784549018",
+    "isDraft": true,
+    "number": 66,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [MEDIUM] Add basic security headers",
+    "updatedAt": "2025-12-26T11:39:48Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/66"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T12:03:38Z",
+    "headRefName": "palette-button-a11y-2983379759854978567",
+    "isDraft": true,
+    "number": 64,
+    "title": "\ud83c\udfa8 Palette: Button Accessibility Improvements",
+    "updatedAt": "2025-12-25T12:03:54Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/64"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T11:43:00Z",
+    "headRefName": "sentinel-fix-cors-security-18230752977920748728",
+    "isDraft": true,
+    "number": 63,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix insecure CORS configuration",
+    "updatedAt": "2025-12-25T11:43:18Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/63"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T11:38:16Z",
+    "headRefName": "bolt-optimize-ingestion-query-1804630156857118313",
+    "isDraft": true,
+    "number": 62,
+    "title": "\u26a1 Bolt: Optimize event ingestion query speed",
+    "updatedAt": "2025-12-25T11:38:32Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/62"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:13:42Z",
+    "headRefName": "feature/memory-expiration-optimization-1600601424454404851",
+    "isDraft": true,
+    "number": 60,
+    "title": "Optimize MemoryManager expiration logic",
+    "updatedAt": "2025-12-25T08:14:01Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/60"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:13:27Z",
+    "headRefName": "knowledge-base-optimization-2989810028268141219",
+    "isDraft": true,
+    "number": 59,
+    "title": "Optimize KnowledgeBase search with inverted index",
+    "updatedAt": "2025-12-25T08:13:43Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/59"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:13:04Z",
+    "headRefName": "agent-broadcast-concurrency-2810301396400765001",
+    "isDraft": true,
+    "number": 58,
+    "title": "Agent Broadcast Concurrency Optimization",
+    "updatedAt": "2025-12-25T08:13:23Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/58"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:07:13Z",
+    "headRefName": "blocking-vrf-simulation-6614803753991214422",
+    "isDraft": true,
+    "number": 57,
+    "title": "Fix blocking VRF simulation",
+    "updatedAt": "2025-12-25T08:07:32Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/57"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:07:03Z",
+    "headRefName": "batch-process-concurrency-1976448705994792219",
+    "isDraft": true,
+    "number": 56,
+    "title": "Optimize batch event processing using asyncio.gather",
+    "updatedAt": "2025-12-25T08:07:20Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/56"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:07:02Z",
+    "headRefName": "perf/knowledge-base-optimization-1968374482546504460",
+    "isDraft": true,
+    "number": 55,
+    "title": "Optimize `get_popular_entries` performance",
+    "updatedAt": "2025-12-25T08:07:18Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/55"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-25T08:05:35Z",
+    "headRefName": "memory-manager-lru-optimization-9311857902177515346",
+    "isDraft": true,
+    "number": 54,
+    "title": "Optimize MemoryManager LRU Eviction",
+    "updatedAt": "2025-12-25T08:05:52Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/54"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-24T12:08:47Z",
+    "headRefName": "palette-button-focus-17981727123836556579",
+    "isDraft": true,
+    "number": 53,
+    "title": "\ud83c\udfa8 Palette: Add accessible focus states and tactile feedback",
+    "updatedAt": "2025-12-24T12:09:08Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/53"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-24T11:37:34Z",
+    "headRefName": "bolt-perf-event-processing-16392546152050038496",
+    "isDraft": true,
+    "number": 52,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "updatedAt": "2025-12-24T11:37:51Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/52"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-24T11:36:52Z",
+    "headRefName": "sentinel-cors-fix-11318330261158574821",
+    "isDraft": true,
+    "number": 51,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix Critical CORS Vulnerability",
+    "updatedAt": "2025-12-24T11:37:11Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/51"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-23T11:43:33Z",
+    "headRefName": "palette-ux-improvements-1303415929962937969",
+    "isDraft": true,
+    "number": 50,
+    "title": "\ud83c\udfa8 Palette: Accessibility and Button Polish",
+    "updatedAt": "2025-12-23T11:43:52Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/50"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-23T11:37:25Z",
+    "headRefName": "sentinel/fix-cors-config-11469986317752178497",
+    "isDraft": true,
+    "number": 49,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-23T11:37:43Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/49"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-23T11:36:59Z",
+    "headRefName": "bolt-perf-event-processing-7301963982227962548",
+    "isDraft": true,
+    "number": 48,
+    "title": "\u26a1 Bolt: Optimize event batch processing",
+    "updatedAt": "2025-12-23T11:37:16Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/48"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-22T11:43:46Z",
+    "headRefName": "palette-ux-improvements-10475162339953763814",
+    "isDraft": true,
+    "number": 47,
+    "title": "\ud83c\udfa8 Palette: Enhance button interaction and accessibility",
+    "updatedAt": "2025-12-22T11:44:03Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/47"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-22T11:40:18Z",
+    "headRefName": "sentinel-fix-cors-config-12045893998201154118",
+    "isDraft": true,
+    "number": 46,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-22T11:40:36Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/46"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-22T11:37:39Z",
+    "headRefName": "bolt-perf-batch-processing-7995918966187089148",
+    "isDraft": true,
+    "number": 45,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "updatedAt": "2025-12-22T11:37:58Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/45"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-21T11:45:06Z",
+    "headRefName": "palette-button-a11y-682806668128868216",
+    "isDraft": true,
+    "number": 44,
+    "title": "\ud83c\udfa8 Palette: Accessible Buttons & Semantic Content",
+    "updatedAt": "2025-12-21T11:45:24Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/44"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-21T11:40:59Z",
+    "headRefName": "bolt-concurrent-processing-10086390083379725770",
+    "isDraft": true,
+    "number": 43,
+    "title": "\u26a1 Bolt: Optimize event processing concurrency",
+    "updatedAt": "2025-12-21T11:41:17Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/43"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-21T11:33:03Z",
+    "headRefName": "sentinel-fix-cors-vulnerability-16677670123966948805",
+    "isDraft": true,
+    "number": 42,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-21T11:33:21Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/42"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-20T11:43:15Z",
+    "headRefName": "palette-button-focus-rings-3821344802931354642",
+    "isDraft": true,
+    "number": 41,
+    "title": "\ud83c\udfa8 Palette: Add focus rings to buttons and fix styles",
+    "updatedAt": "2025-12-20T11:43:31Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/41"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-20T11:37:50Z",
+    "headRefName": "bolt-perf-ingestion-heapq-5716966508357761853",
+    "isDraft": true,
+    "number": 40,
+    "title": "\u26a1 Bolt: Optimize get_recent_events with heapq.nlargest",
+    "updatedAt": "2025-12-20T11:38:10Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/40"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-20T11:35:09Z",
+    "headRefName": "sentinel/fix-cors-config-2910958761820317373",
+    "isDraft": true,
+    "number": 39,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-20T11:35:25Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/39"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-19T11:46:35Z",
+    "headRefName": "sentinel-security-fix-cors-headers-14746788601126694081",
+    "isDraft": true,
+    "number": 38,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix CORS misconfiguration and add security headers",
+    "updatedAt": "2025-12-19T11:47:05Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/38"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-19T11:42:44Z",
+    "headRefName": "palette-button-focus-and-emojis-2328353520884081766",
+    "isDraft": true,
+    "number": 37,
+    "title": "\ud83c\udfa8 Palette: Enhance button focus states and hide decorative emojis",
+    "updatedAt": "2025-12-19T11:43:07Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/37"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-19T11:35:28Z",
+    "headRefName": "bolt-concurrent-processing-8596118844826169435",
+    "isDraft": true,
+    "number": 36,
+    "title": "\u26a1 Bolt: optimize batch event processing",
+    "updatedAt": "2025-12-19T11:35:46Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/36"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-18T11:44:56Z",
+    "headRefName": "sentinel-security-fix-cors-config-12384604095297759074",
+    "isDraft": true,
+    "number": 35,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-18T11:45:18Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/35"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-18T11:42:49Z",
+    "headRefName": "palette-button-a11y-7413277532083725984",
+    "isDraft": true,
+    "number": 34,
+    "title": "\ud83c\udfa8 Palette: Enhance button accessibility and interaction",
+    "updatedAt": "2025-12-18T11:43:09Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/34"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-18T11:35:41Z",
+    "headRefName": "bolt-perf-event-concurrency-3915379051695502716",
+    "isDraft": true,
+    "number": 33,
+    "title": "\u26a1 Bolt: Parallelize event batch processing",
+    "updatedAt": "2025-12-18T11:36:00Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/33"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-17T11:44:13Z",
+    "headRefName": "palette-ux-a11y-improvements-8915230955208924912",
+    "isDraft": true,
+    "number": 32,
+    "title": "\ud83c\udfa8 Palette: Enhance accessibility with hidden emojis and focus states",
+    "updatedAt": "2025-12-17T11:44:31Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/32"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-17T11:38:07Z",
+    "headRefName": "bolt-perf-event-processing-6912403605563400978",
+    "isDraft": true,
+    "number": 31,
+    "title": "\u26a1 Bolt: Optimize event batch processing",
+    "updatedAt": "2025-12-17T11:38:24Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/31"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-17T11:36:00Z",
+    "headRefName": "sentinel-fix-cors-vuln-17848400822528686808",
+    "isDraft": true,
+    "number": 30,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix insecure CORS configuration",
+    "updatedAt": "2025-12-17T11:36:18Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/30"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-16T19:25:10Z",
+    "headRefName": "bolt-ingestion-optimization-13455634452102694449",
+    "isDraft": true,
+    "number": 29,
+    "title": "\u26a1 Bolt: Optimize event ingestion history retrieval",
+    "updatedAt": "2025-12-16T19:25:34Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/29"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-16T11:51:38Z",
+    "headRefName": "palette-ux-fix-focus-styles-15553426834621848622",
+    "isDraft": true,
+    "number": 28,
+    "title": "\ud83c\udfa8 Palette: Focus styles and a11y fixes",
+    "updatedAt": "2025-12-16T11:51:56Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/28"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-16T11:36:02Z",
+    "headRefName": "sentinel-fix-cors-config-5550084313880239358",
+    "isDraft": true,
+    "number": 27,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-16T11:36:22Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/27"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-16T11:34:47Z",
+    "headRefName": "bolt-concurrency-optimization-10776688425655063225",
+    "isDraft": true,
+    "number": 26,
+    "title": "\u26a1 Bolt: Concurrent event processing",
+    "updatedAt": "2025-12-16T11:35:08Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/26"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T16:03:52Z",
+    "headRefName": "leaderboard-achievements-logic-5695060051861023718",
+    "isDraft": true,
+    "number": 25,
+    "title": "Implement achievement count logic for leaderboard",
+    "updatedAt": "2025-12-15T16:04:13Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/25"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T16:03:48Z",
+    "headRefName": "integrate-agent-creation-14473106705564142573",
+    "isDraft": true,
+    "number": 24,
+    "title": "Integrate create_agent API with SystemOrchestrator",
+    "updatedAt": "2025-12-15T16:04:07Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/24"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T16:03:27Z",
+    "headRefName": "integrate-voting-api-16076201931976907034",
+    "isDraft": true,
+    "number": 23,
+    "title": "Integrate voting API with VotingEngine",
+    "updatedAt": "2025-12-15T16:03:48Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/23"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T15:47:28Z",
+    "headRefName": "integrate-voting-api-11264882359641286875",
+    "isDraft": true,
+    "number": 22,
+    "title": "Integrate voting API with VotingEngine",
+    "updatedAt": "2025-12-15T15:47:48Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/22"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T15:07:24Z",
+    "headRefName": "feature/event-pipeline-implementation-3209488433687305470",
+    "isDraft": true,
+    "number": 21,
+    "title": "Implement Event Pipeline Processing Logic",
+    "updatedAt": "2025-12-15T17:20:41Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/21"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T11:41:41Z",
+    "headRefName": "palette-ux-improvements-11899457051988823809",
+    "isDraft": true,
+    "number": 20,
+    "title": "UX: Improve accessibility and fix CSS build",
+    "updatedAt": "2025-12-15T11:42:00Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/20"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T11:40:16Z",
+    "headRefName": "sentinel-fix-cors-vulnerability-6748860073341731152",
+    "isDraft": true,
+    "number": 19,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-15T11:40:34Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/19"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-15T11:35:42Z",
+    "headRefName": "bolt-perf-event-prioritizer-6647171762721591045",
+    "isDraft": true,
+    "number": 18,
+    "title": "\u26a1 Bolt: optimize event processing with concurrent execution",
+    "updatedAt": "2025-12-15T11:36:02Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/18"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-14T11:42:09Z",
+    "headRefName": "palette-focus-states-17351382806062089582",
+    "isDraft": true,
+    "number": 17,
+    "title": "\ud83c\udfa8 Palette: Add focus states to buttons for accessibility",
+    "updatedAt": "2025-12-14T11:42:26Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/17"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-14T11:39:21Z",
+    "headRefName": "bolt-optimize-event-prioritization-7783416478702402484",
+    "isDraft": true,
+    "number": 16,
+    "title": "\u26a1 Bolt: Optimize event prioritization concurrency",
+    "updatedAt": "2025-12-14T11:39:39Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/16"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-14T11:35:55Z",
+    "headRefName": "sentinel/fix-cors-config-16519380531536230189",
+    "isDraft": true,
+    "number": 15,
+    "title": "\ud83d\udee1\ufe0f Sentinel: [HIGH] Fix overly permissive CORS configuration",
+    "updatedAt": "2025-12-14T11:36:14Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/15"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T11:41:55Z",
+    "headRefName": "palette-live-stream-placeholder-2247012831272199589",
+    "isDraft": true,
+    "number": 14,
+    "title": "\ud83c\udfa8 Palette: Enhance Live Stream Placeholder",
+    "updatedAt": "2025-12-13T11:42:15Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/14"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T11:38:41Z",
+    "headRefName": "sentinel/fix-cors-security-headers-15137104950878573790",
+    "isDraft": false,
+    "number": 13,
+    "title": "\ud83d\udee1\ufe0f Sentinel: Fix permissive CORS and add security headers",
+    "updatedAt": "2025-12-25T08:10:35Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/13"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T01:01:00Z",
+    "headRefName": "feature-eth-tx-implementation-15752912679968118455",
+    "isDraft": false,
+    "number": 12,
+    "title": "Implement Ethereum Token Transfer Logic",
+    "updatedAt": "2025-12-25T08:14:48Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/12"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T01:00:57Z",
+    "headRefName": "solana-initialization-783868414048411329",
+    "isDraft": false,
+    "number": 11,
+    "title": "Implement Solana Program Initialization",
+    "updatedAt": "2025-12-25T08:13:37Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/11"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T01:00:39Z",
+    "headRefName": "nlp-entity-extraction-14616795516656704660",
+    "isDraft": false,
+    "number": 10,
+    "title": "Implement actual entity extraction in NLPProcessor",
+    "updatedAt": "2025-12-25T08:11:01Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/10"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T01:00:02Z",
+    "headRefName": "nlp-sentiment-analysis-6682488477329068145",
+    "isDraft": false,
+    "number": 9,
+    "title": "Implement real sentiment analysis in NLPProcessor",
+    "updatedAt": "2025-12-25T08:23:23Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/9"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T00:59:50Z",
+    "headRefName": "nlp-summarization-implementation-8302135707580407645",
+    "isDraft": false,
+    "number": 7,
+    "title": "Implement NLP-based text summarization",
+    "updatedAt": "2025-12-25T08:09:44Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/7"
+  },
+  {
+    "author": {
+      "is_bot": true,
+      "login": "app/google-labs-jules"
+    },
+    "baseRefName": "main",
+    "createdAt": "2025-12-13T00:59:40Z",
+    "headRefName": "solana-staking-implementation-4755943510825594584",
+    "isDraft": false,
+    "number": 6,
+    "title": "Implement Solana Staking Logic",
+    "updatedAt": "2025-12-25T08:12:27Z",
+    "url": "https://github.com/organvm-ii-poiesis/a-i-council--coliseum/pull/6"
+  }
+]

@@ -1,0 +1,2244 @@
+{
+  "startedAt": "2026-02-25T00:31:45.644917+00:00",
+  "repoPath": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum",
+  "defaultBranch": "main",
+  "baselineMainShortSha": "dc9c1fe",
+  "baselineMainFullSha": "dc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0",
+  "phases": {
+    "inventory": {
+      "duplicateSummary": {
+        "duplicateTitleGroups": 10,
+        "duplicateFileSetGroups": 19,
+        "duplicateSingleCommitGroups": 0,
+        "duplicateTitleExamples": [
+          {
+            "key": "config|configuration|cors|high|overly|permissive|sentinel",
+            "prs": [
+              15,
+              27,
+              39,
+              46
+            ]
+          },
+          {
+            "key": "content|link|palette|skip",
+            "prs": [
+              90,
+              99,
+              101
+            ]
+          },
+          {
+            "key": "broken|content|link|palette|skip|ux",
+            "prs": [
+              111,
+              117,
+              124
+            ]
+          },
+          {
+            "key": "initialization|program|solana",
+            "prs": [
+              11,
+              74
+            ]
+          },
+          {
+            "key": "configuration|cors|high|overly|permissive|sentinel|vulnerability",
+            "prs": [
+              19,
+              42
+            ]
+          },
+          {
+            "key": "integrate|voting|votingengine",
+            "prs": [
+              22,
+              23
+            ]
+          },
+          {
+            "key": "batch|bolt|event|perf|processing",
+            "prs": [
+              31,
+              48
+            ]
+          },
+          {
+            "key": "batch|bolt|event|parallelize|perf|processing",
+            "prs": [
+              45,
+              52
+            ]
+          },
+          {
+            "key": "classification|fallback|heuristic|nlp|topic",
+            "prs": [
+              73,
+              78
+            ]
+          },
+          {
+            "key": "accessible|content|link|palette|skip",
+            "prs": [
+              95,
+              103
+            ]
+          }
+        ],
+        "duplicateFileSetExamples": [
+          {
+            "key": "backend/ai_agents/nlp_module.py",
+            "prs": [
+              7,
+              9,
+              72,
+              73,
+              83,
+              85
+            ]
+          },
+          {
+            "key": "backend/event_pipeline/processing.py",
+            "prs": [
+              26,
+              31,
+              33,
+              48,
+              52,
+              56
+            ]
+          },
+          {
+            "key": "backend/main.py",
+            "prs": [
+              30,
+              35,
+              38,
+              39,
+              49,
+              91
+            ]
+          },
+          {
+            "key": "backend/blockchain/solana_contracts.py|backend/tests/test_solana_contracts.py",
+            "prs": [
+              11,
+              74,
+              84,
+              86,
+              96
+            ]
+          },
+          {
+            "key": "backend/ai_agents/knowledge_base.py",
+            "prs": [
+              55,
+              59,
+              69,
+              102
+            ]
+          },
+          {
+            "key": ".jules/palette.md|frontend/next-env.d.ts|frontend/pnpm-lock.yaml|frontend/src/app/layout.tsx|frontend/src/app/page.tsx",
+            "prs": [
+              87,
+              90,
+              95,
+              99
+            ]
+          },
+          {
+            "key": ".jules/palette.md|frontend/src/app/page.tsx",
+            "prs": [
+              108,
+              117,
+              124,
+              125
+            ]
+          },
+          {
+            "key": "backend/blockchain/solana_contracts.py",
+            "prs": [
+              6,
+              79,
+              89
+            ]
+          },
+          {
+            "key": "backend/blockchain/ethereum_contracts.py",
+            "prs": [
+              12,
+              81,
+              82
+            ]
+          },
+          {
+            "key": "backend/main.py|backend/tests/test_cors.py",
+            "prs": [
+              15,
+              19,
+              27
+            ]
+          }
+        ],
+        "duplicateSingleCommitExamples": []
+      },
+      "clusterDispositions": {
+        "Palette": {
+          "cluster": "Palette",
+          "disposition": "partially absorbed",
+          "highImpact": false,
+          "representativePRs": [
+            125,
+            124,
+            121
+          ],
+          "rationale": "Skip-link fix is present on current main (main-content target + tabIndex), but repeated Palette PRs also include button/focus/disabled-state polish that was generated in many variants and is not fully audited in this cleanup pass.",
+          "evidence": {
+            "skipLinkTargetPresent": true,
+            "mainCommit": "dc9c1fe"
+          }
+        },
+        "Sentinel": {
+          "cluster": "Sentinel",
+          "disposition": "partially absorbed",
+          "highImpact": true,
+          "representativePRs": [
+            123,
+            122,
+            119
+          ],
+          "rationale": "CORS restrictions, security headers, and API Field validations are present on current main. XSS escaping and/or rate limiting markers are not consistently detectable across the codebase, so remaining Sentinel PRs are treated as stale duplicates with candidate follow-up review notes.",
+          "evidence": {
+            "corsOriginsPresent": true,
+            "securityHeadersPresent": true,
+            "inputValidationPresent": true,
+            "xssEscapePresent": true,
+            "rateLimitPresent": false,
+            "signatureScore": 4
+          }
+        },
+        "Bolt": {
+          "cluster": "Bolt",
+          "disposition": "partially absorbed",
+          "highImpact": true,
+          "representativePRs": [
+            118,
+            115,
+            112
+          ],
+          "rationale": "Current main contains several Bolt-style optimizations (OrderedDict memory manager and async gather patterns), but the repeated KB/prioritization/gzip variants are not uniformly present and are not merged in this cleanup pass.",
+          "evidence": {
+            "memoryOrderedDict": true,
+            "knowledgeBaseHeapq": false,
+            "prioritizationMarker": true,
+            "gzipMiddleware": true,
+            "asyncGatherPatterns": true,
+            "signatureScore": 4
+          }
+        },
+        "NLP": {
+          "cluster": "NLP",
+          "disposition": "partially absorbed",
+          "highImpact": true,
+          "representativePRs": [
+            85,
+            83,
+            78
+          ],
+          "rationale": "Current NLP module exposes sentiment and entity extraction methods and contains AsyncOpenAI integration markers; topic-classification/summarization variants were repeatedly generated and are archived as intent, not merged now.",
+          "evidence": {
+            "asyncOpenAI": false,
+            "sentimentMethod": true,
+            "entityExtractionMethod": true,
+            "transformersMarker": false,
+            "signatureScore": 2
+          }
+        },
+        "Solana/Ethereum": {
+          "cluster": "Solana/Ethereum",
+          "disposition": "partially absorbed",
+          "highImpact": true,
+          "representativePRs": [
+            110,
+            96,
+            89
+          ],
+          "rationale": "Current main includes AsyncWeb3 and Solana reward distribution markers, but not all staking/transfer variants are confirmed present. Treat as archived intent plus follow-up candidates.",
+          "evidence": {
+            "asyncWeb3": true,
+            "solanaDistributeRewards": true,
+            "solanaStakeTokens": false,
+            "signatureScore": 2
+          }
+        },
+        "Event Pipeline / Integrations": {
+          "cluster": "Event Pipeline / Integrations",
+          "disposition": "candidate follow-up task",
+          "highImpact": false,
+          "representativePRs": [
+            120,
+            100,
+            98
+          ],
+          "rationale": "This cluster contains broader feature/integration work (event pipeline, APIs, infra hooks) not safely reducible to repeated micro-fixes. Archive intent and re-scope as explicit follow-up tasks if needed.",
+          "evidence": {
+            "eventPipelineGatherMarker": true
+          }
+        },
+        "Other": {
+          "cluster": "Other",
+          "disposition": "not absorbed but stale",
+          "highImpact": false,
+          "representativePRs": [
+            57,
+            55
+          ],
+          "rationale": "Miscellaneous one-off bot branches are archived for intent and closed/deleted as stale during this cleanup pass.",
+          "evidence": {}
+        }
+      },
+      "followUpCandidates": [
+        {
+          "cluster": "Sentinel",
+          "topic": "Rate limiting middleware",
+          "candidatePRs": [],
+          "reason": "No high-confidence rate-limit middleware marker detected in current backend files."
+        },
+        {
+          "cluster": "Bolt",
+          "topic": "KnowledgeBase heapq optimization audit",
+          "candidatePRs": [
+            59,
+            69,
+            92,
+            102,
+            109
+          ],
+          "reason": "No high-confidence heapq KB optimization marker detected in current knowledge base module."
+        },
+        {
+          "cluster": "Solana/Ethereum",
+          "topic": "Solana stake_tokens implementation audit",
+          "candidatePRs": [
+            84
+          ],
+          "reason": "No high-confidence stake_tokens method marker detected in current Solana contract manager."
+        },
+        {
+          "cluster": "Event Pipeline / Integrations",
+          "topic": "Re-scope integration PRs into tracked tasks",
+          "candidatePRs": [
+            120,
+            100,
+            98,
+            62,
+            56
+          ],
+          "reason": "Substantive multi-file feature work should be triaged intentionally, not merged from stale bot branches."
+        }
+      ]
+    },
+    "prClosure": {
+      "total": 113,
+      "closed": 113,
+      "commented": 113,
+      "actions": [
+        {
+          "number": 6,
+          "headRefName": "solana-staking-implementation-4755943510825594584",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 7,
+          "headRefName": "nlp-summarization-implementation-8302135707580407645",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 9,
+          "headRefName": "nlp-sentiment-analysis-6682488477329068145",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 10,
+          "headRefName": "nlp-entity-extraction-14616795516656704660",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 11,
+          "headRefName": "solana-initialization-783868414048411329",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 12,
+          "headRefName": "feature-eth-tx-implementation-15752912679968118455",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 13,
+          "headRefName": "sentinel/fix-cors-security-headers-15137104950878573790",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 14,
+          "headRefName": "palette-live-stream-placeholder-2247012831272199589",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 15,
+          "headRefName": "sentinel/fix-cors-config-16519380531536230189",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 16,
+          "headRefName": "bolt-optimize-event-prioritization-7783416478702402484",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 17,
+          "headRefName": "palette-focus-states-17351382806062089582",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 18,
+          "headRefName": "bolt-perf-event-prioritizer-6647171762721591045",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 19,
+          "headRefName": "sentinel-fix-cors-vulnerability-6748860073341731152",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 20,
+          "headRefName": "palette-ux-improvements-11899457051988823809",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 21,
+          "headRefName": "feature/event-pipeline-implementation-3209488433687305470",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 22,
+          "headRefName": "integrate-voting-api-11264882359641286875",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 23,
+          "headRefName": "integrate-voting-api-16076201931976907034",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 24,
+          "headRefName": "integrate-agent-creation-14473106705564142573",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 25,
+          "headRefName": "leaderboard-achievements-logic-5695060051861023718",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 26,
+          "headRefName": "bolt-concurrency-optimization-10776688425655063225",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 27,
+          "headRefName": "sentinel-fix-cors-config-5550084313880239358",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 28,
+          "headRefName": "palette-ux-fix-focus-styles-15553426834621848622",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 29,
+          "headRefName": "bolt-ingestion-optimization-13455634452102694449",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 30,
+          "headRefName": "sentinel-fix-cors-vuln-17848400822528686808",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 31,
+          "headRefName": "bolt-perf-event-processing-6912403605563400978",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 32,
+          "headRefName": "palette-ux-a11y-improvements-8915230955208924912",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 33,
+          "headRefName": "bolt-perf-event-concurrency-3915379051695502716",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 34,
+          "headRefName": "palette-button-a11y-7413277532083725984",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 35,
+          "headRefName": "sentinel-security-fix-cors-config-12384604095297759074",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 36,
+          "headRefName": "bolt-concurrent-processing-8596118844826169435",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 37,
+          "headRefName": "palette-button-focus-and-emojis-2328353520884081766",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 38,
+          "headRefName": "sentinel-security-fix-cors-headers-14746788601126694081",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 39,
+          "headRefName": "sentinel/fix-cors-config-2910958761820317373",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 40,
+          "headRefName": "bolt-perf-ingestion-heapq-5716966508357761853",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 41,
+          "headRefName": "palette-button-focus-rings-3821344802931354642",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 42,
+          "headRefName": "sentinel-fix-cors-vulnerability-16677670123966948805",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 43,
+          "headRefName": "bolt-concurrent-processing-10086390083379725770",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 44,
+          "headRefName": "palette-button-a11y-682806668128868216",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 45,
+          "headRefName": "bolt-perf-batch-processing-7995918966187089148",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 46,
+          "headRefName": "sentinel-fix-cors-config-12045893998201154118",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 47,
+          "headRefName": "palette-ux-improvements-10475162339953763814",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 48,
+          "headRefName": "bolt-perf-event-processing-7301963982227962548",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 49,
+          "headRefName": "sentinel/fix-cors-config-11469986317752178497",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 50,
+          "headRefName": "palette-ux-improvements-1303415929962937969",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 51,
+          "headRefName": "sentinel-cors-fix-11318330261158574821",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 52,
+          "headRefName": "bolt-perf-event-processing-16392546152050038496",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 53,
+          "headRefName": "palette-button-focus-17981727123836556579",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 54,
+          "headRefName": "memory-manager-lru-optimization-9311857902177515346",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 55,
+          "headRefName": "perf/knowledge-base-optimization-1968374482546504460",
+          "cluster": "Other",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 56,
+          "headRefName": "batch-process-concurrency-1976448705994792219",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 57,
+          "headRefName": "blocking-vrf-simulation-6614803753991214422",
+          "cluster": "Other",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 58,
+          "headRefName": "agent-broadcast-concurrency-2810301396400765001",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 59,
+          "headRefName": "knowledge-base-optimization-2989810028268141219",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 60,
+          "headRefName": "feature/memory-expiration-optimization-1600601424454404851",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 62,
+          "headRefName": "bolt-optimize-ingestion-query-1804630156857118313",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 63,
+          "headRefName": "sentinel-fix-cors-security-18230752977920748728",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 64,
+          "headRefName": "palette-button-a11y-2983379759854978567",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 66,
+          "headRefName": "sentinel-security-headers-12914130264784549018",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 67,
+          "headRefName": "palette-disabled-button-states-2642690034922676213",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 68,
+          "headRefName": "bolt-memory-optimization-13323577601643578385",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 69,
+          "headRefName": "bolt/optimize-knowledge-base-heapq-155279521988265201",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 70,
+          "headRefName": "sentinel-security-headers-18404879430170754317",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 71,
+          "headRefName": "palette-skip-link-7429120537729789941",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 72,
+          "headRefName": "nlp-summarization-implementation-1686588178262361815",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 73,
+          "headRefName": "nlp-topic-classification-4527222308535902792",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 74,
+          "headRefName": "solana-initialization-12243703043467185670",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 75,
+          "headRefName": "solana-rewards-distribution-4545190152559402271",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 76,
+          "headRefName": "nlp-entity-extraction-13559531642555241686",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 77,
+          "headRefName": "eth-connection-implementation-11597750245791256047",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 78,
+          "headRefName": "nlp-topic-classification-15642149026415156386",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 79,
+          "headRefName": "feature/solana-reward-distribution-3240895994465389286",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 80,
+          "headRefName": "solana-rewards-distribution-4388972475469022696",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 81,
+          "headRefName": "eth-transfer-impl-13144202169180385868",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 82,
+          "headRefName": "eth-transfer-tokens-9407955727924875770",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 83,
+          "headRefName": "nlp-sentiment-analysis-14520272026655466146",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 84,
+          "headRefName": "feature/solana-stake-tokens-2217138998065294611",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 85,
+          "headRefName": "feature/nlp-topic-classification-2887928656568684953",
+          "cluster": "NLP",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 86,
+          "headRefName": "solana-staking-implementation-9890694889778666616",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 87,
+          "headRefName": "palette-skip-link-2614378897773063730",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 88,
+          "headRefName": "bolt-optimize-memory-manager-4814843537392971274",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 89,
+          "headRefName": "solana-rewards-distribution-7720502563146827908",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 90,
+          "headRefName": "palette-skip-link-15382117385633722380",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 91,
+          "headRefName": "sentinel-security-headers-12605553481758673520",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 92,
+          "headRefName": "bolt-optimize-knowledge-base-631752825821468656",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 94,
+          "headRefName": "bolt-memory-optimization-2706888848393998072",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 95,
+          "headRefName": "palette-skip-link-9277097823990309816",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 96,
+          "headRefName": "sentinel-fix-hardcoded-secret-solana-1568087213360806544",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 97,
+          "headRefName": "sentinel-xss-fix-13545425307252449808",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 98,
+          "headRefName": "bolt/optimize-keyword-extraction-12424665956431383870",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 99,
+          "headRefName": "palette-skip-link-16942158476639863538",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 100,
+          "headRefName": "bolt-optimize-keywords-heapq-9316639758459471555",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 101,
+          "headRefName": "palette-skip-link-18214462126448498892",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 102,
+          "headRefName": "bolt-knowledge-base-optimization-747398631657476118",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 103,
+          "headRefName": "palette-skip-link-7268249817512410800",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 104,
+          "headRefName": "sentinel-xss-fix-3245507546280847048",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 108,
+          "headRefName": "palette-ux-fix-skip-link-1158544930180096464",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 109,
+          "headRefName": "bolt-kb-heap-optimization-2991149502993500805",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 110,
+          "headRefName": "sentinel-fix-eth-leak-15056472117839812900",
+          "cluster": "Solana/Ethereum",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 111,
+          "headRefName": "palette-ux-fix-skip-link-13334106688925214882",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 112,
+          "headRefName": "bolt-memory-optimization-4186426160361128159",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 113,
+          "headRefName": "sentinel-api-validation-6675012327141779541",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 114,
+          "headRefName": "palette-skip-link-fix-6517619891190616260",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 115,
+          "headRefName": "bolt-kb-optimization-6031646638309913815",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 116,
+          "headRefName": "sentinel-input-validation-fix-11165276134219097005",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 117,
+          "headRefName": "palette-ux-fix-skip-link-10533955804613160608",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 118,
+          "headRefName": "bolt-optimize-kb-recent-entries-2971803268308079864",
+          "cluster": "Bolt",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 119,
+          "headRefName": "sentinel-fix-xss-ingestion-13335322750244801575",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 120,
+          "headRefName": "bolt-optimize-prioritization-10267616262586992553",
+          "cluster": "Event Pipeline / Integrations",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 121,
+          "headRefName": "palette-skip-link-fix-12025285390623159168",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 122,
+          "headRefName": "sentinel-api-validation-2849219881441936158",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 123,
+          "headRefName": "sentinel-security-fix-input-validation-15454313581290640899",
+          "cluster": "Sentinel",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 124,
+          "headRefName": "palette-ux-fix-skip-link-15947715567041495745",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        },
+        {
+          "number": 125,
+          "headRefName": "palette-skip-link-fix-6033682961336460305",
+          "cluster": "Palette",
+          "commented": true,
+          "closed": true,
+          "commentError": "",
+          "closeError": ""
+        }
+      ]
+    },
+    "branchDeletion": {
+      "total": 166,
+      "deleted": 166,
+      "actions": [
+        {
+          "branch": "agent-broadcast-concurrency-2810301396400765001",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "batch-process-concurrency-1976448705994792219",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "blocking-vrf-simulation-6614803753991214422",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-concurrency-optimization-10776688425655063225",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-concurrent-processing-10086390083379725770",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-concurrent-processing-8596118844826169435",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-ingestion-optimization-13455634452102694449",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-kb-heap-optimization-2991149502993500805",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-kb-optimization-6031646638309913815",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-knowledge-base-optimization-747398631657476118",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-13323577601643578385",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-2706888848393998072",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-3335938590306578285",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-3661332415857398603",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-4186426160361128159",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-memory-optimization-6704617728803819196",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-event-prioritization-7783416478702402484",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-ingestion-query-1804630156857118313",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-kb-recent-entries-2971803268308079864",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-keywords-heapq-9316639758459471555",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-knowledge-base-631752825821468656",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-memory-manager-4814843537392971274",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-10267616262586992553",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-13493612321908252632",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-5672661080323089963",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-6380958044875084006",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-7336114829044909301",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-optimize-prioritization-7356961250093272274",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-batch-processing-7995918966187089148",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-event-concurrency-3915379051695502716",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-event-prioritizer-6647171762721591045",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-event-processing-16392546152050038496",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-event-processing-6912403605563400978",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-event-processing-7301963982227962548",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-perf-ingestion-heapq-5716966508357761853",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt-solana-rewards-optimization-9591221933058126356",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt/gzip-compression-5409770298334154604",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt/optimize-keyword-extraction-12424665956431383870",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "bolt/optimize-knowledge-base-heapq-155279521988265201",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/cleanup-prs-and-branches",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/deep-clean-open-prs",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/init-repo-ai-agent-framework",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/merge-and-clean-open-prs",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/review-and-merge-open-prs",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "copilot/sub-pr-2",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "entity-extraction-integration-15283262572406109902",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "eth-connection-implementation-11597750245791256047",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "eth-transfer-impl-13144202169180385868",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "eth-transfer-tokens-9407955727924875770",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "event-pipeline-sentiment-integration-8442152911833457510",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feat-topic-classification-1602949834639004941",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feat/consolidated-sprint-cleanup",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature-eth-tx-implementation-15752912679968118455",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature-solana-reward-distribution-221878350629160170",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature/event-pipeline-implementation-3209488433687305470",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature/memory-expiration-optimization-1600601424454404851",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature/nlp-topic-classification-2887928656568684953",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature/solana-reward-distribution-3240895994465389286",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "feature/solana-stake-tokens-2217138998065294611",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "impl-bridge-to-solana-12915195272763430553",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-achievement-system-5609865225371716711",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-agent-creation-14473106705564142573",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-agent-creation-9388869547199653607",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-rewards-api-7005174066698413264",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-staking-api-11257994998497099074",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-user-system-2826508287370219006",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-user-system-6595990450779411585",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-voting-api-11264882359641286875",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-voting-api-16076201931976907034",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "integrate-voting-create-session-13670297730782240535",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "knowledge-base-optimization-2989810028268141219",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "leaderboard-achievements-logic-5695060051861023718",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "memory-manager-lru-optimization-9311857902177515346",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "merge-consolidated-features-15399876699212378483",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-entity-extraction-13559531642555241686",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-entity-extraction-14616795516656704660",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-sentiment-analysis-14520272026655466146",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-sentiment-analysis-6682488477329068145",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-summarization-implementation-1686588178262361815",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-summarization-implementation-8302135707580407645",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-topic-classification-15642149026415156386",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "nlp-topic-classification-4527222308535902792",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "origin",
+          "deleted": true,
+          "error": "Command failed (1) on attempt 4/4: git push origin --delete origin\nSTDOUT:\n\nSTDERR:\nerror: unable to delete 'origin': remote ref does not exist\nerror: failed to push some refs to 'github.com:organvm-ii-poiesis/a-i-council--coliseum.git'\n"
+        },
+        {
+          "branch": "palette-button-a11y-2983379759854978567",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-button-a11y-682806668128868216",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-button-a11y-7413277532083725984",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-button-focus-17981727123836556579",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-button-focus-and-emojis-2328353520884081766",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-button-focus-rings-3821344802931354642",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-disabled-button-states-2642690034922676213",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-fix-skip-link-target-10216515391014222814",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-fix-skip-to-content-9550480325590498398",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-focus-states-17351382806062089582",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-live-stream-placeholder-2247012831272199589",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-15382117385633722380",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-16942158476639863538",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-18214462126448498892",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-2614378897773063730",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-7268249817512410800",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-7429120537729789941",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-9277097823990309816",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-12025285390623159168",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-14150090721261770244",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-14734612257074472736",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-6033682961336460305",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-6517619891190616260",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-link-fix-6720054691880859458",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-skip-to-content-580194086454761172",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-a11y-improvements-8915230955208924912",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-focus-styles-15553426834621848622",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-10533955804613160608",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-1158544930180096464",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-13334106688925214882",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-15947715567041495745",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-521498374733253583",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-6732384854670473358",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-7601764385987138970",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-fix-skip-link-9542977290690432020",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-improvements-10475162339953763814",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-improvements-11899457051988823809",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "palette-ux-improvements-1303415929962937969",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "perf/knowledge-base-optimization-1968374482546504460",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "roadmap-planning-295738438326256003",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-api-validation-2849219881441936158",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-api-validation-6675012327141779541",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-blockchain-input-validation-577135085908212638",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-cors-fix-11318330261158574821",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-config-12045893998201154118",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-config-5550084313880239358",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-security-18230752977920748728",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-vuln-17848400822528686808",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-vulnerability-16677670123966948805",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-cors-vulnerability-6748860073341731152",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-eth-leak-15056472117839812900",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-hardcoded-secret-solana-1568087213360806544",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-fix-xss-ingestion-13335322750244801575",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-input-validation-6340723368095334752",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-input-validation-fix-11165276134219097005",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-rate-limit-713839585790603080",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-rate-limit-fix-7493302866160368581",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-fix-cors-config-12384604095297759074",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-fix-cors-headers-14746788601126694081",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-fix-input-validation-15454313581290640899",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-fix-input-validation-blockchain-1033216043639133572",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-headers-12605553481758673520",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-headers-12914130264784549018",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-security-headers-18404879430170754317",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-validation-fix-3894715094923364651",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-validation-fix-5538584028716075959",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-xss-fix-13545425307252449808",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel-xss-fix-3245507546280847048",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-agent-validation-1230991844772212931",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-cors-config-11469986317752178497",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-cors-config-16519380531536230189",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-cors-config-2910958761820317373",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-cors-security-headers-15137104950878573790",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/fix-input-validation-security-11364443604861322340",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "sentinel/input-validation-1265214094437659959",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-initialization-12243703043467185670",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-initialization-783868414048411329",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-rewards-distribution-4388972475469022696",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-rewards-distribution-4545190152559402271",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-rewards-distribution-7720502563146827908",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-staking-implementation-4755943510825594584",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "solana-staking-implementation-9890694889778666616",
+          "deleted": true,
+          "error": ""
+        },
+        {
+          "branch": "web3-connection-setup-5885644749125138261",
+          "deleted": true,
+          "error": ""
+        }
+      ]
+    },
+    "verification": {
+      "bundleVerifyReturnCode": 0,
+      "bundleVerifyStdout": "The bundle contains these 168 refs:\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/heads/feat/consolidated-sprint-cleanup\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/heads/main\n7969c8d3cb0edb69c88ba5bf1dd494c3210b4ee3 refs/remotes/origin/agent-broadcast-concurrency-2810301396400765001\n06175b9fad739d0526dd75e4bffaf5551618749e refs/remotes/origin/batch-process-concurrency-1976448705994792219\n012657539edcefa4a46cd18a97cebdfbdde0cb46 refs/remotes/origin/blocking-vrf-simulation-6614803753991214422\nc81c73f494bc864b0004a63d2fe549c22ad54743 refs/remotes/origin/bolt-concurrency-optimization-10776688425655063225\nfe7603a50a5062237aae32253e55015e051e9ac5 refs/remotes/origin/bolt-concurrent-processing-10086390083379725770\n61462341bb4511245625ca55ce99947bfe6b1c5f refs/remotes/origin/bolt-concurrent-processing-8596118844826169435\n5194a30fceddf9b9b8a6ccd51fd5cf097e5c0063 refs/remotes/origin/bolt-ingestion-optimization-13455634452102694449\n6629a9f2d9450f3581f5d46fc83dbdb56ba6a227 refs/remotes/origin/bolt-kb-heap-optimization-2991149502993500805\n98f00001c2e90d255d7b408c479d206684ed284a refs/remotes/origin/bolt-kb-optimization-6031646638309913815\nab66136eed0c048fdb2a69631b5c20188ee4ad7d refs/remotes/origin/bolt-knowledge-base-optimization-747398631657476118\n4ffdae9524a7fdfc463005be2825c5104e5c1df5 refs/remotes/origin/bolt-memory-optimization-13323577601643578385\nf70edd21fd926f64178e192908aa70ad23ee663e refs/remotes/origin/bolt-memory-optimization-2706888848393998072\n55dd372558a880ab8269d61ba1a55509687c59a0 refs/remotes/origin/bolt-memory-optimization-3335938590306578285\nf7c2d5700cd12e8282bf36e9c0b88d1699393646 refs/remotes/origin/bolt-memory-optimization-3661332415857398603\n3d5e7968e7b23b22a383333059efc43898033135 refs/remotes/origin/bolt-memory-optimization-4186426160361128159\n82028f4ad8d489a5f53e5b1b2697f9bad4886b71 refs/remotes/origin/bolt-memory-optimization-6704617728803819196\n6e309c88c97f5d9e84a7c7b09f987957bcc22a9c refs/remotes/origin/bolt-optimize-event-prioritization-7783416478702402484\neded22cfe69c68755da1a96425683ead07150a16 refs/remotes/origin/bolt-optimize-ingestion-query-1804630156857118313\n8951dea92e8585d5aa81103d7b7b07ecdf3b5524 refs/remotes/origin/bolt-optimize-kb-recent-entries-2971803268308079864\n35b8ede4a08dbaabfccd84aa3d760764d4beef92 refs/remotes/origin/bolt-optimize-keywords-heapq-9316639758459471555\na067f345399d5a941a9e31286a2038756f683ae8 refs/remotes/origin/bolt-optimize-knowledge-base-631752825821468656\n83aa4a075e3aae770463c4427c4096ab25df1fd5 refs/remotes/origin/bolt-optimize-memory-manager-4814843537392971274\n954f3cd7d1abe1070716810d680372b70b2993ca refs/remotes/origin/bolt-optimize-prioritization-10267616262586992553\nb7f4e4e0efdfc5a84f9446796a216e1f74cb2016 refs/remotes/origin/bolt-optimize-prioritization-13493612321908252632\n7470ce4327e2b259f953629795f8a48d30683ae6 refs/remotes/origin/bolt-optimize-prioritization-5672661080323089963\n82d586e07056f21d36a1b259368eca335d45b2db refs/remotes/origin/bolt-optimize-prioritization-6380958044875084006\ndf2f38d125d650aab76f345122af69c817fdd346 refs/remotes/origin/bolt-optimize-prioritization-7336114829044909301\n79c027534ef97c883c88a53ea06f64be6697b5b4 refs/remotes/origin/bolt-optimize-prioritization-7356961250093272274\n211ae6ad18a184bf387d3c9a687881183fcdbee6 refs/remotes/origin/bolt-perf-batch-processing-7995918966187089148\n566a520b7721c5c5684861f83cb2b0957f62de25 refs/remotes/origin/bolt-perf-event-concurrency-3915379051695502716\nf4536c1ca13817cdc1f1fe86dfce2b9c1ce02ba3 refs/remotes/origin/bolt-perf-event-prioritizer-6647171762721591045\na5c5d7bd5715be9dd7d82b107ee30ed50d2a6cf7 refs/remotes/origin/bolt-perf-event-processing-16392546152050038496\n93778f579890bddf33bf3bc5890ce98d94f0863d refs/remotes/origin/bolt-perf-event-processing-6912403605563400978\ncb33e27ebd4385878cd2da347cf07e0b3de0f878 refs/remotes/origin/bolt-perf-event-processing-7301963982227962548\n17e9bd5943e92d09b0eac65808d832db289f1b23 refs/remotes/origin/bolt-perf-ingestion-heapq-5716966508357761853\n0f644219b37322847fd6d1c1cd446642fbfe1324 refs/remotes/origin/bolt-solana-rewards-optimization-9591221933058126356\n295d72690c7562bba7e3a0d4022d00441883ddef refs/remotes/origin/bolt/gzip-compression-5409770298334154604\n9943f7242c60d54aec0603e613115f171775d67e refs/remotes/origin/bolt/optimize-keyword-extraction-12424665956431383870\na56168328c6f3ace2024add33d280598defa014f refs/remotes/origin/bolt/optimize-knowledge-base-heapq-155279521988265201\n13e0648ed6456c248599dc29ffdc813a6d413105 refs/remotes/origin/copilot/cleanup-prs-and-branches\n241ae5dd340742f1e366aa478f295c64fd3e7539 refs/remotes/origin/copilot/deep-clean-open-prs\n951e264a1e4162357f018438c0e3fd1f1423f970 refs/remotes/origin/copilot/init-repo-ai-agent-framework\n64356638670380962a9f9f287059af465ad71b2e refs/remotes/origin/copilot/merge-and-clean-open-prs\n84064510a711b0d2ce07394867cc95f6c49a1f67 refs/remotes/origin/copilot/review-and-merge-open-prs\n3ca789b81b39aca566cf9a0c089516f553d74a6b refs/remotes/origin/copilot/sub-pr-2\n695b9f4abef20ac458f6e0bf653902359bad8ae8 refs/remotes/origin/entity-extraction-integration-15283262572406109902\n9535e0cf16903c1d970489350469c8653ca536d4 refs/remotes/origin/eth-connection-implementation-11597750245791256047\n54493af7b6420a06e919e16cb1b760452de1b024 refs/remotes/origin/eth-transfer-impl-13144202169180385868\n1e5722321c2ba1a3adab963d9c829860352b3126 refs/remotes/origin/eth-transfer-tokens-9407955727924875770\n218906e57339308d0758f2b4e1841cca521e5db7 refs/remotes/origin/event-pipeline-sentiment-integration-8442152911833457510\n3d86bf9f92c7be57547fcd9691dc77706e189563 refs/remotes/origin/feat-topic-classification-1602949834639004941\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/remotes/origin/feat/consolidated-sprint-cleanup\nad17ff5ddd8cfa0e99c8393a242489433e802b2e refs/remotes/origin/feature-eth-tx-implementation-15752912679968118455\nc313a18b7217bb0de55cceae68a096d2371dc4b8 refs/remotes/origin/feature-solana-reward-distribution-221878350629160170\n54cc27700a19c25543caf267e0341cb120560106 refs/remotes/origin/feature/event-pipeline-implementation-3209488433687305470\n58bd1bc7f53afa49ad20ecc587f1038ec454f4b9 refs/remotes/origin/feature/memory-expiration-optimization-1600601424454404851\nad2b53e32b33abb746c0a7e3b46c8fc8094e5c10 refs/remotes/origin/feature/nlp-topic-classification-2887928656568684953\n06c0068afa2ba179703c3eb7b8d78ee1feb47ddf refs/remotes/origin/feature/solana-reward-distribution-3240895994465389286\n5f12169ad5f6317064335e3444916b5a43c1501e refs/remotes/origin/feature/solana-stake-tokens-2217138998065294611\neca8c84f4042badca323fdb1aa0eef2315ff2a16 refs/remotes/origin/impl-bridge-to-solana-12915195272763430553\na268355a21d4150c0a1b6408112d01529f198aae refs/remotes/origin/integrate-achievement-system-5609865225371716711\ne84e3fcbd8953098f7d77fdf980d14e0e88ffb9d refs/remotes/origin/integrate-agent-creation-14473106705564142573\n183b2ceb1f87f2f7e34bbca987d2c1679dc1fa07 refs/remotes/origin/integrate-agent-creation-9388869547199653607\nc52917a3792920f38a4aca240da7f60beea054b9 refs/remotes/origin/integrate-rewards-api-7005174066698413264\nfcafb0887f427a308a94e4700d6b5534f5b32071 refs/remotes/origin/integrate-staking-api-11257994998497099074\n1c68c3c93f1dad57540a1603eb86daddedf0900f refs/remotes/origin/integrate-user-system-2826508287370219006\ne616c026125beb9ca442cd25aee70df897f2398d refs/remotes/origin/integrate-user-system-6595990450779411585\n9df9307964d885937d0a96d644fde2ead6683db4 refs/remotes/origin/integrate-voting-api-11264882359641286875\ne60f92c0209440472f77f407b0bbcf23a1a5105c refs/remotes/origin/integrate-voting-api-16076201931976907034\n816fdfc918bb12807544fe3d34f9803577efc9a6 refs/remotes/origin/integrate-voting-create-session-13670297730782240535\n10cc3e225af2cc78d19dd79ac61f0b4135adc842 refs/remotes/origin/knowledge-base-optimization-2989810028268141219\n8c0706c3b23727515822956aee3d07a2f832d076 refs/remotes/origin/leaderboard-achievements-logic-5695060051861023718\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/remotes/origin/main\nd59e0dbb8f3253c98b86c125f2d86e83f2468891 refs/remotes/origin/memory-manager-lru-optimization-9311857902177515346\nbabbb24c5c372948865bfa9e1c87cb6d27963ce8 refs/remotes/origin/merge-consolidated-features-15399876699212378483\nb76d80e94245911a12764a93008875e1124fc741 refs/remotes/origin/nlp-entity-extraction-13559531642555241686\n358a5715049a99d2dcb4dcf94fcfdaff3fdb367c refs/remotes/origin/nlp-entity-extraction-14616795516656704660\n8123f2b9bcb1e7c9ec591dea3a8fbe82873ec578 refs/remotes/origin/nlp-sentiment-analysis-14520272026655466146\n00ac968e93e6c2a0d573c5e613482dbe4d09bc1f refs/remotes/origin/nlp-sentiment-analysis-6682488477329068145\nd1f3d4d4f049d82bfa8cf5c0ab269edfa6e4201e refs/remotes/origin/nlp-summarization-implementation-1686588178262361815\n65e9178ae78a89a50b7f141655194fa333d3a0f3 refs/remotes/origin/nlp-summarization-implementation-8302135707580407645\n0005a2b4f3c5ca505430c953cfaa7698464c15d3 refs/remotes/origin/nlp-topic-classification-15642149026415156386\n38afdd8a820b31f081711243092138271ac2fdbe refs/remotes/origin/nlp-topic-classification-4527222308535902792\nc7bef2c58d7a4c0ed5c9969407f006d75476f210 refs/remotes/origin/palette-button-a11y-2983379759854978567\nc3edb5857457ad6a3b711ddc0a1c12cbb734baa6 refs/remotes/origin/palette-button-a11y-682806668128868216\n6fd3f8f758b5d4a253c6489ce00b291f80ed516d refs/remotes/origin/palette-button-a11y-7413277532083725984\n4f0ec1c1cd56a899434b49e3dae22ec993c54030 refs/remotes/origin/palette-button-focus-17981727123836556579\ncbc7973275f854aeab51d39089d88355843bb994 refs/remotes/origin/palette-button-focus-and-emojis-2328353520884081766\n0d0fbd5466d3f78734ebe280df6bb0477877ed72 refs/remotes/origin/palette-button-focus-rings-3821344802931354642\n440aac8a147f6d4616b1a13229f91f8caef0f6af refs/remotes/origin/palette-disabled-button-states-2642690034922676213\n160d5466b38b0c0f1e57de38218dd36e719709b2 refs/remotes/origin/palette-fix-skip-link-target-10216515391014222814\nfe041fb89975d7a2f6132952fc335d95d67c5c92 refs/remotes/origin/palette-fix-skip-to-content-9550480325590498398\n8d3121c0f320f10ef1aed767d2dea4877f0b5f43 refs/remotes/origin/palette-focus-states-17351382806062089582\n9a72a632b6ffd262d96f9200ce661be77f0e7385 refs/remotes/origin/palette-live-stream-placeholder-2247012831272199589\n0225f6c95f893af61631abcd203b3b30049fccf7 refs/remotes/origin/palette-skip-link-15382117385633722380\na001f34bf6db85965a29310007a2d265284a47a3 refs/remotes/origin/palette-skip-link-16942158476639863538\n745972215c3b77d798fa139f72508f21eaf665e8 refs/remotes/origin/palette-skip-link-18214462126448498892\n5242e908dbc2a41f55828fbe1b4fecae48b4c9a9 refs/remotes/origin/palette-skip-link-2614378897773063730\n044e9443835a3ed3d134297a8ba2e475d8f796ec refs/remotes/origin/palette-skip-link-7268249817512410800\n3f8ba4078cdb2c70f186d3fafce16a727358bfc5 refs/remotes/origin/palette-skip-link-7429120537729789941\nbdb3e498720e47717f5d49607630b303be9fc52e refs/remotes/origin/palette-skip-link-9277097823990309816\n3455c4279fac074a3b05a93ff25b1c54bf5e4be3 refs/remotes/origin/palette-skip-link-fix-12025285390623159168\ncc51cf574950bf94cf976eda98c01992395324ca refs/remotes/origin/palette-skip-link-fix-14150090721261770244\n2b15cfee2b849e93339b9d9ee4501229f61bd947 refs/remotes/origin/palette-skip-link-fix-14734612257074472736\n0297ee88d302f5769e428637b511ac15f6676883 refs/remotes/origin/palette-skip-link-fix-6033682961336460305\nff675e5f8e3e01004888cd4730b9d11122cd1fcf refs/remotes/origin/palette-skip-link-fix-6517619891190616260\nfeccbb75647cdb6c16ea29654953c4699e4990e5 refs/remotes/origin/palette-skip-link-fix-6720054691880859458\n13c2011cbe44d6b70b9c6ee83f787a665213fec6 refs/remotes/origin/palette-skip-to-content-580194086454761172\n8eda210f7aff833c9742b00f21d22a7c88056d92 refs/remotes/origin/palette-ux-a11y-improvements-8915230955208924912\n287540e9440be407075e38b8be6737baede4233f refs/remotes/origin/palette-ux-fix-focus-styles-15553426834621848622\nc6d503dc81f3cf82de620ad8e03db1b3ff1e56ef refs/remotes/origin/palette-ux-fix-skip-link-10533955804613160608\n55807c66fe02f408bb7372692cbb7b855bde4743 refs/remotes/origin/palette-ux-fix-skip-link-1158544930180096464\nececa55725c280e72222dfa0ec5d03389afe581a refs/remotes/origin/palette-ux-fix-skip-link-13334106688925214882\n5b404bae1b4c220167675c92543ffe61c8de52e0 refs/remotes/origin/palette-ux-fix-skip-link-15947715567041495745\ncfecb9a27ee685816060955521d7bff10a97fe16 refs/remotes/origin/palette-ux-fix-skip-link-521498374733253583\n0f45f323c0260cc7f251ec2e41ca8625aac871d9 refs/remotes/origin/palette-ux-fix-skip-link-6732384854670473358\n00c77d6428d82dbd039e3066633e4274139e4c62 refs/remotes/origin/palette-ux-fix-skip-link-7601764385987138970\n9940a3b560e0dd07a58587cd2a67cce5bd63d554 refs/remotes/origin/palette-ux-fix-skip-link-9542977290690432020\n961e4c1a471d7e2a81df868db10b8db9444a2e03 refs/remotes/origin/palette-ux-improvements-10475162339953763814\nb6910c6b25d233549f4f54f3259d6b5b974fe2c2 refs/remotes/origin/palette-ux-improvements-11899457051988823809\n549ab88277df5654c51f3ff823ead8344236797b refs/remotes/origin/palette-ux-improvements-1303415929962937969\n137f20f393306350f1ab3980e2588a24731fe6a1 refs/remotes/origin/perf/knowledge-base-optimization-1968374482546504460\n88c7777e380a1cf9e1c1d0823ef86260d25c3626 refs/remotes/origin/roadmap-planning-295738438326256003\n2066aeb3087f8a045f958d319c9d26206cfda316 refs/remotes/origin/sentinel-api-validation-2849219881441936158\n86da28790921dae9c071c7fe3ea6b8445e591f3c refs/remotes/origin/sentinel-api-validation-6675012327141779541\n1075cdd0e47f25dfa41c28a8d0777683d7a802a6 refs/remotes/origin/sentinel-blockchain-input-validation-577135085908212638\n62da0771b7fb908ab02e26aacb74931a35b0d1da refs/remotes/origin/sentinel-cors-fix-11318330261158574821\n225e50868c25427440d532a572ceca28baf4cf20 refs/remotes/origin/sentinel-fix-cors-config-12045893998201154118\n5f94ebd1891cfa4277858918bef2abfcdf606d49 refs/remotes/origin/sentinel-fix-cors-config-5550084313880239358\n7f8c88ed3218f53763a93d60e6815c518ed7f8cf refs/remotes/origin/sentinel-fix-cors-security-18230752977920748728\n3d456906cbb9391c60f4ba92a63c7591c645b8d1 refs/remotes/origin/sentinel-fix-cors-vuln-17848400822528686808\n5c2e5e136b26e381924e2d9612a74885dea70b40 refs/remotes/origin/sentinel-fix-cors-vulnerability-16677670123966948805\n382f6e3aed7dcdc40b540f1c1c7c91dcc0323aaa refs/remotes/origin/sentinel-fix-cors-vulnerability-6748860073341731152\n92a595cbf75e13c9e58dcdd7c7ed82dd535614ca refs/remotes/origin/sentinel-fix-eth-leak-15056472117839812900\n36fd937c287799a6d5ef205c0c6797860c154146 refs/remotes/origin/sentinel-fix-hardcoded-secret-solana-1568087213360806544\nea5393b16dc5c004d01752f47e627a015778a439 refs/remotes/origin/sentinel-fix-xss-ingestion-13335322750244801575\n19effa27477fe1be3e11181cb86ddd67f5696e42 refs/remotes/origin/sentinel-input-validation-6340723368095334752\nd420c02ea0539cf33b865a345be95cdb1f93649c refs/remotes/origin/sentinel-input-validation-fix-11165276134219097005\nbc2f33083c480eef0085c3c19ffbfa737ff307dd refs/remotes/origin/sentinel-rate-limit-713839585790603080\n54b6bab667910b8314d2c9b2529e63aaa6180062 refs/remotes/origin/sentinel-rate-limit-fix-7493302866160368581\n6defa950cbbc8c99de333808de5323af85920c2f refs/remotes/origin/sentinel-security-fix-cors-config-12384604095297759074\n902246d35960d4ada3c1ab824e1ec0e602cdfb18 refs/remotes/origin/sentinel-security-fix-cors-headers-14746788601126694081\n4e3470fe34854e0471e12012ec4cc14ff3182d3f refs/remotes/origin/sentinel-security-fix-input-validation-15454313581290640899\n5f4bdffde3432fdb47631d8d72736b2ee9dc132d refs/remotes/origin/sentinel-security-fix-input-validation-blockchain-1033216043639133572\nec94050fa87124cd6fc08b870cc152dc50c9d80e refs/remotes/origin/sentinel-security-headers-12605553481758673520\n7990cbb8de37c7abf0e7ac8d79da2a55b3111b55 refs/remotes/origin/sentinel-security-headers-12914130264784549018\na18219b20a2177cbdf7c396468a42b93b1ea237a refs/remotes/origin/sentinel-security-headers-18404879430170754317\n6950867d5a62dc37132b15a167a4a0709bdf90fb refs/remotes/origin/sentinel-validation-fix-3894715094923364651\n8cdc6ada12c29b7e33a5d9f2ff150a90952dc501 refs/remotes/origin/sentinel-validation-fix-5538584028716075959\ned369b5be33aa742f729b8765f2e88318b9a906d refs/remotes/origin/sentinel-xss-fix-13545425307252449808\n9a0bb7a744524aa34b5453e1055b1ec68921c981 refs/remotes/origin/sentinel-xss-fix-3245507546280847048\nf54c18f0bac132af0f3658b71a28b9a670003300 refs/remotes/origin/sentinel/fix-agent-validation-1230991844772212931\n4685d51378390192115578a649a2840370b74199 refs/remotes/origin/sentinel/fix-cors-config-11469986317752178497\n111681a748f794176efd9f2b5c131a1936bd030d refs/remotes/origin/sentinel/fix-cors-config-16519380531536230189\n467ea5c6169b0960bf599437e1c489988c00b130 refs/remotes/origin/sentinel/fix-cors-config-2910958761820317373\n9fd85ff4a4bf1f82d304bfe580d3b1426e835750 refs/remotes/origin/sentinel/fix-cors-security-headers-15137104950878573790\nd136175f27b869645cab7a77e9445761efda2775 refs/remotes/origin/sentinel/fix-input-validation-security-11364443604861322340\nf8e83a83f5a068eb7eb93037b26065ed3f2af6a2 refs/remotes/origin/sentinel/input-validation-1265214094437659959\n0b2eac5b39f4b1a1d2e76e30d1932cfd8383dba6 refs/remotes/origin/solana-initialization-12243703043467185670\nc86677a26db9f40c832d96092b9c4c53b74dff5e refs/remotes/origin/solana-initialization-783868414048411329\nd6ea12b30210e7d0a566d963778c3c994d40a502 refs/remotes/origin/solana-rewards-distribution-4388972475469022696\n2ccae485d9c6867c33fe6eb33d3a57530ff093df refs/remotes/origin/solana-rewards-distribution-4545190152559402271\n2a823300a31c25dc7e6d0f0c92c8fe23b41aeacb refs/remotes/origin/solana-rewards-distribution-7720502563146827908\nf2b1b93e5a88c05ecb729ec111aa8c858e7aa664 refs/remotes/origin/solana-staking-implementation-4755943510825594584\n1933e6fc1ea0ab375029aff3bc47bc9effd654f5 refs/remotes/origin/solana-staking-implementation-9890694889778666616\n4135aa687da8ec6221e32f421f1c3de507f237b1 refs/remotes/origin/web3-connection-setup-5885644749125138261\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1\n",
+      "bundleVerifyStderr": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/backups/a-i-council--coliseum-pre-zeroing-20260225-0031.bundle is okay\n",
+      "remainingOpenPrNumbers": [],
+      "remainingNonMainRemoteBranches": []
+    }
+  },
+  "artifactPaths": {
+    "openPrs": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/open_prs.json",
+    "remoteBranches": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/remote_branches.json",
+    "prFileInventory": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/pr_file_inventory.json",
+    "clusterMatrix": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/cluster_matrix.csv",
+    "intentReport": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/jules_intent_report.md",
+    "executionLog": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/artifacts/jules_cleanup/cleanup_execution_log.json"
+  },
+  "backup": {
+    "path": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/backups/a-i-council--coliseum-pre-zeroing-20260225-0031.bundle",
+    "sha256": "d50c442a10ea3eb9561fb419f41bb680141f0e2c8b8f0535928451df65e256f9",
+    "verified": true,
+    "verifyStdout": "The bundle contains these 168 refs:\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/heads/feat/consolidated-sprint-cleanup\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/heads/main\n7969c8d3cb0edb69c88ba5bf1dd494c3210b4ee3 refs/remotes/origin/agent-broadcast-concurrency-2810301396400765001\n06175b9fad739d0526dd75e4bffaf5551618749e refs/remotes/origin/batch-process-concurrency-1976448705994792219\n012657539edcefa4a46cd18a97cebdfbdde0cb46 refs/remotes/origin/blocking-vrf-simulation-6614803753991214422\nc81c73f494bc864b0004a63d2fe549c22ad54743 refs/remotes/origin/bolt-concurrency-optimization-10776688425655063225\nfe7603a50a5062237aae32253e55015e051e9ac5 refs/remotes/origin/bolt-concurrent-processing-10086390083379725770\n61462341bb4511245625ca55ce99947bfe6b1c5f refs/remotes/origin/bolt-concurrent-processing-8596118844826169435\n5194a30fceddf9b9b8a6ccd51fd5cf097e5c0063 refs/remotes/origin/bolt-ingestion-optimization-13455634452102694449\n6629a9f2d9450f3581f5d46fc83dbdb56ba6a227 refs/remotes/origin/bolt-kb-heap-optimization-2991149502993500805\n98f00001c2e90d255d7b408c479d206684ed284a refs/remotes/origin/bolt-kb-optimization-6031646638309913815\nab66136eed0c048fdb2a69631b5c20188ee4ad7d refs/remotes/origin/bolt-knowledge-base-optimization-747398631657476118\n4ffdae9524a7fdfc463005be2825c5104e5c1df5 refs/remotes/origin/bolt-memory-optimization-13323577601643578385\nf70edd21fd926f64178e192908aa70ad23ee663e refs/remotes/origin/bolt-memory-optimization-2706888848393998072\n55dd372558a880ab8269d61ba1a55509687c59a0 refs/remotes/origin/bolt-memory-optimization-3335938590306578285\nf7c2d5700cd12e8282bf36e9c0b88d1699393646 refs/remotes/origin/bolt-memory-optimization-3661332415857398603\n3d5e7968e7b23b22a383333059efc43898033135 refs/remotes/origin/bolt-memory-optimization-4186426160361128159\n82028f4ad8d489a5f53e5b1b2697f9bad4886b71 refs/remotes/origin/bolt-memory-optimization-6704617728803819196\n6e309c88c97f5d9e84a7c7b09f987957bcc22a9c refs/remotes/origin/bolt-optimize-event-prioritization-7783416478702402484\neded22cfe69c68755da1a96425683ead07150a16 refs/remotes/origin/bolt-optimize-ingestion-query-1804630156857118313\n8951dea92e8585d5aa81103d7b7b07ecdf3b5524 refs/remotes/origin/bolt-optimize-kb-recent-entries-2971803268308079864\n35b8ede4a08dbaabfccd84aa3d760764d4beef92 refs/remotes/origin/bolt-optimize-keywords-heapq-9316639758459471555\na067f345399d5a941a9e31286a2038756f683ae8 refs/remotes/origin/bolt-optimize-knowledge-base-631752825821468656\n83aa4a075e3aae770463c4427c4096ab25df1fd5 refs/remotes/origin/bolt-optimize-memory-manager-4814843537392971274\n954f3cd7d1abe1070716810d680372b70b2993ca refs/remotes/origin/bolt-optimize-prioritization-10267616262586992553\nb7f4e4e0efdfc5a84f9446796a216e1f74cb2016 refs/remotes/origin/bolt-optimize-prioritization-13493612321908252632\n7470ce4327e2b259f953629795f8a48d30683ae6 refs/remotes/origin/bolt-optimize-prioritization-5672661080323089963\n82d586e07056f21d36a1b259368eca335d45b2db refs/remotes/origin/bolt-optimize-prioritization-6380958044875084006\ndf2f38d125d650aab76f345122af69c817fdd346 refs/remotes/origin/bolt-optimize-prioritization-7336114829044909301\n79c027534ef97c883c88a53ea06f64be6697b5b4 refs/remotes/origin/bolt-optimize-prioritization-7356961250093272274\n211ae6ad18a184bf387d3c9a687881183fcdbee6 refs/remotes/origin/bolt-perf-batch-processing-7995918966187089148\n566a520b7721c5c5684861f83cb2b0957f62de25 refs/remotes/origin/bolt-perf-event-concurrency-3915379051695502716\nf4536c1ca13817cdc1f1fe86dfce2b9c1ce02ba3 refs/remotes/origin/bolt-perf-event-prioritizer-6647171762721591045\na5c5d7bd5715be9dd7d82b107ee30ed50d2a6cf7 refs/remotes/origin/bolt-perf-event-processing-16392546152050038496\n93778f579890bddf33bf3bc5890ce98d94f0863d refs/remotes/origin/bolt-perf-event-processing-6912403605563400978\ncb33e27ebd4385878cd2da347cf07e0b3de0f878 refs/remotes/origin/bolt-perf-event-processing-7301963982227962548\n17e9bd5943e92d09b0eac65808d832db289f1b23 refs/remotes/origin/bolt-perf-ingestion-heapq-5716966508357761853\n0f644219b37322847fd6d1c1cd446642fbfe1324 refs/remotes/origin/bolt-solana-rewards-optimization-9591221933058126356\n295d72690c7562bba7e3a0d4022d00441883ddef refs/remotes/origin/bolt/gzip-compression-5409770298334154604\n9943f7242c60d54aec0603e613115f171775d67e refs/remotes/origin/bolt/optimize-keyword-extraction-12424665956431383870\na56168328c6f3ace2024add33d280598defa014f refs/remotes/origin/bolt/optimize-knowledge-base-heapq-155279521988265201\n13e0648ed6456c248599dc29ffdc813a6d413105 refs/remotes/origin/copilot/cleanup-prs-and-branches\n241ae5dd340742f1e366aa478f295c64fd3e7539 refs/remotes/origin/copilot/deep-clean-open-prs\n951e264a1e4162357f018438c0e3fd1f1423f970 refs/remotes/origin/copilot/init-repo-ai-agent-framework\n64356638670380962a9f9f287059af465ad71b2e refs/remotes/origin/copilot/merge-and-clean-open-prs\n84064510a711b0d2ce07394867cc95f6c49a1f67 refs/remotes/origin/copilot/review-and-merge-open-prs\n3ca789b81b39aca566cf9a0c089516f553d74a6b refs/remotes/origin/copilot/sub-pr-2\n695b9f4abef20ac458f6e0bf653902359bad8ae8 refs/remotes/origin/entity-extraction-integration-15283262572406109902\n9535e0cf16903c1d970489350469c8653ca536d4 refs/remotes/origin/eth-connection-implementation-11597750245791256047\n54493af7b6420a06e919e16cb1b760452de1b024 refs/remotes/origin/eth-transfer-impl-13144202169180385868\n1e5722321c2ba1a3adab963d9c829860352b3126 refs/remotes/origin/eth-transfer-tokens-9407955727924875770\n218906e57339308d0758f2b4e1841cca521e5db7 refs/remotes/origin/event-pipeline-sentiment-integration-8442152911833457510\n3d86bf9f92c7be57547fcd9691dc77706e189563 refs/remotes/origin/feat-topic-classification-1602949834639004941\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/remotes/origin/feat/consolidated-sprint-cleanup\nad17ff5ddd8cfa0e99c8393a242489433e802b2e refs/remotes/origin/feature-eth-tx-implementation-15752912679968118455\nc313a18b7217bb0de55cceae68a096d2371dc4b8 refs/remotes/origin/feature-solana-reward-distribution-221878350629160170\n54cc27700a19c25543caf267e0341cb120560106 refs/remotes/origin/feature/event-pipeline-implementation-3209488433687305470\n58bd1bc7f53afa49ad20ecc587f1038ec454f4b9 refs/remotes/origin/feature/memory-expiration-optimization-1600601424454404851\nad2b53e32b33abb746c0a7e3b46c8fc8094e5c10 refs/remotes/origin/feature/nlp-topic-classification-2887928656568684953\n06c0068afa2ba179703c3eb7b8d78ee1feb47ddf refs/remotes/origin/feature/solana-reward-distribution-3240895994465389286\n5f12169ad5f6317064335e3444916b5a43c1501e refs/remotes/origin/feature/solana-stake-tokens-2217138998065294611\neca8c84f4042badca323fdb1aa0eef2315ff2a16 refs/remotes/origin/impl-bridge-to-solana-12915195272763430553\na268355a21d4150c0a1b6408112d01529f198aae refs/remotes/origin/integrate-achievement-system-5609865225371716711\ne84e3fcbd8953098f7d77fdf980d14e0e88ffb9d refs/remotes/origin/integrate-agent-creation-14473106705564142573\n183b2ceb1f87f2f7e34bbca987d2c1679dc1fa07 refs/remotes/origin/integrate-agent-creation-9388869547199653607\nc52917a3792920f38a4aca240da7f60beea054b9 refs/remotes/origin/integrate-rewards-api-7005174066698413264\nfcafb0887f427a308a94e4700d6b5534f5b32071 refs/remotes/origin/integrate-staking-api-11257994998497099074\n1c68c3c93f1dad57540a1603eb86daddedf0900f refs/remotes/origin/integrate-user-system-2826508287370219006\ne616c026125beb9ca442cd25aee70df897f2398d refs/remotes/origin/integrate-user-system-6595990450779411585\n9df9307964d885937d0a96d644fde2ead6683db4 refs/remotes/origin/integrate-voting-api-11264882359641286875\ne60f92c0209440472f77f407b0bbcf23a1a5105c refs/remotes/origin/integrate-voting-api-16076201931976907034\n816fdfc918bb12807544fe3d34f9803577efc9a6 refs/remotes/origin/integrate-voting-create-session-13670297730782240535\n10cc3e225af2cc78d19dd79ac61f0b4135adc842 refs/remotes/origin/knowledge-base-optimization-2989810028268141219\n8c0706c3b23727515822956aee3d07a2f832d076 refs/remotes/origin/leaderboard-achievements-logic-5695060051861023718\ndc9c1fe3f38936fcfcfe2c7977feb41f429a9ff0 refs/remotes/origin/main\nd59e0dbb8f3253c98b86c125f2d86e83f2468891 refs/remotes/origin/memory-manager-lru-optimization-9311857902177515346\nbabbb24c5c372948865bfa9e1c87cb6d27963ce8 refs/remotes/origin/merge-consolidated-features-15399876699212378483\nb76d80e94245911a12764a93008875e1124fc741 refs/remotes/origin/nlp-entity-extraction-13559531642555241686\n358a5715049a99d2dcb4dcf94fcfdaff3fdb367c refs/remotes/origin/nlp-entity-extraction-14616795516656704660\n8123f2b9bcb1e7c9ec591dea3a8fbe82873ec578 refs/remotes/origin/nlp-sentiment-analysis-14520272026655466146\n00ac968e93e6c2a0d573c5e613482dbe4d09bc1f refs/remotes/origin/nlp-sentiment-analysis-6682488477329068145\nd1f3d4d4f049d82bfa8cf5c0ab269edfa6e4201e refs/remotes/origin/nlp-summarization-implementation-1686588178262361815\n65e9178ae78a89a50b7f141655194fa333d3a0f3 refs/remotes/origin/nlp-summarization-implementation-8302135707580407645\n0005a2b4f3c5ca505430c953cfaa7698464c15d3 refs/remotes/origin/nlp-topic-classification-15642149026415156386\n38afdd8a820b31f081711243092138271ac2fdbe refs/remotes/origin/nlp-topic-classification-4527222308535902792\nc7bef2c58d7a4c0ed5c9969407f006d75476f210 refs/remotes/origin/palette-button-a11y-2983379759854978567\nc3edb5857457ad6a3b711ddc0a1c12cbb734baa6 refs/remotes/origin/palette-button-a11y-682806668128868216\n6fd3f8f758b5d4a253c6489ce00b291f80ed516d refs/remotes/origin/palette-button-a11y-7413277532083725984\n4f0ec1c1cd56a899434b49e3dae22ec993c54030 refs/remotes/origin/palette-button-focus-17981727123836556579\ncbc7973275f854aeab51d39089d88355843bb994 refs/remotes/origin/palette-button-focus-and-emojis-2328353520884081766\n0d0fbd5466d3f78734ebe280df6bb0477877ed72 refs/remotes/origin/palette-button-focus-rings-3821344802931354642\n440aac8a147f6d4616b1a13229f91f8caef0f6af refs/remotes/origin/palette-disabled-button-states-2642690034922676213\n160d5466b38b0c0f1e57de38218dd36e719709b2 refs/remotes/origin/palette-fix-skip-link-target-10216515391014222814\nfe041fb89975d7a2f6132952fc335d95d67c5c92 refs/remotes/origin/palette-fix-skip-to-content-9550480325590498398\n8d3121c0f320f10ef1aed767d2dea4877f0b5f43 refs/remotes/origin/palette-focus-states-17351382806062089582\n9a72a632b6ffd262d96f9200ce661be77f0e7385 refs/remotes/origin/palette-live-stream-placeholder-2247012831272199589\n0225f6c95f893af61631abcd203b3b30049fccf7 refs/remotes/origin/palette-skip-link-15382117385633722380\na001f34bf6db85965a29310007a2d265284a47a3 refs/remotes/origin/palette-skip-link-16942158476639863538\n745972215c3b77d798fa139f72508f21eaf665e8 refs/remotes/origin/palette-skip-link-18214462126448498892\n5242e908dbc2a41f55828fbe1b4fecae48b4c9a9 refs/remotes/origin/palette-skip-link-2614378897773063730\n044e9443835a3ed3d134297a8ba2e475d8f796ec refs/remotes/origin/palette-skip-link-7268249817512410800\n3f8ba4078cdb2c70f186d3fafce16a727358bfc5 refs/remotes/origin/palette-skip-link-7429120537729789941\nbdb3e498720e47717f5d49607630b303be9fc52e refs/remotes/origin/palette-skip-link-9277097823990309816\n3455c4279fac074a3b05a93ff25b1c54bf5e4be3 refs/remotes/origin/palette-skip-link-fix-12025285390623159168\ncc51cf574950bf94cf976eda98c01992395324ca refs/remotes/origin/palette-skip-link-fix-14150090721261770244\n2b15cfee2b849e93339b9d9ee4501229f61bd947 refs/remotes/origin/palette-skip-link-fix-14734612257074472736\n0297ee88d302f5769e428637b511ac15f6676883 refs/remotes/origin/palette-skip-link-fix-6033682961336460305\nff675e5f8e3e01004888cd4730b9d11122cd1fcf refs/remotes/origin/palette-skip-link-fix-6517619891190616260\nfeccbb75647cdb6c16ea29654953c4699e4990e5 refs/remotes/origin/palette-skip-link-fix-6720054691880859458\n13c2011cbe44d6b70b9c6ee83f787a665213fec6 refs/remotes/origin/palette-skip-to-content-580194086454761172\n8eda210f7aff833c9742b00f21d22a7c88056d92 refs/remotes/origin/palette-ux-a11y-improvements-8915230955208924912\n287540e9440be407075e38b8be6737baede4233f refs/remotes/origin/palette-ux-fix-focus-styles-15553426834621848622\nc6d503dc81f3cf82de620ad8e03db1b3ff1e56ef refs/remotes/origin/palette-ux-fix-skip-link-10533955804613160608\n55807c66fe02f408bb7372692cbb7b855bde4743 refs/remotes/origin/palette-ux-fix-skip-link-1158544930180096464\nececa55725c280e72222dfa0ec5d03389afe581a refs/remotes/origin/palette-ux-fix-skip-link-13334106688925214882\n5b404bae1b4c220167675c92543ffe61c8de52e0 refs/remotes/origin/palette-ux-fix-skip-link-15947715567041495745\ncfecb9a27ee685816060955521d7bff10a97fe16 refs/remotes/origin/palette-ux-fix-skip-link-521498374733253583\n0f45f323c0260cc7f251ec2e41ca8625aac871d9 refs/remotes/origin/palette-ux-fix-skip-link-6732384854670473358\n00c77d6428d82dbd039e3066633e4274139e4c62 refs/remotes/origin/palette-ux-fix-skip-link-7601764385987138970\n9940a3b560e0dd07a58587cd2a67cce5bd63d554 refs/remotes/origin/palette-ux-fix-skip-link-9542977290690432020\n961e4c1a471d7e2a81df868db10b8db9444a2e03 refs/remotes/origin/palette-ux-improvements-10475162339953763814\nb6910c6b25d233549f4f54f3259d6b5b974fe2c2 refs/remotes/origin/palette-ux-improvements-11899457051988823809\n549ab88277df5654c51f3ff823ead8344236797b refs/remotes/origin/palette-ux-improvements-1303415929962937969\n137f20f393306350f1ab3980e2588a24731fe6a1 refs/remotes/origin/perf/knowledge-base-optimization-1968374482546504460\n88c7777e380a1cf9e1c1d0823ef86260d25c3626 refs/remotes/origin/roadmap-planning-295738438326256003\n2066aeb3087f8a045f958d319c9d26206cfda316 refs/remotes/origin/sentinel-api-validation-2849219881441936158\n86da28790921dae9c071c7fe3ea6b8445e591f3c refs/remotes/origin/sentinel-api-validation-6675012327141779541\n1075cdd0e47f25dfa41c28a8d0777683d7a802a6 refs/remotes/origin/sentinel-blockchain-input-validation-577135085908212638\n62da0771b7fb908ab02e26aacb74931a35b0d1da refs/remotes/origin/sentinel-cors-fix-11318330261158574821\n225e50868c25427440d532a572ceca28baf4cf20 refs/remotes/origin/sentinel-fix-cors-config-12045893998201154118\n5f94ebd1891cfa4277858918bef2abfcdf606d49 refs/remotes/origin/sentinel-fix-cors-config-5550084313880239358\n7f8c88ed3218f53763a93d60e6815c518ed7f8cf refs/remotes/origin/sentinel-fix-cors-security-18230752977920748728\n3d456906cbb9391c60f4ba92a63c7591c645b8d1 refs/remotes/origin/sentinel-fix-cors-vuln-17848400822528686808\n5c2e5e136b26e381924e2d9612a74885dea70b40 refs/remotes/origin/sentinel-fix-cors-vulnerability-16677670123966948805\n382f6e3aed7dcdc40b540f1c1c7c91dcc0323aaa refs/remotes/origin/sentinel-fix-cors-vulnerability-6748860073341731152\n92a595cbf75e13c9e58dcdd7c7ed82dd535614ca refs/remotes/origin/sentinel-fix-eth-leak-15056472117839812900\n36fd937c287799a6d5ef205c0c6797860c154146 refs/remotes/origin/sentinel-fix-hardcoded-secret-solana-1568087213360806544\nea5393b16dc5c004d01752f47e627a015778a439 refs/remotes/origin/sentinel-fix-xss-ingestion-13335322750244801575\n19effa27477fe1be3e11181cb86ddd67f5696e42 refs/remotes/origin/sentinel-input-validation-6340723368095334752\nd420c02ea0539cf33b865a345be95cdb1f93649c refs/remotes/origin/sentinel-input-validation-fix-11165276134219097005\nbc2f33083c480eef0085c3c19ffbfa737ff307dd refs/remotes/origin/sentinel-rate-limit-713839585790603080\n54b6bab667910b8314d2c9b2529e63aaa6180062 refs/remotes/origin/sentinel-rate-limit-fix-7493302866160368581\n6defa950cbbc8c99de333808de5323af85920c2f refs/remotes/origin/sentinel-security-fix-cors-config-12384604095297759074\n902246d35960d4ada3c1ab824e1ec0e602cdfb18 refs/remotes/origin/sentinel-security-fix-cors-headers-14746788601126694081\n4e3470fe34854e0471e12012ec4cc14ff3182d3f refs/remotes/origin/sentinel-security-fix-input-validation-15454313581290640899\n5f4bdffde3432fdb47631d8d72736b2ee9dc132d refs/remotes/origin/sentinel-security-fix-input-validation-blockchain-1033216043639133572\nec94050fa87124cd6fc08b870cc152dc50c9d80e refs/remotes/origin/sentinel-security-headers-12605553481758673520\n7990cbb8de37c7abf0e7ac8d79da2a55b3111b55 refs/remotes/origin/sentinel-security-headers-12914130264784549018\na18219b20a2177cbdf7c396468a42b93b1ea237a refs/remotes/origin/sentinel-security-headers-18404879430170754317\n6950867d5a62dc37132b15a167a4a0709bdf90fb refs/remotes/origin/sentinel-validation-fix-3894715094923364651\n8cdc6ada12c29b7e33a5d9f2ff150a90952dc501 refs/remotes/origin/sentinel-validation-fix-5538584028716075959\ned369b5be33aa742f729b8765f2e88318b9a906d refs/remotes/origin/sentinel-xss-fix-13545425307252449808\n9a0bb7a744524aa34b5453e1055b1ec68921c981 refs/remotes/origin/sentinel-xss-fix-3245507546280847048\nf54c18f0bac132af0f3658b71a28b9a670003300 refs/remotes/origin/sentinel/fix-agent-validation-1230991844772212931\n4685d51378390192115578a649a2840370b74199 refs/remotes/origin/sentinel/fix-cors-config-11469986317752178497\n111681a748f794176efd9f2b5c131a1936bd030d refs/remotes/origin/sentinel/fix-cors-config-16519380531536230189\n467ea5c6169b0960bf599437e1c489988c00b130 refs/remotes/origin/sentinel/fix-cors-config-2910958761820317373\n9fd85ff4a4bf1f82d304bfe580d3b1426e835750 refs/remotes/origin/sentinel/fix-cors-security-headers-15137104950878573790\nd136175f27b869645cab7a77e9445761efda2775 refs/remotes/origin/sentinel/fix-input-validation-security-11364443604861322340\nf8e83a83f5a068eb7eb93037b26065ed3f2af6a2 refs/remotes/origin/sentinel/input-validation-1265214094437659959\n0b2eac5b39f4b1a1d2e76e30d1932cfd8383dba6 refs/remotes/origin/solana-initialization-12243703043467185670\nc86677a26db9f40c832d96092b9c4c53b74dff5e refs/remotes/origin/solana-initialization-783868414048411329\nd6ea12b30210e7d0a566d963778c3c994d40a502 refs/remotes/origin/solana-rewards-distribution-4388972475469022696\n2ccae485d9c6867c33fe6eb33d3a57530ff093df refs/remotes/origin/solana-rewards-distribution-4545190152559402271\n2a823300a31c25dc7e6d0f0c92c8fe23b41aeacb refs/remotes/origin/solana-rewards-distribution-7720502563146827908\nf2b1b93e5a88c05ecb729ec111aa8c858e7aa664 refs/remotes/origin/solana-staking-implementation-4755943510825594584\n1933e6fc1ea0ab375029aff3bc47bc9effd654f5 refs/remotes/origin/solana-staking-implementation-9890694889778666616\n4135aa687da8ec6221e32f421f1c3de507f237b1 refs/remotes/origin/web3-connection-setup-5885644749125138261\nThe bundle records a complete history.\nThe bundle uses this hash algorithm: sha1\n",
+    "verifyStderr": "/Users/4jp/Workspace/organvm-ii-poiesis/a-i-council--coliseum/backups/a-i-council--coliseum-pre-zeroing-20260225-0031.bundle is okay\n",
+    "refCount": 168
+  },
+  "preCounts": {
+    "openPrs": 113,
+    "remoteNonMainBranches": 166,
+    "remoteBranchesWithOpenPr": 113,
+    "remoteBranchesWithoutOpenPr": 53
+  },
+  "postCounts": {
+    "openPrs": 0,
+    "remoteHeadsTotal": 1,
+    "remoteNonMainBranches": 0,
+    "remoteHeadNames": [
+      "main"
+    ]
+  },
+  "failures": [],
+  "completedAt": "2026-02-25T00:40:08.083530+00:00",
+  "status": "complete"
+}
