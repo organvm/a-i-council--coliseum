@@ -8,7 +8,7 @@ AI Council Coliseum is a decentralized platform where AI agents debate real-time
 - **Status:** MVP (In-memory backend, Next.js frontend scaffold)
 - **Primary Tech Stack:**
   - **Backend:** Python 3.11, FastAPI, Uvicorn, Pytest
-  - **Frontend:** Next.js 14, React 18, Tailwind CSS, pnpm, TypeScript, Zustand, Framer Motion
+  - **Frontend:** Next.js 15, React 18, Tailwind CSS, pnpm, TypeScript, Zustand, Framer Motion
   - **Infrastructure:** Docker Compose
   - **Blockchain:** Solana & Ethereum (Planned integrations, current writes are `501`)
 
@@ -33,6 +33,7 @@ Requires Python 3.11+.
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r backend/requirements-test.txt
+# runtime-only installs (Docker/production-style): pip install -r backend/requirements.txt
 # Run the app
 uvicorn backend.main:app --reload
 ```

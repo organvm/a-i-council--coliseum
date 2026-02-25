@@ -40,8 +40,9 @@ cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (dev/test superset for local work)
+pip install -r requirements-test.txt
+# Runtime-only installs should use requirements.txt
 
 # Setup environment
 cp ../.env.example .env
@@ -64,14 +65,15 @@ API documentation at `http://localhost:8000/docs`
 cd frontend
 
 # Install dependencies
-npm install
+corepack enable
+pnpm install
 
 # Setup environment
 cp ../.env.example .env.local
 # Edit .env.local with your configuration
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 Frontend will be available at `http://localhost:3000`
@@ -448,7 +450,7 @@ docker-compose exec backend python -c "from sqlalchemy import create_engine; eng
 ```bash
 # Clear cache
 rm -rf frontend/node_modules frontend/.next
-cd frontend && npm install && npm run build
+cd frontend && pnpm install && pnpm run build
 
 # Check Node version
 node --version  # Should be 20+
