@@ -3,20 +3,22 @@
 # Deferred integrations (full blockchain adapters, external ML stacks, etc.)
 # stay on the roadmap until production contracts are finalized.
 
-fastapi==0.109.0
+fastapi==0.120.4
+starlette==0.49.1
 uvicorn[standard]==0.27.0
 pydantic==2.5.3
 pydantic-settings==2.1.0
 python-dateutil==2.8.2
-httpx<0.24.0,>=0.23.0
+httpx==0.28.1
 sqlalchemy==2.0.25
 asyncpg==0.29.0
 greenlet==3.0.3
-python-jose[cryptography]==3.4.0
+PyJWT[crypto]==2.11.0
 passlib[bcrypt]==1.7.4
 litellm==1.61.15
-solana==0.30.2
-anchorpy==0.18.0
+solana==0.36.11
+# anchorpy intentionally omitted: unused in the application codebase and
+# incompatible with the upgraded solana/httpx stack used to clear pip-audit findings.
 pgvector==0.2.4
 web3>=6.0.0
 email-validator

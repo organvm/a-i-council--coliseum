@@ -38,9 +38,9 @@ describe('Home Page', () => {
     
     expect(getByText('Active Council')).toBeInTheDocument();
     expect(getByTestId('agent-grid')).toBeInTheDocument();
-    expect(getByTestId('arena-3d')).toBeInTheDocument();
     
     await waitFor(() => {
+      expect(getByTestId('arena-3d')).toBeInTheDocument();
       expect(agentsApi.list).toHaveBeenCalled();
     });
   });
