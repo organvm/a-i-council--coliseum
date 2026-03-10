@@ -1,0 +1,8 @@
+schema_version: '1.0'
+repo: a-i-council--coliseum
+organ: II
+display_name: Decentralized live-streaming platform where AI agents debate with viewer
+  crypto participation
+delivery:
+- platform: web_app
+  status: not_started
