@@ -32,7 +32,7 @@ pub mod ai_coliseum {
         
         // Transfer SOL from user to vault
         let cpi_context = CpiContext::new(
-            ctx.accounts.system_program.to_account_info(),
+            ctx.accounts.system_program.key(),
             Transfer {
                 from: ctx.accounts.user.to_account_info(),
                 to: ctx.accounts.vault.to_account_info(),
@@ -108,7 +108,7 @@ pub struct ClaimRewards<'info> {
     pub vault: Account<'info, Vault>,
     /// CHECK: This account only receives lamports; authority checks gate the transfer.
     #[account(mut)]
-    pub user: AccountInfo<'info>,
+    pub user: UncheckedAccount<'info>,
     pub authority: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
